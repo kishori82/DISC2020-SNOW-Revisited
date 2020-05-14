@@ -1,0 +1,24 @@
+%\section{Formalizing the SNOW Theorem}
+{\bf The SNOW Theorem.}
+\label{sec:snow}
+%This section explains the SNOW properties and the theorem as presented in the original paper.  
+Consider a transaction processing system with an asynchronous network where a set $\mathcal{O}$ of objects are maintained by individual server processes,  with at least one write client and at least two read clients. Then the SNOW Theorem~\cite{SNOW2016} can be stated as follows.
+%Appendix~\ref{app:snow} restates them formally.
+%\subsection{The SNOW Properties}
+%\label{subsec:properties}
+
+
+%More formally, a {\sc READ} transaction $R=READ(\{o_i\})$ is said to allow write transactions that conflict if for any execution $E$, given a {\sc WRITE} transaction $W=WRITE(\{o_j\})$ with  $\RESP{R}$ appears after $\INV{W}$ and $\INV{R}$ appears before $\RESP{W}$ in $E$ and $o_i \cap o_j \neq \phi$, there exists an execution $E'$ equivalent to $E$, such that the execution fragment $E'_R$, which starts with $\INV{R}$ and ends with $\RESP{R}$ has no input actions from $\INV{W}$ and vice versa, i.e., the execution fragment $E'_W$, which starts with $\INV{W}$ and ends with $\RESP{W}$ has no input actions from $\INV{R}$.  
+
+%\subsection{Existing Impossibility Result}
+%\label{subsec:theorem}
+%\paragraph{\textbf{The SNOW Theorem~\cite{SNOW2016}.}} 
+\emph{``For any transaction processing system in an asynchronous setting, with at least one writer and two reader clients, and at least two sharded objects, it is impossible to have an algorithm such that all of its executions guarantee the SNOW properties.''} %\blue{need better phrasing to define the problem}
+
+%\begin{theorem}\label{thm:snow3}
+ %The SNOW properties cannot be implemented in a system with at least three clients and one writer, for two servers.
+%\end{theorem}
+
+%More formally, given a {\sc READ} transaction $R=READ(\{o_i\})$ and a {\sc WRITE} transaction $W=WRITE(\{o_j\})$ with $o_i \cap o_j \neq \phi$, there does not exist an algorithm $\pi$ executed by automata $A$, such that for any execution $E$ of $A$ satisfies: (1) $\RESP{R}$ appears after $\INV{W}$ and $\INV{R}$ appears before $\RESP{W}$, (2) for any execution fragment $E_R \in E$, which starts with $\INV{R}$ and ends with $\RESP{R}$, $E_R|A_i$ has at most one pair of $\recv{m_i^{r}}{r, s_i}$ and $\send{v_i}{ s_i, r}$ with $m_i^{r}=read(o_i)$ and $c_r$ is $R$'s originating client, and there is no other input action between $\recv{m_i^{r}}{r, s_i}$ and $\send{v_i}{ s_i, r}$, and (3) $E$ has an equivalent execution $E'$, where the execution fragment $E'_R$, which starts with $\INV{R}$ and ends with $\RESP{R}$ has no input actions from $\INV{W}$ and vice versa for $E'_W$, with $E'_R$ appearing before $E'_W$ if $\RESP{R}$ happens before $\INV{W}$ in real time or appearing after $E'_W$ if $\RESP{W}$ happens before $\INV{R}$.
+
+%\hl{The formal re-definitions of snow properties and the theorem are commented out. Do we really not want a more rigorous re-statement of them? One reviewer complained about ``even the snow theorem is not formalized."}

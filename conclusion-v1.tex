@@ -1,0 +1,25 @@
+We revisited the SNOW Theorem and when it is possible for READ transactions to have the same latency as simple reads.
+We provided a new and more rigorous proof of the original result.
+We also closed several open questions that were either explicitly posed by the original work or that emerged from our increased rigor.
+We found that READ transactions can match the latency of simple reads when client-to-client communication is allowed and there is at most one reader.
+We found that they cannot and must have higher worst-case latency when client-to-client communication is disallowed or there are at least two readers.
+We also presented the first algorithms that provide bounded worst-case latency for read-only transactions in strictly serializable systems with 
+WRITE transactions.
+
+\remove{
+There are, however, several remaining important questions.
+The first three questions focus on bounds for read-only transactions in strictly serializable systems with WRITE transactions.
+First, is it possible to return exactly one version, always complete in two rounds, but that also can optimistically complete after one round?
+Second, is it possible to always complete in one round and return a bound on number of versions that is less than the number of concurrent 
+WRITEs?
+Third, is there a way to enhance our model such that blocking could be bounded, and, if so, what bounds on blocking are possible?
+Another open question is whether our new algorithms for READ transactions could be adapted to work in systems with READ-WRITE 
+transactions that are more powerful than WRITE transactions? We conjecture they can be.
+
+Our final open questions focus on ever more practical settings. 
+%Each of our algorithms for bounding latency uses a 
+coordinator, which in a real system would eventually become bottlenecked and restrict scaling to arbitrary sizes.
+Is it possible to design algorithms that match our bounds on 
+latency without relying on a centralized component and thus could scale arbitrarily?
+Can one design a coordinator that can scale to arbitrary throughputs?
+}

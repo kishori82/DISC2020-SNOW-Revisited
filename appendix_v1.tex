@@ -1,0 +1,809 @@
+
+
+
+	%\subsection{System Model and Assumptions}
+	\section{Algorithm Specification with I/O Automata}
+	\label{subsec:model}
+	%\paragraph{\textbf{Executions and I/O automata.}}
+	We model a distributed algorithm using   the I/O Automata~\cite{Lynch1996}.
+	%. A detailed account on IO Automata can be found in ~\cite{Lynch1996}. 
+	Here we limit our discussion of I/O Automata to the relevant concepts, but for a detailed account the reader should refer 
+	to ~\cite{Lynch1996}.
+	An algorithm is a composition $\mathcal{A}$ of a set of \emph{automata} where each automaton  $A_i$ corresponds to a process (e.g., client or server) or a communication channel in the system.  $A_i$ is defined in terms of
+	a set of deterministic transition functions  $\trans{A_i}$ (also called \textit{actions}), which can be thought of as the algorithmic steps of $A_i$;  and  a set of states $\states{A_i}$. 
+	%Each process is an automation $A_i \in A$, i.e., a deterministic state machine. $A_i$ contains a set of states $\states{A_i} \subseteq \states{A}$. 
+	%The set of possible initial state of $A_i$ is $\startstates{A_i} \subseteq \states{A_i}$. 
+	An execution of $\mathcal{A}$ is a sequence of alternating states and actions of $A$,  $\sigma_0, a_1, \sigma_1, a_2, \sigma_2, \ldots, \sigma_n$. 
+	A state change, called a \textit{step}, is a 3-tuple $(\sigma_i, a_i, \sigma_{i+1})$, with $\sigma_i, \sigma_{i+1} \in \states{A_i}$ and $a_i \in \trans{A_i}$. 
+	%$a_i$ is an input action if it receives a message. 
+	The set of input actions is denoted by $\inactions{A_i}$, e.g.,  $a_i \in \inactions{A_i}$ is an input action if it receives a message. The set of output actions is denoted by $\outactions{A_i}$. The input and output actions are also called external actions, denoted by $\extactions{A_i}$ and $\inactions{A_i} \cup \outactions{A_i}=\extactions{A_i}$. If an action $a_i \notin \extactions{A_i}$, then $a_i$ is an internal action.
+	Communications between any two automata $A_i$ and $A_j$ is modeled by using channel automata $Channel_{i, j}$ for sending messages from $A_i$ to $A_j$; and $Channel_{j, i}$ for sending message from $A_j$ to $A_i$. When $A_i$ sends some
+	message $m$ to $A_j$ the following sequence of actions occur: $send(m)_{i,j}$  occurs at $A_i$, then 
+	$send(m)_{i,j}$ followed by $recv(m)_{i, j}$ occur at $Channel_{i,j}$; then finally, $A_j$ receives $m$ via the action $recv_{i,j}(m)$.
+	In our model,  the communication channels are simple because we assume reliable communication between each pair of processes. Therefore, we ignore the actions in the $Channel_{i, j}$ and instead say   $send(m)_{i,j}$  occurs at $A_i$ and then $A_j$ receives $m$ via the action $recv_{i,j}(m)$.
+	%$a_i$ is an external action, i.e., $a_i \in \extactions{A_i}$, if $a_i$ receives/sends a message from/to another automation, otherwise $a_i$ is an internal action of $A_i$. 
+	%
+	%An execution of algorithm $\pi$ is a composition $E$ of $E_i$, i.e., the execution on each automation. 
+	An execution fragment $\alpha$ %is a continuous segment of $E$. $\alpha$ 
+	can be either finite, i.e., having finite states, or infinite.
+	% We use the notation $trace(\alpha)$ to denote the sequence of external actions in $\alpha$; and by $trace(\alpha) | A_i$ we denote the sequence of external actions in $trace(\alpha)$ that belongs to automaton $A_i$. 
+	If $\alpha$ is a finite execution and $\beta$ is an execution fragment, such that $\beta$ starts with the final state of $\alpha$ then we use $\alpha \circ \beta$ to denote the concatenation of $\alpha$ and $\beta$.
+	If $\epsilon$ and $\epsilon'$ are two execution fragments, such that they have the same sequence of states at automaton $A_i$, i.e., $\epsilon|A_i = \epsilon'|A_i$, then $\epsilon$ and $\epsilon'$ are indistinguishable at $A_i$, denoted by $\epsilon \stackrel{A_i}{\sim} \epsilon'$. When the context is clear, we simply use $\epsilon \sim \epsilon'$. 
+
+
+For any execution of $\mathcal{A}$, 
+$\finiteprefix{k-1}{k}\ldots$, where $\sigma$'s and $a$'s are states and actions,
+we use the notation $\finiteprefixt{k-1}{k}\ldots$ that shows only the actions while leaving out the states to simplify notation. 
+
+% The network is either asynchronous or partially synchronous, i.e., there do not exist perfect wall clocks in the system that atomically synchronize the sending and receiving of messages. That is, messages can be delayed and the delay is assumed to be either unbounded or bounded by some upper bound.
+
+
+
+\section{Some Useful I/OA results}
+Below we add some useful  theorems are useful related to  executions of a composed I/O Automata~\cite{Lynch1996}. 
+%We will use the following theorem to change the occurrence of some external actions controlled by the adversary but preserve the order at individual automatons and then using the result of the theorem show the existence of an  execution of the algorithm.
+%The following theorem is used to create, starting  from some execution $\alpha$ of an I/O automaton $A$,  
+%a new execution $\alpha'$, also of $A$, where certain external actions in $trace(\alpha)$ appear in $trace(\alpha')$ 
+%earlier. Essentially, this allows us to create executions for $A$ where clients send messages, corresponding to read operations, early enough but the adversary delays the the arrival of messages, such that, 
+%to receiving servers, the execution is indistinguishable from if the client sent the messages later but messages arrive at the similar point in execution a%s in the first execution.
+
+
+\begin{theorem} \label{thm:paste} %[Theorem 8.2] 
+	Let $\{A_i\}_{i \in  I}$ be a compatible collection of automata and let $A = \Pi_{i \in I}A_i$. Suppose $\alpha_i$ is an execution of $A_i$ for every $i \in I$, and suppose $\beta$ is a sequence of actions in $ext(A)$ such that 
+	$\beta | A_i = trace(\alpha_i)$ for every $i \in I$. Then there is an execution $\alpha$ of $A$ such that $\beta = trace(\alpha)$ and $\alpha_i = \alpha | A$, for every $i \in I$.
+\end{theorem}
+
+%We will use the following theorem to extend the execution fragments of our algorithm.
+\begin{theorem} \label{thm:extension}
+	Let $A$ be any I/O automaton.
+	\begin{enumerate}
+		\item [1.] If $\alpha$ is a finite execution of $A$, then there is a fair execution of $A$ that starts with $\alpha$.
+		\item [2.]  If $\beta$ is a finite trace of $A$, then there is a fair trace of $A$ that starts with $\beta$.  
+		\item [3.] If $\alpha$ is a finite execution of $A$  and $\beta$ is any finite or infinite sequence of input actions of $A$, then there is a fair execution  $\alpha \circ \alpha'$ of $A$ such that the sequence of input actions in $\alpha'$ is exactly $\beta$.
+		\item [4.]  If $\beta$ is a finite trace of $A$ and $\beta'$ is any finite or infinite sequence of input actions of $A$, then there is a fair execution $\alpha \circ \alpha'$ of $A$ such that $trace(\alpha) = \beta$ and such that the sequence of input actions in $\alpha'$ is exactly $\beta'$.
+	\end{enumerate}
+\end{theorem}
+
+The following useful  claim is adopted from  Chapter 16 of \cite{Lynch1996}.
+\begin{claim}\label{claim:reorder}
+	Suppose we have an automaton $A = \Pi_{i=1}^k A_i$ where $A$ is composed of the compatible collection of automata $A_i$, where $i \in \{1, \cdots, k\}$.
+	Let $\beta$ be a fair trace of $A$ then we define an irreflexive partial order $\rightarrow_{\beta}$ on the actions of $\beta$
+	as follows. If $\pi$ and $\phi$ are events in $\beta$, with $\pi$ preceding $\phi$, then we say $\phi$ depends on $\pi$, which we denote as $\pi \rightarrow_{\beta}\phi$, if one of the following holds:  
+	\begin{enumerate}
+		\item[1.] $\pi$ and $\phi$ are actions at the same automaton;
+		\item[2.] $\pi$ is some $send(\cdot)_{j, i}$ at some $A_j$ and $\phi$ is some $recv(\cdot)_{j,i}$ at $A_i$; and
+		\item[3.] $\pi$ and $\phi$ are related by a chain of the relations of items 1. and 2.
+	\end{enumerate}
+	Then if $\gamma$ is a sequence obtained by reordering the events in $\beta$ while preserving the $\rightarrow_{\beta}$, then $\gamma$ is also a fair trace of $A$.
+\end{claim}
+\begin{theorem}[\cite{Lynch1996}] \label{thm:fairtrace}
+	Let $\{A_i\}_{i \in I}$ be a compatible collection of automata and let $A = \Pi_{i=1}^k A_i$. Suppose $\alpha_i$ is a fair
+	execution of $A_i$ for every $i \in I$, and suppose $\beta$ is a sequence of actions  in $ext(A)$ such that $\beta|A_i=trace(\alpha_i)$
+	for every $i \in I$. Then there is a fair execution $\alpha$ of $A$ such that $\beta=trace(\alpha)$ and $\alpha_i = \alpha|A$ for 
+	every $i\in I$.
+\end{theorem}
+
+
+\section{Technical Preliminaries}
+\label{app:lem_exec3_consistent}
+\begin{lemma*}\ref{lem:exec3_consistent} 
+Suppose $\alpha$ is any execution of $\mathcal{A}$ such that a {\sc read} $R_i$ is in $\alpha$. Suppose the  execution fragment $\frage{I_i}{\alpha}{} \circ \frage{F_{i, x}}{\alpha}{x_{t}} \circ \frage{F_{i,y}}{\alpha}{y_{s}} \circ \frage{E}{\alpha}{x_{t'}, y_{s'}}$ in $\alpha$,  corresponds to $R_i$,  where   $x_t, x_{t'} \in V_1$ and  $y_s, y_{s'} \in V_2$, and $s, s', t, t' $ are version identifiers  then $(i)$ $s = s'$  and $ t=t'$ and $(ii)$ $s'=t'$.  
+%Similarly, if  the execution fragment $\frage{I_1}{\epsilon}{} \circ \frage{F_{2,x}}{\epsilon}{x} \circ \frage{F_{2,y}}{\epsilon}{y} \circ \frage{E_1}{\epsilon}{x', y'}$ appears, where   $x, x' \in V_1$ and  $y, y' \in V_2$, then $x = x'$ and $y=y'$.
+\end{lemma*}
+
+\begin{proof}
+Suppose $R_i$ is invoked at reader $r_i$.  Then, via the action $send(x_t)_{s_x, r_i}$, in 
+execution fragment  $\frage{F_{i, x}}{\alpha}{x_{t}}$, server $s_1$ sends the value $x_t$ to $r_i$,   which is received at $r_i$ through the action 
+$recv(x_{t'})_{s_1, r_i}$ in $\frage{E_i}{\alpha}{x_{t'}, y_{s'}}$.
+ By the assumptions of the reliable channel automata in our model,  we have $x_{t}=x_{t'}$, i.e., $t=t'$. Similar argument for 
+$\frage{F_{i,y}}{\alpha}{y_{s}}$  and $\frage{E_i}{\alpha}{x_{t'}, y_{s'}}$ leads us to conclude $s=s'$. Next, $R_i$ responds with $(x_{t'}, y_{s'})$, which implies  by the S property for executions of
+ $\mathcal{A}$ that  $x_{t'}$ and $y_{s'}$ must correspond to the same version, i.e., $s'=t'$. %Therefore, we have $s = s' = t=t'$.
+\end{proof}
+
+
+Note that the above results hold even if there are any other  execution fragments, that do not contain any actions at 
+$r_i$, $s_1$ or $s_y$,   in-between the $I_i$, $F_{i, j}$ and $E_i$ execution  fragments. 
+\begin{corollary}\label{lem:exec3_consistent_corollary} 
+Suppose $\alpha$ is any execution of $\mathcal{A}$ such that a {\sc read} $R_i$ is in $\alpha$. Suppose the  execution 
+fragment $\frage{I_i}{\alpha}{} \circ  X_1 \circ \frage{F_{i, x}}{\alpha}{x_{t}} \circ X_2 \circ  \frage{F_{i,y}}{\alpha}{y_{s}} \circ X_3 \circ \frage{E_i}{\alpha}{x_{t'}, y_{s'}}$ in $\alpha$,  corresponds to $R_i$,  where   $x_t, x_{t'} \in V_1$ and  $y_s, y_{s'} \in V_2$, $X_1, X_2, X_3$ are some execution fragments that do not contain any action at $r_i$, $s_1$ or $s_y$, and $s, s', t, t' $ are version identifiers  then $(i)$ $s = s'$  and $ t=t'$ and $(ii)$ $s'=t'$.  
+\end{corollary}
+
+
+\begin{proof} 
+The constraint $(i)$ in the statement can be derived  from the fact that $\mathcal{A}$ satisfies the  O property,  which implies that any version returned by $R_i$ for object value $o_1$ (or $o_2$) and this  must be the only version sent by the server $s_1$ (or $s_y$) to $r$. Constraint 
+$(ii)$ from the S property of $\mathcal{A}$.
+\end{proof}
+
+
+\begin{lemma*}\ref{lem:exec3_commute} (Commuting fragments) 
+  Let $\alpha$ be an execution of $\mathcal{A}$. Suppose $\frage{G_1}{\alpha}{}$ and $\frage{G_2}{\alpha}{}$ are any  execution fragments in $\alpha$ such that
+  all actions in each fragment occur only at one automaton and  either $(a)$ none of the fragments contain input actions, or $(b)$ 
+  at least one of the fragments have no external actions. Suppose $\frage{G_1}{\alpha}{}$ 
+  and $\frage{G_2}{\alpha}{}$  occur at two distinct automata and the execution
+  fragment $\frage{G_1}{\alpha}{}\circ \frage{G_2}{\alpha}{}$ occurs in $\alpha$.
+  Then there exists an execution $\alpha'$ of $\mathcal{A}$, where  the execution fragment  $\frage{G_2}{\alpha}{}\circ \frage{G_1}{\alpha}{}$ appears in $\alpha'$, such that 
+  %\blue{
+  $(i)$  $\frage{G_1}{\alpha}{} \sim \frage{G_1}{\alpha'}{}$ and  $\frage{G_2}{\alpha}{} \sim \frage{G_2}{\alpha'}{}$
+  %}
+  $(ii)$ 
+the prefix  in $\alpha$  before  $\frage{G_1}{\alpha}{} \circ \frage{G_2}{\alpha}{}$
+ is identical to the prefix  in $\alpha'$ before  $\frage{G_1}{\alpha'}{} \circ \frage{G_2}{\alpha'}{}$; and $(ii)$ 
+the suffix in $\alpha$  after   
+ $\frage{G_1}{\alpha}{} \circ \frage{G_2}{\alpha}{}$
+is identical to the suffix in $\alpha'$ after the execution fragment 
+ $\frage{G_2}{\alpha'}{} \circ \frage{G_1}{\alpha'}{}$. 
+ % Similar results  hold for the traces of $\alpha$ and $\beta$  in terms of the 
+ %trace fragments   $\fragt{G_1}{\alpha}{}$ and $ \fragt{G_2}{\alpha}{}$
+  \end{lemma*}
+
+\begin{proof}
+  This is clear because the network can move the actions in $G_2$ to occur before $G_1$ at their respective automata, and  because 
+   either $(a)$ none of the fragments have any input action or $(b)$ at least one of them has no external actions, and hence 
+  the actions in one of these fragments cannot affect the actions in the other fragment.
+\end{proof}
+
+\begin{lemma*}\ref{lem:exec3_equiv} (Indistinguishability)  
+Let $\alpha$ and $\beta$ be executions of $\mathcal{A}$ and let $R$ be any \rot{}. Then 
+$(i)$  if $\frage{F_{x}}{\alpha}{} \stackrel{s_x}{\sim}\frage{F_{x}}{\beta}{}$ then both 
+$R(\alpha)$ and $R(\beta)$ respond with the same value $x$ at $s_x$; and 
+$(ii)$ if  $\frage{F_{y}}{\alpha}{} \stackrel{s_y}{\sim}\frage{F_{y}}{\beta}{}$ then both 
+$R(\alpha)$ and $R(\beta)$ respond with the same value $y$ at $s_y$.
+\end{lemma*}
+
+\begin{proof}
+Suppose $R$ is invoked at some reader $r$. Let $j \in \{1, 2\}$ and  suppose the fragments  $\frage{F_{j}}{\alpha}{}$ and  $\frage{F_{j}}{\beta}{}$ 
+appears in $\alpha$ and $\beta$ respectively, where in $\frage{F_{j}}{\alpha}{}$ server $s_j$
+sends  $v_j \in V_j$ to $r$. Then $R(\alpha)$ must return $v_j$ for object $o_j$ by the O property  of $\mathcal{A}$. Then since $\frage{F_{j}}{\alpha}{} \stackrel{s_j}{\sim} \frage{F_{j}}{\beta}{}$ then
+in  $\frage{F_{j}}{\beta}{}$  the server $s_j$ 
+must also  send $v_j$ to $r$,  therefore,  both $R(\alpha)$ and $R(\beta)$ must return value $v_j$ for $o_j$.
+%Then by the $S$ property  $R(\beta)$ must return $(x_t, y_t)$, which proves the result of the lemma. 
+%
+\end{proof}
+
+\begin{lemma*}\ref{lem:read_format}
+%If a \rot{} $R_i$ is invoked in $\mathcal{A}$ then there exists a fair execution $\epsilon$ of $\mathcal{A}$ such that 
+%the fragments $\frage{I_i}{\epsilon}{}$, $ \frage{F_{i, 1}}{\epsilon}{x}$, $\frage{F_{i,y}}{\epsilon}{y}$ and 
+ %$\frage{E_i}{\epsilon}{x, y}$ appear in $\epsilon$.
+If any finite execution of  $\mathcal{A}$ ends with $\INV{R}$, for a \rot{} $R$ then there exists an extension $\alpha$ which is a fair execution of $\mathcal{A}$ and  is  of the form  
+   $\frage{P}{\alpha}{} \circ\frage{I}{\alpha}{} \circ \frage{F_{1}}{\alpha}{x} \circ \frage{F_{2}}{\alpha}{y} \circ \frage{E}{\alpha}{x, y} \circ \frage{S}{\alpha}{}$, where $\frage{P}{\alpha}{}$ is the prefix and $\frage{S}{\alpha}{}$ denotes the rest of the execution. 
+ \end{lemma*}
+
+\begin{proof}
+ Consider a finite execution of $\mathcal{A}$  that end with  $INV(R)$, which  occurs at some reader  $r$, 
+then the  network  induces the execution fragment $\frage{I}{\alpha}{}$  by delaying all actions, except the internal and output actions at $r$, between 
+the actions $\INV{R}$ and the later of the actions $send(m_x^{r})_{r, s_x}$ and $send(m_y^{r})_{r, s_y}$. Next, the network  
+delivers $m_x^{r}$ at $s_x$ (via the action $recv(m_x^{r})_{r, s_x}$) and delays all actions, other than internal and output actions at $s_x$, until $s_x$ responds with $x$, via  $send(x)_{s_x, r}$; 
+we identify this  execution fragment
+ as $\frage{F_{1}}{\alpha}{x}$. Subsequently, in a similar manner, 
+the  network  delivers the message  $m_y^{r}$ and delays appropriate actions to induce the execution fragment 
+$\frage{F_{2}}{\alpha}{y}$. Finally, the network  delivers the values $x$ and $y$ to $r$ (via the events $recv(x)_{s_x, r}$ and $recv(y)_{s_y, r}$), 
+and delays all actions at other automata until $R$ completes  with action $\RESP{R}$ by returning $(x, y)$.  As a result, we  arrive at a fair execution of $\mathcal{A}$ of the form
+ $\frage{I}{\alpha}{} \circ \frage{F_{1}}{\alpha}{x} \circ \frage{F_{2}}{\alpha}{y} \circ \frage{E}{\alpha}{x, y} \circ \frage{S}{\alpha}{}$.
+\end{proof}
+
+
+
+
+\section{Proof of the SNOW Theorem 3-clients}
+\label{app:sec5_lemmas}
+\begin{lemma*}\ref{lem:exec3_alpha2} [Existence of $\alpha_2$] 
+\sloppy There exists  fair execution $\alpha_2$  of $\mathcal{A}$ that contains transactions 
+$W$, $R_1$ and $R_2$ and can be written in the form 
+$\finiteprefixA{k}{k+1} \circ 
+\frage{R_1}{}{x_1, y_1}
+% \fragt{I_1}{\alpha_2}{} \circ  \fragt{F_{1,x}}{\alpha_2}{x_1} \circ \fragt{F_{1,y}}{\alpha_2}{y_1} \circ \fragt{E_1}{\alpha_2}{x_1, y_1}
+ \circ
+ \frage{R_2}{}{x_1, y_1}
+ %\fragt{I_2}{\alpha_2}{}  \circ \fragt{F_{2,x}}{\alpha_2}{x_1} \circ \fragt{F_{2,y}}{\alpha_2}{y_1} \circ \fragt{E_2}{\alpha_2}{x_1, y_1}
+\circ \fragt{S}{\alpha_2}{}$, where both $R_1$ and $R_2$ return $(x_1, y_1)$.
+\end{lemma*}
+
+\begin{proof}
+
+We can construct a fair execution  $\alpha_2$ of $\mathcal{A}$ as follows. Consider the prefix 
+$\finiteprefixt{k}{k+1} \circ 
+\frage{R_1}{\alpha_1}{x_1, y_1}$
+of the execution $\alpha_1$, from Lemma~\ref{lem:exec3_alpha1}. At the end of this prefix, the network invokes $R_2$. Now, by 
+Lemma~\ref{lem:read_format}, due to $\INV{R_2}$
+there is an extension of the prefix of the form 
+$\finiteprefixt{k}{k+1} \circ  \frage{R_1}{\alpha_1}{x_1, y_1} \circ 
+\frage{I}{\alpha}{} \circ \frage{F_{1, x}}{\alpha}{x} \circ \frage{F_{1, y}}{\alpha}{y} \circ \frage{E}{\alpha}{x, y}$. 
+By the S property, we have $x = x_1$ and $y= y_1$. Therefore, $\alpha_2$ (Fig.~\ref{fig:executions3}) can be written in the form
+$\finiteprefixA{k}{k+1} \circ 
+\frage{R_1}{}{x_1, y_1}
+% \fragt{I_1}{\alpha_2}{} \circ  \fragt{F_{1,x}}{\alpha_2}{x_1} \circ \fragt{F_{1,y}}{\alpha_2}{y_1} \circ \fragt{E_1}{\alpha_2}{x_1, y_1}
+ \circ
+ \frage{R_2}{}{x_1, y_1}
+ %\fragt{I_2}{\alpha_2}{}  \circ \fragt{F_{2,x}}{\alpha_2}{x_1} \circ \fragt{F_{2,y}}{\alpha_2}{y_1} \circ \fragt{E_2}{\alpha_2}{x_1, y_1}
+\circ \fragt{S}{\alpha_2}{}$, where $\fragt{S}{\alpha_2}{}$ is the rest of the execution.
+%
+\end{proof}
+
+\remove{
+\begin{lemma*}\ref{lem:exec3_alpha3} [Existence of $\alpha_3$] 
+\sloppy There exists  fair execution $\alpha_3$  of $\mathcal{A}$ that contains transactions $W$, $R_1$ and $R_2$, and can be written in the form  
+$\finiteprefixA{k-1}{k} \circ  \fragt{I_2}{\alpha_3}{} \circ  a_{k+1} \circ 
+\frage{R_1}{}{x_1, y_1}
+%  \fragt{I_1}{\alpha_3}{} \circ \fragt{F_{1,x}}{\alpha_3}{x_1} \circ \fragt{F_{1,y}}{\alpha_3}{y_1} 
+%\circ \fragt{E_1}{\alpha_3}{x_1, y_1}
+\circ \fragn{F_{2,x}}{\alpha_3}{x_1} \circ \fragn{F_{2,y}}{\alpha_3}{y_1} \circ \fragn{E_2}{\alpha_3}{x_1, y_1}
+\circ \fragt{S}{\alpha_3}{}$,  where both $R_1$ and $R_2$ return $(x_1, y_1)$.
+\end{lemma*}
+
+\begin{proof}
+Consider the execution $\alpha_2$ as in  Lemma~\ref{lem:exec3_alpha2}. 
+In the execution fragment $ \fragt{I_1}{\alpha_2}{} \circ  \fragt{F_{1,x}}{\alpha_2}{x_1} \circ \fragt{F_{1,y}}{\alpha_2}{y_1} 
+\circ \fragt{E_1}{\alpha_2}{x_1, y_1}$  in $\alpha_2$,  none of the actions occur at $r_2$ and  by Lemma~\ref{lem:exec3_alpha1}, $a_{k+1}$ occurs at $r_1$, 
+also the actions in $\fragt{I_2}{}{}$ occur only at $r_2$.
+%
+Starting with $\alpha_2$, and by repeatedly using Lemma~\ref{lem:exec3_commute}, we create a sequence of four fair executions of $\mathcal{A}$ by repeatedly swapping 
+ $\fragt{I_2}{\alpha_2}{}$ with the execution fragments 
+$\fragt{E_1}{\alpha_2}{x_1, y_1}$, $\fragt{F_{1,y}}{\alpha_2}{y_1}$, $ \fragt{F_{1,x}}{\alpha_2}{x_1}$
+and $\fragt{I_1}{\alpha_2}{}$, which appears in   $ \fragt{I_1}{\alpha_2}{} \circ  \fragt{F_{1,x}}{\alpha_2}{x_1} \circ \fragt{F_{1,y}}{\alpha_2}{y_1} 
+\circ \fragt{E_1}{\alpha_2}{x_1, y_1}
+\circ \fragt{I_2}{\alpha_2}{}$, 
+where the following sequence of execution fragments
+ $ \fragt{I_1}{\alpha_2}{} \circ  \fragt{F_{1,x}}{\alpha_2}{x_1} \circ \fragt{F_{1,y}}{\alpha_2}{y_1}  \circ \fragt{I_2}{\alpha_2}{} \circ \fragt{E_1}{\alpha_2}{x_1, y_1}$ (by commuting  $\fragt{I_2}{\alpha_2}{}$  and $\fragt{E_1}{\alpha_2}{x_1, y_1}$); ~
+ $ \fragt{I_1}{\alpha_2}{} \circ  \fragt{F_{1,x}}{\alpha_2}{x_1} \circ \fragt{I_2}{\alpha_2}{}  \circ \fragt{F_{1,y}}{\alpha_2}{y_1} \circ \fragt{E_1}{\alpha_2}{x_1, y_1}$ (by commuting $\fragt{I_2}{\alpha_2}{}$  and $\fragt{F_{1,y}}{\alpha_2}{y_1}$); ~
+ $ \fragt{I_1}{\alpha_2}{} \circ  \fragt{I_2}{\alpha_2}{}  \circ \fragt{F_{1,x}}{\alpha_2}{x_1} \circ \fragt{F_{1,y}}{\alpha_2}{y_1} \circ \fragt{E_1}{\alpha_2}{x_1, y_1}$ (by commuting   $\fragt{I_2}{\alpha_2}{}$  and $\fragt{F_{1,x}}{\alpha_2}{x_1}$)
+appear. Finally, we have an  execution $\alpha'$ of the form 
+$ \finiteprefixA{k}{k+1} \circ  \fragt{I_2}{\alpha''}{} \circ 
+\frage{R_1}{}{x_1, y_1}
+%  \fragt{I_1}{\alpha_3'}{} \circ \fragt{F_{1,x}}{\alpha_3'}{x_1} \circ \fragt{F_{1,y}}{\alpha_3'}{y_1} 
+%\circ \fragt{E_1}{\alpha_3'}{x_1, y_1}
+\circ \fragt{F_{2,x}}{\alpha'}{x_1} \circ \fragt{F_{2,y}}{\alpha'}{y_1} \circ \fragt{E_2}{\alpha_3'}{x_1, y_1}
+\circ \fragt{S}{\alpha'}{}$ (by commuting $\fragt{I_2}{\alpha_2}{}$ and $\fragt{I_1}{\alpha_2}{}$). In all of the above steps where 
+Lemma~\ref{lem:exec3_commute} is applied the two automata are $r_2$ and the automaton resulting from the composition of the automata $r_1$, $s_2$ and $s_3$ (see ~\cite{Lynch1996} for details on composition).
+Next, from $\alpha'$, by using Lemma~\ref{lem:exec3_commute}  and swapping $a_{k+1}$ with $\fragt{I_2}{\alpha_2}{}$ we show the existence  of  a fair execution 
+ $\alpha_3$  as stated in the lemma.
+\end{proof}
+}
+
+In the following lemma, we show that we can create a fair execution $\alpha_4$, of $\mathcal{A}$, where 
+$\fragt{F_{2,y}}{\alpha_4}{}$ occurs immediately before  $ \fragt{E_1}{\alpha_4}{x_1, y_1}$, while $\fragt{R_1}{\alpha_4}{}$ and 
+$\fragt{R_2}{\alpha_4}{}$ both return 
+$(x_1, y_1)$.
+\begin{lemma*}\ref{lem:exec3_alpha4}[Existence of $\alpha_4$]  
+\sloppy There exists  fair execution $\alpha_4$  of $\mathcal{A}$ that contains transactions $W$, $R_1$ and $R_2$ and  can be written in the form
+$ \finiteprefixA{k-1}{k} \circ \fragt{I_2}{\alpha_4}{}  \circ a_{k+1} $$ \circ \fragt{I_1}{\alpha_4}{}
+\circ \fragn{F_{1,x}}{\alpha_4}{x_1} \circ   \fragn{F_{1,y}}{\alpha_4}{y_1} 
+\circ \fragn{F_{2,y}}{\alpha_4}{y_1} 
+\circ \fragn{E_1}{\alpha_4}{x_1, y_1}
+$$\circ \fragn{F_{2,x}}{\alpha_4}{x_1} \circ  \fragn{E_2}{\alpha_4}{x_1, y_1}\circ \fragt{S}{\alpha_4}{}$, where both $R_1$ and $R_2$ return $(x_1, y_1)$.
+\end{lemma*}
+
+\begin{proof}
+We start with an execution  $\alpha_3$, as in  Lemma~\ref{lem:exec3_alpha3}, and apply Lemma~\ref{lem:exec3_commute} twice.  
+
+First, by  Lemma~\ref{lem:exec3_commute}, we know there exists a fair execution $\alpha'$ of $\mathcal{A}$
+where  $\fragt{F_{2,x}}{\alpha_3}{}$ (identify as $G_1$) and 
+$\fragt{F_{2,y}}{\alpha_3}{}$ (identify as $G_2$)  are interchanged since actions of 
+$\fragt{F_{2,x}}{\alpha_3}{}$ occurs solely at $s_1$ and those of $\fragt{F_{2,y}}{\alpha_3}{}$ at $s_y$, 
+and  $\fragt{F_{2,x}}{\alpha_3}{}$ and $\fragt{F_{2,y}}{\alpha_3}{}$ return $x_1$ and $y_1$, respectively, to $r_2$.
+
+
+Next, by Lemma~\ref{lem:exec3_commute} there is 
+fair execution  of $\mathcal{A}$,  say $\alpha_4$ where
+the fragments 
+$\fragt{E_1}{\alpha_3}{}$ (identify as $G_1$)  and 
+$\fragt{F_{2,y}}{\alpha_3}{}$ (identify as $G_2$) are interchanged, with respect to $\alpha'$, because  the actions in  $\fragt{E_1}{\alpha'}{}$ occur at $r_1$ and 
+those of $\fragt{F_{2,y}}{\alpha_3}{}$ at $s_y$. Furthermore, $\alpha_4$
+  can be written in the form
+ $  \finiteprefixA{k-1}{k}  \circ  \fragt{I_2}{\alpha''}{} \circ  a_{k+1}  \circ $$
+  \fragt{I_1}{\alpha''}{} \circ \fragt{F_{1,x}}{\alpha''}{x_1}
+   \circ \fragt{F_{1,y}}{\alpha''}{y_1} 
+  \circ \fragt{F_{2,y}}{\alpha''}{y_1} 
+\circ \fragt{E_1}{\alpha''}{x_1, y_1}
+\circ \fragt{F_{2,x}}{\alpha''}{x_1} \circ \fragt{E_2}{\alpha''}{x_1, y_1}
+\circ \fragt{S}{\alpha''}{}$.
+\end{proof}
+
+
+In the following lemma,  starting from $\alpha_6$ in Lemma~\ref{lem:exec3_alpha5} we create a fair execution $\alpha_7$ for $\mathcal{A}$ where $\fragt{F_{2,x}}{\alpha_7}{}$ 
+appears  before $\fragn{F_{1,y}}{\alpha_7}{y_0} \circ\fragn{E_1}{\alpha_7}{x_0, y_0}$, where $R_1$ returns $(x_0, y_0)$ and $R_2$ returns $(x_1, y_1)$.
+At high level, we will be working on moving the execution fragments  of $R_2$ forward, a little at a time, until finally we have $R_2$ finishing before $R_1$ starts.  This simply uses commutativity since the actions in the swapped execution fragments occurs at different automata.
+
+\begin{lemma*}\ref{lem:exec3_alpha6} [Existence of $\alpha_7$] 
+\sloppy There exists  fair execution $\alpha_7$  of $\mathcal{A}$ that contains transactions $W$, $R_1$ and $R_2$, and   can be written in the form
+$\finiteprefixA{k-1}{k} \circ \fragt{I_2}{\alpha_7}{}  \circ \fragt{I_1}{\alpha_7}{} \circ \fragn{F_{1,x}}{\alpha_7}{x_0} 
+\circ \fragn{F_{2,y}}{\alpha_7}{y_1}\circ \fragn{F_{2,x}}{\alpha_7}{x_1} 
+ \circ \fragn{F_{1,y}}{\alpha_7}{y_0} \circ\fragn{E_1}{\alpha_7}{x_0, y_0}\circ
+ \fragn{E_2}{\alpha_7}{x_1, y_1}\circ \fragt{S}{\alpha_7}{}$ where $R_1$ returns $(x_0, y_0)$ and $R_2$ returns $(x_1, y_1)$.
+\end{lemma*}
+
+\begin{proof}
+\sloppy This result is proved by applying the result of Lemma~\ref{lem:exec3_commute}  to the fair execution created in Lemma~\ref{lem:exec3_alpha5}. 
+Suppose,  $\alpha_6$ (Fig.~\ref{fig:executions3}) is a fair  execution as  in Lemma~\ref{lem:exec3_alpha5}, 
+where in  the   execution fragment 
+$\fragt{E_1}{\alpha_6}{x_0, y_0}\circ\fragt{F_{2,x}}{\alpha_6}{}$  we identify 
+ $\fragt{E_1}{\alpha_6}{x_0, y_0}$  as $G_1$ and 
+$\fragt{F_{2,x}}{\alpha_6}{y_0}$  as $G_2$. The actions of $G_1$ and $G_2$ occur at two distinct automata, therefore,  we  can use the result of Lemma~\ref{lem:exec3_commute}, to argue that there exists a fair execution $\alpha'$ of $\mathcal{A}$  that  contains the  execution fragment 
+$\fragt{F_{2,x}}{\alpha_7}{}  \circ\fragt{E_1}{\alpha_7}{x_0, y_0}$, and $\alpha_6$ and $\alpha'$ are identical in the prefixes and suffixes corresponding to $G_1$ and $G_2$.
+
+ Now,  $\alpha'$ contains  $\fragt{F_{1,y}}{\alpha''}{} \circ \fragt{F_{2,x}}{\alpha'}{}$, where  
+  the actions in  $\fragt{F_{1,y}}{\alpha''}{}$ (identified as $G_1$) and $\fragt{F_{2,x}}{\alpha''}{}$ (identify as $G_2$)  occur  at distinct automata. Hence, by  Lemma~\ref{lem:exec3_commute} there exists  an execution $\alpha_7$ of the form
+$\finiteprefixA{k-1}{k}  \circ \fragt{I_2}{\alpha_7}{}  \circ \fragt{I_1}{\alpha_7}{} \circ \fragt{F_{1,x}}{\alpha_7}{x_0} 
+\circ \fragt{F_{2,y}}{\alpha_7}{y_1}\circ \fragt{F_{2,x}}{\alpha_7}{x_1} 
+ \circ \fragt{F_{1,y}}{\alpha_7}{y_0} \circ\fragt{E_1}{\alpha_7}{x_0, y_0}\circ
+ \fragt{E_2}{\alpha_7}{x_1, y_1}\circ \fragt{S}{\alpha_7}{}$.
+%
+\end{proof}
+
+
+\begin{lemma*}  \ref{lem:exec3_alpha7} [Existence of $\alpha_8$] 
+\sloppy There exists  fair execution $\alpha_8$  of $\mathcal{A}$ that contains transactions $W$, $R_1$ and $R_2$
+and   can be written in the form 
+$\finiteprefixA{k-1}{k}  \circ  \fragt{I_2}{\alpha_8}{} \circ \fragn{F_{2,y}}{\alpha_8}{y_1} \circ 
+$$\fragt{I_1}{\alpha_8}{} \circ \fragn{F_{1,x}}{\alpha_8}{x_0} 
+\circ  \fragn{F_{2,x}}{\alpha_8}{x_1} 
+$$ \circ \fragn{F_{1,y}}{\alpha_8}{y_0} \circ \fragn{E_1}{\alpha_8}{x_0, y_0}
+\circ \fragn{E_2}{\alpha_8}{x_1, y_1}\circ \fragt{S}{\alpha_8}{}$, where $R_1$ returns $(x_0, y_0)$ and $R_2$ returns $(x_1, y_1)$.
+\end{lemma*}
+
+\begin{proof}
+ Consider the fair execution $\alpha_7$ of $\mathcal{A}$ as in Lemma~\ref{lem:exec3_alpha6}. In the context of 
+  of  Lemma~\ref{lem:exec3_commute}, in $\alpha_7$ (Fig.~\ref{fig:executions3}) the actions in  
+ $ \fragt{F_{1,x}}{\alpha_8}{}$ (identify as $G_1$)  occur at $s_1$  and  those in $\fragt{F_{2,y}}{\alpha_8}{}$ (identify as $G_2$) at  $s_y$. Then by  
+ Lemma~\ref{lem:exec3_commute} there exists a fair execution $\alpha'$ of $\mathcal{A}$,  of the form 
+ $ \finiteprefixA{k-1}{k}  \circ \fragt{I_2}{\alpha'}{}  \circ \fragt{I_1}{\alpha''}{} 
+ \circ \fragn{F_{2,y}}{\alpha'}{y_1} 
+\circ \fragn{F_{1,x}}{\alpha'}{x_0} 
+\circ \fragn{F_{2,x}}{\alpha'}{x_1} 
+ \circ \fragn{F_{1,y}}{\alpha'}{y_0} \circ\fragn{E_1}{\alpha'}{x_0, y_0}\circ
+ \fragn{E_2}{\alpha''}{x_1, y_1}\circ \fragt{S}{\alpha'}{}$, where $ \fragt{F_{2,y}}{\alpha_8}{}$ and 
+  $ \fragt{F_{1,x}}{\alpha_8}{}$  are interchanged.
+ 
+ Since  actions in  $ \fragt{F_{2,y}}{\alpha_8}{}$ (identify as $G_1$)  occur at $s_y$ and those in 
+  $ \fragt{I_{1}}{\alpha_8}{}$ (identify as $G_1$)  occur at $r_1$ then by Lemma~\ref{lem:exec3_commute}
+  there is a  fair execution of $\mathcal{A}$, $\alpha_8$ where $\fragt{F_{2,y}}{\alpha_8}{}$ appear before $\fragt{I_1}{\alpha_8}{}$, i.e., of the form  $\finiteprefixA{k-1}{k}  \circ \fragt{I_2}{\alpha_8}{} \circ \fragt{F_{2,y}}{\alpha_8}{}  \circ
+ \fragt{I_1}{\alpha_7}{} \circ \fragt{F_{1,x}}{\alpha_8}{} 
+\circ \fragt{F_{2,x}}{\alpha_8}{} 
+ \circ \fragt{F_{1,y}}{\alpha_8}{} \circ\fragt{E_1}{\alpha_8}{} \circ
+ \fragt{E_2}{\alpha_8}{}\circ \fragt{S}{\alpha_8}{}$, where $ \fragt{F_{2,y}}{\alpha_8}{}$ and 
+  $ \fragt{I_{1}}{\alpha_8}{}$  are interchanged.
+ 
+ By $(ii)$ of Lemma~\ref{lem:exec3_equiv} we have 
+$\frage{F_{2,x}}{\alpha'}{} \stackrel{s_1}{\sim} \frage{F_{2,x}}{\alpha_8}{}$ hence $\fragt{F_{2,x}}{\alpha_8}{}$ sends $x_1$ and 
+$\fragt{F_{1,x}}{\alpha_8}{}$ and $\fragt{F_{1,y}}{\alpha_8}{}$ sends $x_0$ and $y_0$, respectively. So considering these returned values we have $\alpha_8$ 
+(Fig.~\ref{fig:executions3}) in the form as stated in the lemma.
+\end{proof}
+
+
+
+\begin{lemma}\ref{lem:exec3_alpha8} [Existence of $\alpha_9$]   
+\sloppy There exists  fair execution $\alpha_9$  of $\mathcal{A}$ that contains transactions $W$, $R_1$ and $R_2$
+and   can be written in the form 
+$\finiteprefixA{k-1}{k}  \circ  \fragt{I_2}{\alpha_8}{} \circ \fragt{F_{2,y}}{\alpha_8}{y_1} \circ 
+$$\fragt{I_1}{\alpha_8}{} \circ \fragt{F_{2,x}}{\alpha_8}{x_1} 
+\circ  \fragt{F_{1,x}}{\alpha_8}{x_0} 
+$$ \circ \fragt{F_{1,y}}{\alpha_8}{y_0} \circ \fragt{E_1}{\alpha_8}{x_0, y_0}
+\circ \fragt{E_2}{\alpha_8}{x_1, y_1}\circ \fragt{S}{\alpha_8}{}$
+where $R_1$ returns $(x_0, y_0)$ and $R_2$ returns $(x_1, y_1)$.
+\end{lemma}
+%}
+
+\begin{proof}
+%\blue{
+In $\alpha_8$ from Lemma~\ref{lem:exec3_alpha7}, all the actions in  
+ $ \fragn{I_1}{\alpha_8}{}$  occur at $r_1$; those in   $ \fragn{F_{1,x}}{\alpha_8}{x_1}$  occur at $s_1$; and  the  
+actions in $ \fragn{F_{2,x}}{\alpha_8}{y_1}$ occur only  at $s_1$. 
+%
+Note that actions of  both execution fragments $ \fragt{F_{2,x}}{\alpha_8}{}$  and   
+$\fragt{F_{1,x}}{\alpha_8}{}$ occur at $r_1$.  
+Consider the prefix of $\alpha_8$ that ends with $\fragt{I_1}{}{}$ then suppose the network  extends this prefix by adding an execution fragment of the form
+$ \fragt{F_{2,x}}{\alpha_8}{} \circ  \fragt{F_{1,x}}{\alpha_8}{}$ as follows.  
+%
+First note that  the actions $send(m_x^{r_2})_{r_2, s_1}$ and 
+ $send(m_x^{r_1})_{r_1, s_1}$ appears in the prefix but do not have corresponding $recv$ actions.
+ %}
+%\blue{
+The  network places action $recv(m_x^{r_2})_{r_2, s_1}$, and allows an execution fragment of the form 
+$ \fragt{F_{2,x}}{\alpha_8}{}$ to appear. Now, immediately after this the network further extends it with 
+an execution fragment of the form  $\fragt{F_{1,x}}{\alpha_8}{}$  by placing action $recv(m_x^{r_1})_{r_1, s_1}$. 
+ Next the fragment $\fragn{F_{1,y}}{\alpha_8}{y_0}$ is added  and is the same as $ \frage{F_{1,y}}{\alpha_8}{}$.
+This last step can be argued by the fact that none of the actions in  $ \fragn{F_{1,y}}{\alpha_8}{y_0}$ can be affected by 
+any of the output actions at $ \fragt{F_{2,x}}{\alpha_8}{}$ and  $\fragt{F_{1,x}}{\alpha_8}{}$. Note that a careful argument can be done by using Theorem~\ref{thm:fairtrace} to conclude the same. Following this the network allows the rest of the execution by adding an execution fragment of the form $\fragn{E_1}{\alpha_8}{x_0, y_0}
+\circ \fragn{E_2}{\alpha_8}{x_1, y_1}\circ \fragn{S}{\alpha_8}{}$. The resulting fair execution is of the form 
+$\finiteprefixA{k-1}{k}  \circ  \fragt{I_2}{\alpha_8}{} \circ \fragt{F_{2,y}}{\alpha_8}{y_1} \circ 
+$$\fragt{I_1}{\alpha_8}{} \circ \fragn{F_{2,x}}{\alpha_8}{x_1} 
+\circ  \fragn{F_{1,x}}{\alpha_8}{x_0} 
+$$ \circ \fragt{F_{1,y}}{\alpha_8}{y_0} \circ \fragn{E_1}{\alpha_8}{x_0, y_0}
+\circ \fragn{E_2}{\alpha_8}{x_1, y_1}\circ \fragt{S}{\alpha_8}{}$, where we retained the values wherever it is known, and we denote this  execution by $\alpha_9$.
+%}
+
+%\blue{
+Now, we argue about the return values in $\alpha_9$. 
+Applying Lemma~\ref{lem:exec3_equiv} to $R_2$ and $\fragn{F_{2,y}}{\alpha_8}{y_1}$ implies that $R_2$ 
+returns $(x_1, y_1 )$. Similarly, 
+applying Lemma~\ref{lem:exec3_equiv} to $R_1$ and $\fragn{F_{1,y}}{\alpha_8}{y_0}$ implies that $R_1$ 
+must return $(x_0, y_0 )$ in $\alpha_9$.
+%}
+\end{proof}
+
+\section{Two Client Open Question}
+ \subsection{No  SNOW Without C2C  Messages}
+ \label{app:2c-no-c2c}
+
+\begin{lemma*}\ref{lem:exec_alpha} 
+There exists a finite execution $\alpha$ of $\mathcal{A}$ that contains transactions $R_1(\alpha)$  
+ and $W(\alpha)$ where $\INV{R_1}$ appears after $\RESP{W}$ and the following conditions hold:
+\begin{enumerate}
+\item[$(i)$] The actions $send(m_x^{r_1})_{r_1, s_1}$ and  $send(m_y^{r_1})_{r_1, s_y}$ appear consecutively in $trace(\alpha)|r_1$; and 
+\item[$(ii)$]   $\alpha$ contains the execution fragment  $\frag{1, x}{\alpha}$.
+%, i.e., the actions  $recv(m_x^r)_{r, s_1}$ and  $send(x)_{r, s_1}$ appear in $trace(\alpha)|s_1$, where  there is no input action of  $s_1$  between these actions.
+% \item[$(ii)$]  $R(\alpha)$ returns  $(x_1, y_1)$. 
+\end{enumerate} 
+\end{lemma*}
+
+
+\begin{proof}
+Consider a finite  execution fragment  of $\mathcal{A}$ with a completed transaction $W$, where  after $W$ 
+completes  the network invokes $R_1$, i.e., $\INV{R_1}$ occurs.
+ Note that each of the  read operations $op_1^{r_1}$ and $op_2^{r_1}$,  in $R_1$,  can be invoked by 
+the network at any point in the execution.  
+ Following $\INV{R_1}$,  the network introduces the invocation action $\inv{op_1^{r_1}}$;  by the O property of the read operations of $\mathcal{A}$  
+the action $send(m_x^{r_1})_{r_1, s_1}$ eventually occurs. Next, the network introduces 
+ $\inv{op_2^{r_1}}$ and also, delays the arrival of  $m_x^{r_1}$ until  action $send(m_y^{r_1})_{r_1, s_y}$ 
+eventually occurs, 
+ which  must occur in accordance with  the property O  of read operations. Let us call this finite execution $\alpha^0$. 
+ 
+ Next, suppose at the end of $\alpha^0$  the network delivers the message $m_x^{r_1}$, which has been delayed so far,  via the action  $recv(m_x^{r_1})_{r_1, s_1}$, 
+ at  $s_1$,   but  it delays any  other input actions at $s_1$. Note that by the $N$ property of read operations $s_1$ eventually responds with  $send(x)_{s_1, r_1}$, with one value $x$ by O property,  where $x = x_1$ by the S property, since $R_1$ begins after $W$ completes. 
+ Let us call this execution $\alpha$. Note that $\alpha$ satisfies conditions $(i)$ and $(ii)$ by the design of the execution.
+\end{proof}
+
+\begin{lemma*}\ref{lem:exec_beta} 
+There exists an  execution $\beta$ of $\mathcal{A}$ that contains transactions $R_1$ and $W$ where $\INV{R_1}$ 
+appears after $\RESP{W}$ and the following conditions hold:
+\begin{enumerate}
+\item[$(i)$] The actions $send(m_x^{r_1})_{r_1, s_1}$ and  $send(m_y^{r_1})_{r_1, s_y}$ appear consecutively in 
+$trace(\beta)|r_1$; and
+\item[$(ii)$]   $\beta$ contains the execution fragment  $\frag{1, x}{\beta} \circ \frag{1, y}{\beta}$.
+% $recv(m_x^r)_{r, s_1}$,  $send(x)_{r, s_1}$,  $recv(m_y^r)_{r, s_y}$,  $send(y)_{r, s_y}$, where  there is no external action, in $\beta$,  of  $s_1$ and $s_y$ between these actions.
+% \item[$(iii)$] $R(\beta)$ returns $(x_1, y_1)$. 
+\end{enumerate} 
+\end{lemma*}
+
+\begin{proof}
+Consider the  execution $\alpha$ of $\mathcal{A}$ as constructed in Lemma~\ref{lem:exec_alpha}.  
+At the end of the execution fragment $\alpha$,  the network  delivers the previously delayed message
+ $m_y^{r_1}$, which is sent via the action $send(m_y^{r_1})_{r_1, s_y}$,  by  introducing the action $recv(m_y^{r_1})_{r_1, s_y}$. The network then delays any other  input action in $\mathcal{A}$. By the N property,  
+server $s_y$ must respond to $r_1$, with some value $y$,  and hence 
+the output action $send(y)_{s_y, r_1}$ must eventually occur at $s_y$.  
+Let us call this finite execution as $\beta$. Note that $\beta$ satisfies the  properties $(i)$ and $(ii)$ in the statement of the lemma.
+\end{proof}
+
+
+\begin{lemma*}\ref{lem:exec_gamma} 
+There exists a fair execution $\gamma$ of $\mathcal{A}$ with transactions $R_1$ and $W$ where the action  $\INV{R_1}$ appears before $\INV{W}$ and $\RESP{R_1}$ appears after  $\RESP{W}$,  and the following conditions hold for $\gamma$:
+\begin{enumerate}
+\item[$(i)$] The actions $send(m_x^{r_1})_{r_1, s_x}$ and  $send(m_y^{r_1})_{r_1, s_y}$  appear before $\INV{W}$ and they appear consecutively in $trace(\gamma)|r_1$;
+%\item[$(ii)$]   $trace(\beta)$ contains the sequence  $recv(m_x^r)_{r, s_x}$,  $send(x)_{r, s_x}$,  $recv(m_y^r)_{r, s_y}$,  $send(y)_{r, s_y}$.
+\item[$(ii)$]   $\gamma$ contains the execution fragment  $\frag{1,x}{\gamma} \circ \frag{1,y}{\gamma}$; and 
+\item[$(iii)$] action $\RESP{W}$ occurs before $\frag{1,x}{\gamma}$.
+\end{enumerate} 
+\end{lemma*}
+
+
+\begin{proof}
+Consider the execution $\beta$ of $\mathcal{A}$  as in Lemma~\ref{lem:exec_beta}. Note that $\beta$
+is an execution of the composed automaton $\mathcal{A}$ ($\equiv S_x \times r_1$).  In $\beta$,  the actions 
+ $send(m_x^{r_1})_{r_1, s_x}$ and   $send(m_y^{r_1})_{r_1, s_y}$ occur at $r_1$; and following that,  the actions 
+ $recv(m_x^{r_1})_{r_1, s_x}$, $recv(m_y^{r_1})_{r_1, s_y}$, $send(x)_{s_x, r_1}$ and  $send(y)_{s_y, r_1}$ occur at $S_x$. 
+ Consider the executions $\alpha_{r_1} \equiv \beta|r_1$ and  $\alpha_{S_x} \equiv \beta|S_x$. Let $s_{\beta}$ denote  $trace(\beta)$.
+ 
+ In $s_{\beta}$, $send(m_x^{r_1})_{r_1, s_x}$,  $send(m_y^{r_1})_{r_1, s_y}$ appear after $\RESP{W}$, as in $trace(\beta)$. Let $s'_{\beta}$ be the sequence of
+ external actions of $S_y$ which we construct from $s_{\beta}$ by moving $send(m_x^{r_1})_{r_1, s_x}$,  $send(m_y^{r_1})_{r_1, s_y}$ before $\INV{W}$, which  is also 
+ an external action of $\mathcal{A}$, and leaving the rest of the actions in $s_{\beta}$ as it is.
+ 
+ 
+ In $\beta$,  $\INV{R_1}$, $recv(x)_{ s_x, r_1}$ and  $recv(y)_{s_y, r_1}$ 
+  are the only input actions at $r_1$, therefore,   $s'_{\beta} |r_1= trace(\alpha_{r_1})$. 
+  %
+  On the other hand,  $recv(m_x^{r_1})_{r_1, s_x}$, $recv(m_y^{r_1})_{r_1, s_y}$ are the only input actions at $s_x$ ,
+   therefore, $s'_{\beta} |S_1 = trace(\alpha_{S_1})$.  Now, by Theorem ~\ref{thm:paste}, there exists an execution 
+ $\gamma$ of $\mathcal{A}$ such that, $s'_{\beta} = trace(\gamma)$ 
+ and $\alpha_{r_1} = \gamma|r_1$ and $\alpha_{S_x} = \gamma|S_x$. Therefore, 
+ in $\gamma$, $send(m_x^{r_1})_{r_1, s_x}$,  $send(m_y^{r_1})_{r_1, s_y}$ appear before
+  $\INV{W}$ (condition $(i)$) and since $s'_{\beta} = trace(\gamma)$ condition $(ii)$  holds. Conditions $(iii)$ holds trivially.
+\end{proof}
+
+
+\begin{lemma*}\ref{lem:exec_delta} 
+There exists a fair execution $\eta$ of $\mathcal{A}$ that contains transactions $R_1$ and $W$ where $\INV{R}$ appears before $\INV{W}$;  $\RESP{R_1}$ appears after  $\RESP{W}$ and the following conditions hold for $\eta$:
+\begin{enumerate}
+\item[ $(i)$] $\eta$ can be written in the form $\prefix{\eta}\circ \frag{1, x}{\eta} \circ \frag{1, y}{\eta} \circ \suffix{\eta}$, for some 
+   $\prefix{\eta}$ and $\suffix{\eta}$;
+\item[$(ii)$] The actions $send(m_x^{r_1})_{r_1, s_1}$ and  $send(m_y^{r_1})_{r_1, s_y}$  appear before  $\INV{W}$ and they appear consecutively in $trace(\eta)|r_1$;
+\item[$(iii)$] action $\RESP{W}$ occurs before $\frag{1, x}{\eta}$; and 
+ \item[$(iv)$] $R_1(\eta)$ returns $(x_1, y_1)$. 
+\end{enumerate} 
+\end{lemma*}
+
+
+\begin{proof}
+Let $\gamma$ be a fair execution of $\mathcal{A}$, as described in Lemma~\ref{lem:exec_gamma}. 
+%Without loss of generality, suppose   $recv(m_x^r)_{r, s_1}$ occurs in $\gamma$ before  $recv(m_y^r)_{r, s_y}$. 
+ Let $\gamma^0$ be the execution fragment of $\gamma$
+up to the action $send(y)_{s_y, r_1}$. Now, by Theorem~\ref{thm:extension} (1), there exists a fair execution $\gamma^0 \circ \mu$, of 
+$\mathcal{A}$, where $\mu$ denotes the extended portion of the execution.
+
+% with the empty sequence for $\beta$, in the theorem statement.  Now, due to the N and O properties of a fair execution of $\mathcal{A}$ the
+%action $send(x)_{r, s_1}$ occurs in $\gamma^0 \circ \mu$ (in $\mu$, to be precise).
+%Let $\mu^0$ be the prefix of $\mu$ with its last output action as  $send(x)_{r, s_1}$. Again, using Theorem~\ref{thm:extension} (3), with $\beta$ consisting of only $recv(m_y^r)_{r, s_y}$, we create a fair execution of $\mathcal{A}$ that starts with $\gamma^0 \circ \mu^0$.
+ Clearly, by the N and O properties, 
+%fair executions of $\mathcal{A}$ 
+the actions  $\resp{op_1^{r_1}}$ and $\resp{op_2^{r_1}}$ must eventually occur in $\gamma^0 \circ \mu$.
+%We can write $\nu$ as $\nu^0\circ \eta^0$ such that it ends with the action  $send(y)_{r, s_y}$.
+ Now,  identify $\eta$ as $\gamma^0 \circ \mu$,  where $\prefix{\eta} \circ \frag{1, x}{\eta} \circ \frag{1, y}{\eta}$  is $\gamma^0$,   and $\mu$ is $\suffix{\eta}$, thereby, proving condition $(i)$.
+
+Note the condition $(ii)$ is satisfied by $\eta$ because $\RESP{W}$ appears in $\prefix{\eta}$, therefore, the fair execution $\gamma$ is equivalent to the execution fragment of $\prefix{\eta}$ up to the event $\INV{W}$, and  also, 
+$\gamma$ satisfies condition $(ii)$ as stated in Lemma~\ref{lem:exec_gamma}.
+
+Condition $(iii)$ is true because $\frag{1, x}{\eta}$ begins with action $recv(m_x^{r_1})_{r_1, s_1}$, which 
+occurs after $\RESP{W}$.
+Condition $(iv)$ is satisfied by $\eta$ because $\eta$ is an extension of $\gamma$ and due to  the result of Lemma~\ref{lem:exec_xi}.
+\end{proof}
+
+
+
+\subsection{Condition for Proving Strict Serializability}\label{sc_condition_app}
+\input{strict-serializability-criteria-v1.tex}
+
+\subsection{SNOW with C2C Communication}
+\label{app:algorithm-a}
+In this section,  we show that SNOW is possible in the   \emph{multiple-writers single-reader} 
+(MWSR) setting %, and prove that any fair and well-formed execution  of $A$ satisfies  the SNOW properties.  
+%In practice, a system with a single reader may not be very useful but this algorithm serves a counter example 
+%algorithm
+when client-to-client communication is allowed. In particular, we present an algorithm $A$, which has all SNOW properties in such setting.
+%Algorithm $A$ 
+%shows that if client-to-client communication is allowed, it is possible to have algorithms  that satisfies all of the SNOW properties with two clients. 
+We consider a system that has $\ell \geq 1$ writers with ids $w_1, 
+w_2 \cdots w_{\ell} \in \mathcal{W}$ 
+%(we denote this set by $\mathcal{W}$)
+, one reader $r$, and  $k \geq 1$ servers with ids $s_1, s_2\cdots s_k \in \mathcal{S}$. 
+%(denote as $\mathcal{S}$) that maintains the  objects $o_1, \cdots, o_k$, respectively. 
+Client-to-client communication is allowed. 
+%Note that for a two-client system, when both  clients are of the same type, i.e., two writers or two readers, the SNOW properties are trivially satisfied.
+%			
+% For any two tags $t_1, t_2 \in \mathcal{T}$ we say  $t_2 > t_1$ if $(i)$ $t_2.z > t_1.z$ or $(ii)$ $t_2.z = t_1.z$ and $t_2.w > t_1.w$. Therefore, the set $\mathcal{T}$ is totally ordered set. We also assume that every client and servers has a unique id and the ids can be compared w.r.t. some lexicographic order.
+%
+The pseudocode for algorithm $A$ is presented in Pseudocode~\ref{fig:algo_a}. 
+%We assume that each of the processes is run in a single-threaded manner.
+%, and therefore, each of the servers or the clients executes the algorithmic steps sequentially. 	
+%
+We use keys to uniquely identify a \wot{} in algorithm $A$.  A key $\kappa \in \mathcal{K}$ is defined as a pair $(z, w)$, 
+where $z \in \mathbb{N}$, and $w \in \mathcal{W}$ is the id of a writer. $\mathcal{K}$ denotes the set of all possible keys. 
+Also, with each transaction we associate a tag $t \in \mathbb{N}$. % which will help us define an order among the transactions. 
+
+%For version control of the  object values  we use tags.  A tag $t$ is defined as a pair $(z, w)$, where $z \in \mathbb{N}$ and $w \in \mathcal{W}$  is the id of a writer. We use $\mathcal{T}$ to denote the set of all possible tags.
+
+\textit{\textbf{State variables:}} %The state variables in  writer, reader and  server processes are as follows. 
+$(i)$ Any  \emph{writer $w$} has  a counter $z$ to keep track of the
+number of \wots{}  it  has  invoked so far, initially $0$.
+$(ii)$ The  \emph{reader} $r$ has an 
+ordered list of elements, $List$, as $(\kappa, (b_1, \cdots, b_k))$,  where 
+$\kappa  \in \mathcal{K}$  and 
+$(b_1, \cdots b_k) \in  \{0, 1\}^k$. Initially,  
+$List= [ ({\kappa}^0, (1, \cdots 1) ]$, where ${\kappa}^0  \equiv (0, w_0)$, 
+and $w_0$ is any
+place holder identifier for writer id. $List$ can be thought of as an array, with $0$ as the starting index.
+$(iii)$ Each   \emph{server} $s_i \in \mathcal{S}$  has  a set variable $Vals$ 
+with elements 
+of key-value pairs $({\kappa}, v_i) \in \mathcal{K} \times \mathcal{V}_i$. Initially,
+$Vals= \{ ({\kappa}^0, v_i^0)\}$. 
+%This ensures that each \wot{} generates a unique key.
+%labeled with phase names, viz., {\readGetTag}, {\readValueTag}, {\readCompleteTag} and {\writeGetTag}. The server to server messages are labeled as {\readDisperseTag}. Also, in some phases of {\SODA},  the message-disperse primitives {\mdmetaprim} and {\mdvalueprim} are used  as services. 
+
+\textit{\textbf{Writer steps:}} Any writer client, $w \in \mathcal{W}$, can issue a \wot{} that consists of a set of write operations by invoking the following operations $\Writetr{ (o_{i_1}, v_{i_1}), (o_{i_2}, v_{i_2}), \cdots, (o_{i_p}, v_{i_p}) }$, 
+%for a \wot{},
+%can be  invoked at any writer $w$, 
+where  $I = \{i_1, i_2, \cdots, i_p\}$ is  any subset of $p$ indices of $[k]$. We define the set  $S_I\triangleq \{s_{i_1}, s_{i_2}, \cdots, s_{i_p}\}$.      
+This procedure consists of two consecutive phases: {\writeValue} and {\informReader}.  In the {\writeValue} phase,  $w$ creates a key ${\kappa}$ as  $ {\kappa}  \equiv (z + 1, w)$; and also increments the local counter $z$ by one.   Then it sends $(${\writeValueTag}$, ({\kappa}, v_{i}))$ to each server $s_i$ in $S_I$, and awaits {\ackTag}s  
+from each server  in $S_I$.  After receiving all {\ackTag}s,    $w$ initiates the {\informReader} phase during which  it sends 
+(\informReaderTag, $({\kappa}, (b_{1}, \cdots b_{k})$) to $r$, where for any $i \in [k]$, $b_i$ is a boolean variable, such that $b_i=1$ if $s_i \in S_I$, otherwise $b_i=0$. 
+Essentially, such a $(k+1)$-tuple
+identifies the set of objects that are updated during that \wot{}, i.e., if $b_i=1$ then object 
+$o_i$ was updated 
+during the execution of the  \wot{}, otherwise $b_i=0$.  
+After $w$ receives    {\ackTag} 
+%tag $t_w$ 
+from $r$ it completes the \wot{}. 
+
+\textit{\textbf{Reader steps:}}  
+We use the same notations for $I$ and $S_I$ as above for the set of indices and corresponding servers, possibly 
+different across transactions.
+The procedure  \Readtr{$ o_{i_1},  o_{i_2}, \cdots, o_{i_p}$}, 
+for any  \rot{}, 
+is  initiated at  reader  $r$, where   $o_{i_1},  o_{i_2}, \cdots, o_{i_p}$  denotes the  subset  of  
+objects $r$ 
+intends to read. This procedure
+consists of only one phase,  {\readValue},  of communication 
+between the reader and the servers in $S_I$.   Here $r$ sends  the message
+(\readValueTag, ${\kappa}_i$) to each server $s_i \in S_I$, where 
+the ${\kappa}_i$ is the key in  the tuple $({\kappa}_{i}, (b_{1}, \cdots, b_{k}))$  in  $List$ located at  index $j^*$ such that $b_i =1$ such that 
+$i \in I$. % where $I \triangleq  \{{i_1},  {i_2}, \cdots, {i_p}\}$.
+After
+receiving the values $v_{i_1}$, $v_{i_2}, \cdots v_{i_p}$ from all  servers in $\mathcal{S_I}$,  where $S_I \triangleq \{s_{i_1},  s_{i_2}, \cdots, s_{i_p}\}$, the transaction completes by 
+returning $(v_{i_1}, \cdots v_{i_p})$.
+
+If  reader $r$ receives a message  
+(\informReaderTag, $({\kappa}, (b_{1}, \cdots, b_{k})$) from any writer $w$, then $r$ appends  
+$({\kappa}, (b_{1}, \cdots, b_{k})$ to its  $List$,  and responds to $w$ with  
+{\ackTag} and $t_w = |List|$, i.e., number of elements in $List$.
+The order of the  elements in  $List$ corresponds to  the order  
+the \wots{}, the order of the incoming  {\informReaderTag} updates,  as seen by the reader.
+
+
+\textit{\textbf{Server steps:}} The server protocol consists of two procedures corresponding to the messages containing the tags 
+{\writeValueTag} and \readValueTag.  The first procedure is used if a server $s_i$ receives a 
+message  $(${\writeValueTag}$, ({\kappa}, v_{i}))$  from a writer $w$,  it  adds $({\kappa}, v_i)$ to its set variable   $Vals$ and sends {\ackTag} back to $w$.
+The second procedure is used  if  $s_i$ receives a message, i.e., $(${\readValueTag}$, {\kappa}_{i})$, from $r$, then it responds with $v_i$ such that $({\kappa}_{i}, v_i)$ is in its $Vals$.
+
+\begin{algorithm*}[!h]
+	\begin{algorithmic}[2]
+		%\vspace{-2em}
+		\begin{multicols}{2}{\footnotesize
+				%\Statex  
+				\Statex {\bf At writer $w$}
+				\Part{{\it State Variables at $w$}}{ 	
+					\Statex $z \in \mathbb N$, initially   $0$
+				}\EndPart
+				\Statex\Statex
+				{\bf  \Writetr{$(o_{i_1}, v_{i_1}), (o_{i_2}, v_{i_2}), \cdots, (o_{o_p},  v_{i_p})$}}
+				\Part{ \underline{\writeValue}} {
+					\State ${\kappa} \leftarrow (z +1,  w)$; $z \leftarrow z +1 $
+					\State $I\triangleq \{i_1, i_2, \cdots, i_p \}$
+					%\State $S_{I}\triangleq \{s_{i_1}, s_{i_2}, \cdots, s_{i_p} \}$
+					\For{$i \in I$} 
+					\State Send \writeValueTag, $({\kappa}, v_{s_i})$ to  $s_i$
+					\EndFor 
+					\State  Await {\ackTag}  from  $s_i$ for every $i \in I$.
+				}\EndPart
+				\Statex
+				\Part{ \underline{\informReader}} {
+					\For{$i \in [k]$} 
+					\If{$i \in I$}
+					\State $b_i \leftarrow 1$
+					\Else
+					\State $b_i \leftarrow 0$
+					\EndIf
+					\EndFor 
+					%      \State $b_{i}\triangleq$   $v_i$ if  $i \in I$, otherwise $\bot$
+					\State  Send  (\informReaderTag, $({\kappa}, (b_{1}, \cdots, b_{k}))$) to   $r$
+					\State  Receive ({\ackTag}, $t_w$) from  $r$
+				}\EndPart
+		}\end{multicols}	
+		%\vspace{-2.0em} 
+		\\\hrulefill 	%\vspace{-1.5em}
+		\begin{multicols}{2}{\footnotesize	
+				\Statex {\bf At reader $r$}
+				\Part{{\it State Variables at $r$}}{ 	
+					\Statex $List$, a list  of elements in  $\mathcal{K} \times \{ 0, 1 \}^k $,\\ ~~~~~initially  $[({\kappa}^0, 1, \cdots 1)]$
+				}\EndPart
+				
+				\Statex
+				\Statex  {\bf \Readtr{$ o_{i_1},  o_{i_2}, \cdots, o_{i_p}$}}	
+				\Part{{\underline{{\readValue}}}}{ 
+					% \State $\forall i, 1 \leq i \leq k$: $t_i^{max}  \leftarrow \max\{ t: (i, t) \in  Tags\}$
+					\State $I\triangleq \{i_1, i_2, \cdots, i_p \}$
+					%\State $S_{I}\triangleq \{s_{i_1}, s_{i_2}, \cdots, s_{i_p} \}$
+					\For{$i \in I$} 
+					\State $j^* \leftarrow \max_{1 \leq j \leq |List|} \{ j : List[j].b_i = 1\}$
+					\State ${\kappa}_i = List[j^*].{\kappa}$
+					\State  Send (\readValueTag, ${\kappa}_i$) to $s_i$
+					\EndFor 
+					\State  Await responses  $v_{i}$ from  $s_i$ for  each $i\in I$
+					\Statex /* $t_r \triangleq \max_{1 \leq j \leq |List|} \{ j : List[j].b_i = 1 \wedge i \in I\}$ */
+					\State Return  $(v_{i_1}, v_{i_2}, \cdots, v_{i_p})$
+				}\EndPart
+				%	\Statex
+				\\\hrulefill
+				\Statex
+				\Statex {\bf Response routines}
+				\Part{{\underline{On recv  (\informReaderTag, $({\kappa}, (b_{1}, \cdots b_{k}))$) from  $w$}}}{ 
+					\Statex %// $\bigoplus$ denotes append to list
+					\State $List  \leftarrow List \bigoplus~ ({\kappa}, (b_{1}, \cdots b_{k}))$ 
+					//$\bigoplus$ for append
+					\State $tag \leftarrow |List|$ // $| \cdot |$ size of the list
+					\State Send  ({\ackTag}, $tag$) to  $w$
+				}\EndPart
+				%\Statex
+		}\end{multicols}
+		
+	%	\vspace{-2.0em}
+		\\\hrulefill %	\vspace{-1.5em}
+		\begin{multicols}{2}{\footnotesize
+				\Statex {\bf At server $s_i$ for any $i \in [k]$}
+				\Part{{\it State Variables}}{ 
+					
+					\Statex $Vals\subset \mathcal{K} \times \mathcal{V}_i$, initially   $\{(t^0_{key}, v_i^0)\}$
+					%							pair with a tag and a coded element, initially $(t_0, c_0)$.
+					%\Statex $t_c$,  the commited tag, initially $t_0$
+				}\EndPart
+				\Statex
+				
+				\Part {\underline{On recv (\writeValueTag, $({\kappa}, v)$) 
+						from writer $w$}} {
+					\State   $Vals \gets   Vals \cup \{({\kappa}, v)\}$ 
+					\Statex  Send {\ackTag} to writer $w$.
+				}\EndPart
+				\Statex
+				\Part{ \underline{On recv (\readValueTag, ${\kappa}$) from reader $r$ }} {
+					\State   Send $v$ s.t. $({\kappa}, v) \in Vals$  to reader $r$
+				}\EndPart	
+		}\end{multicols}
+	\end{algorithmic}	
+	\caption{The protocol for a writer $w$, reader $r$ and server $s_i$ for  algorithm $A$.}\label{fig:algo_a}
+\end{algorithm*}	
+%	Below we show that algorithm $C$ satisfies the SNOW properties. For the property ``S'' we will lean on an equivalence condition result from atomicity (strong consistency). We reproduce the lemma below. \blue{Note that this lemma for atomicity on read/write atomic register but we will have to adapt it to atomic transactions carefully. For now,  we will assume it and later we will prove it for atomic transactions. }
+The following theorem proves that algorithm $A$ respects all SNOW properties. Due to space constraints, the proof of the theorem can be found in Appendix~\ref{app:algorithm-a}. %, where \wots{} are live. % and the proof is omitted, for now, since it is very straightforward. 
+
+
+%Consider any failure-free execution of algorithm $A$. In the steps for the reader assume the quantity
+%$t_r \triangleq \max_{1 \leq j \leq |List|} \{ j : List[j].b_i = 1 \wedge i \in I\}$, which is presented as a comment in the pseudo-code for $A$.
+%We associate with any transaction $\phi$ a tag
+%$tag(\phi)$ such that if  $\phi$ is a \wot{}  $tag(\phi)=t_w$, i.e., the value of $t_w$ before the completion of the operation, and $tag(\phi)=t_r$ when $\phi$ is a \rot{}.
+
+\begin{theorem} Any well-formed  and fair execution of algorithm $A$ is a wait-free implementation of  transaction processing in the MWSR setting with for objects of type $\mathcal{O}_T$, consisting of  objects $o_1, o_2, \cdots o_k$ maintained by the  servers $s_1, s_y, \cdots, s_k$, respectively; and it respects the SNOW properties and {\sc write}s transactions are live.
+	\end{theorem}
+	
+
+	\begin{proof} Below we show that $A$ satisfies the  SNOW properties. 
+	
+	\noindent{\emph{\underline{S property:}}} 
+	Let $\beta$ be any fair execution  of  $A$ and 
+ suppose all clients in $\beta$ behave in a well-formed
+manner. Suppose $\beta$ contains no incomplete transactions and let  $\Pi$ be the set of transactions in $\beta$.  We define an irreflexive partial ordering ($\prec$) among the transactions in $\Pi$ as follows:  if $\phi$ and $\pi$ are any two distinct transactions in $\Pi$ then we say 
+	$\phi \prec \pi$ if either $(i)$ $tag(\phi) < tag(\pi)$ or $(ii)$ $tag(\phi) = tag(\pi)$ and $\phi$ is a {\sc write} and $\pi$ is a {\sc read}. We will prove the $S$  (strict-serializability) property of $A$ by proving that the properties $P1$, $P2$, $P3$ and $P4$ of Lemma~\ref{lem:equivalence} hold for $\beta$. 
+	
+	\emph{P1:}   If $\pi$ is a {\sc read} then since all {\sc read}s are invoked by a single reader $r$ and in a well-formed manner, 
+	therefore, there cannot be an infinite number of {\sc read}s such that they all 
+	precede $\pi$ (w.r.t $\prec$).
+	 Now, suppose $\pi$ is a {\sc write}. Clearly, from an inspection of the algorithm, 
+	 $tag(\pi) \in \mathbb{N}$. From inspection of the algorithm, each {\sc write} increases the size of 
+	 $List$, and the value of the tags are  defined by the size of $List$. Therefore, there can be at 
+	 most a finite number of {\sc write}s such that can precede $\pi$ (w.r.t. $\prec$) in $\beta$.
+	  
+	\emph{P2:}  Suppose $\phi$ and $ \pi$ are any two transactions in $\Pi$, such that, $\pi$ begins after $\phi$ completes. 
+	Then we show that we cannot have $\pi \prec \phi$. Now, we consider four cases, depending on whether $\phi$ and $\pi$ are {\sc read}s or {\sc write}s.	
+	\begin{enumerate}
+	    \item [$(a)$] $\phi$ and $\pi$ are {\sc write}s invoked by writers $w_{\phi}$ and $w_{\pi}$, respectively. Since the size of $List$, in $r$,  grows monotonically with each {\sc write}  hence  $w_{\pi}$ receives the  tag at least as high as $tag(\phi)$, so $\pi\not \prec \phi$.
+	      %
+	       \item [$(b)$] $\phi$ is a {\sc write}, $\pi$ is a {\sc read} transactions invoked by writer $w_{\phi}$ and $r$, respectively.  
+	        Since the size of $List$, in $r$,  grows monotonically, and because  $w_{\pi}$ invokes $\pi$ after $\phi$ completes hence  $tag(\pi)$ is at least as high as $tag(\phi)$, so $\pi\not \prec \phi$.
+	      %
+	        \item[$(c)$] $\phi$ and $\pi$ are {\sc read}s  invoked by reader $r$. 
+	           Since the size of $List$, in $r$,  grows monotonically,  hence  $w_{\pi}$ invoked $\pi$ after $\phi$ completes hence $tag(\pi)$ is at least as high as $tag(\phi)$, so $\pi\not \prec \phi$.
+	        %
+	         \item [$(d)$] $\phi$ is a {\sc read}, $\pi$ is a {\sc write}  invoked by reader $r$ and $w_{\pi}$, respectively.
+	         This case is simple because new values are added to $List$  only  by writers, and $tag(\pi)$ 
+	         is larger than the tag of $\phi$ and hence   $\pi\not \prec \phi$. 
+	\end{enumerate}
+	
+	\emph{P3:} This is clear by the fact that any {\sc write} transaction always creates a unique tag and all tags are totally ordered since they all belong to $\mathbb{N}$
+	
+	\emph{P4:} Consider a {\sc read} $\rho$ as $READ(o_{i_1}, o_{i_2}, \cdots, o_{i_q})$, in $\beta$. 
+Let the returned value from $\rho$ be $\mathbf{v} \equiv $$(v_{i_1}, v_{i_2}, \cdots, v_{i_q})$ such that 
+$1 \leq {i_1} <  {i_2} <  \cdots <  {i_q} \leq k$, where value  $v_{i_j}$ corresponds to $o_{i_j}$. 
+	Suppose $tag(\rho) \in \mathbb{N}$ was created during some {\sc write} transaction, say $\phi$, i.e., $\phi$ is the {\sc write} that 
+	added the elements in index $(tag(\rho)-1)$ of $List$. Note that element in index $0$ contains the initial value.
+	%because {\sc read} transactions do not generate new tags as they do not add any new item to the $Vals$ of any server.
+	 Now we consider two cases:
+	 
+	\emph{Case $tag(\rho) = 1$.} We  know that it corresponds the initial default value $v_i^0$ at each sub-object $o_i$, and this equates to $\rho$ returning the default initial value for each sub-object.
+	 %
+	% Therefore, $tag(\rho) = tag(\phi)$. 
+	 
+	 \emph{Case $tag(\rho) > 1$.} Then we argue that there exists no {\sc write} transaction, say $\pi$, that updated object $o_{i_j}$,   in $\beta$, such that,  $\pi \neq \phi$ and $\rho$ returns values written by $\pi$ and $\phi \prec \pi \prec \rho$. Suppose we assume the 	contrary, which means $tag(\phi) < tag(\pi) < tag(\rho)$. The latter implies $tag(\phi)  = tag(\pi)$ which is not possible because 
+	this contradicts the fact that for any two distinct {\sc write}s $tag(\phi) \neq tag(\pi)$  in any execution of   $A$.
+	
+	\noindent{\emph{\underline{N property:}}}  By inspection of algorithm $A$ for the  response steps  of the servers to the reader.
+	
+	\noindent{\emph{\underline{O property:}}} By inspection of the  {\readValue} phase: it consists of one round of communication between the reader and the servers, where the servers send only one version of the value of the object it maintains.
+	
+	\noindent{\emph{\underline{W property:}}}  By inspection of the {\sc write} transaction steps, and  and  that writers always get to complete the transactions they invoke.
+	%Finally, the liveness property of {\sc write} transactions can be realized by inspecting the steps of  algorithm $A$.
+	\end{proof}
+

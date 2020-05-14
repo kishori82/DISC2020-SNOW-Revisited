@@ -1,0 +1,70 @@
+\rots{} that read data distributed across servers dominate the workloads of real-world distributed storage systems.
+The SNOW Theorem~\cite{SNOW2016} proved that ideal \rots{} that have optimal latency and the strongest guarantees---i.e., ``SNOW'' \rots{}---are impossible in one specific setting. That setting requires three or more clients, at least two readers among the clients (SWMR), and does not allow client-to-client communication.
+It left many open questions around when SNOW is possible that depend on whether client-to-client communication is allowed, whether clients are readers or writers, and when there are two clients.
+%It implicitly left open the possibility of SNOW with client-to-client communication, 
+%implicitly left open the possibility of SNOW with one reader and multiple writers (MWSR), and
+%explicitly left open the possibility of SNOW with two clients.
+We close all of these open questions with new impossibility results or new algorithms.
+We prove SNOW is impossible when client-to-client communication is allowed with three or more clients.
+That proof uses two writers and one reader, and thus also shows SNOW is impossible for multiple writers and a single reader (MWSR) with client-to-client communication.
+We show SNOW's possibility with two clients (SWSR) is dependent on client-to-client communication:
+We give an algorithm that provides SNOW when client-to-client communication is allowed;
+we prove it is impossible when client-to-client communication is disallowed.
+
+
+
+
+
+
+% Large-scale web services are built on distributed storage systems that \textit{shard} data across many machines within a datacenter and \textit{geo-replicate} data across several datacenters.
+% At the heart of designing such systems is the trade-off between the strength of guarantees provided to higher-level applications and the performance of the system.
+% The performance-guarantee trade-off due to replication has been well studied with impossibility results such as FLP~\cite{Fischer:pds1983} and CAP~\cite{Brewer:pdc2000, Gilbert:sigact2002}. % with several well-known impossibility results that influence the design of practical systems.
+% The trade-off due to sharding, in contrast, is far less understood with only one result that is relevant for the \rots{} that dominate real-world workloads.
+% This result is the SNOW Theorem \cite{SNOW2016}, which proves the ideal \rots{} that have optimal latency and the strongest guarantees---i.e., ``SNOW'' \rots{}---are impossible.
+% %This result is the SNOW Theorem, which proves that it is impossible for \rots{} to have all of the S, N, O, and W properties, where the SNOW properties represent the optimal latency and strongest guarantees.
+% Our work builds on the SNOW Theorem to clarify this fundamental trade-off by closing several open questions.
+% %and provide rigorously proved results.
+% These questions relate to the possibility of SNOW with two clients, multiple writers and a single reader, and when client-to-client communication is allowed.
+% We prove that SNOW is possible in some of these settings, but that it is impossible in the most general case even with client-to-client communication.
+% %This general impossibility raises the question of what the best achievable latency is for \rots{} with the strongest guarantees.
+% %Surprisingly, no existing algorithm provides bounded latency.
+% %We present the first algorithms with bounded latency for \rots{} with the strongest guarantees.
+% %We provide rigorous proofs for the SNOW theorem with three clients and show the impossibility of SNOW with two clients.
+% Our proofs require delicate reasoning about the inter-play of the SNOW properties and asynchrony, therefore, we rely heavily on I/O automata theory to derive these results.
+
+%Surprisingly, no existing algorithm provides bounded latency.
+%We present two algorithms with bounded latency that differ in the number of rounds they take and the number of versions of data they return.
+%Our final algorithm provides optimal latency in its best case and has a worst case of two non-blocking rounds that return two versions of the requested data.
+
+
+%% In this paper, we revisit SNOW with greater rigor to strengthen the fundamental understandings in sharding dimension.
+%% We present a rigor proof of the SNOW Theorem using I/O automata and five new (im)possibility findings with different system settings and client-to-client communication.
+%% We also present a set of novel {\sc READ} transaction algorithms that achieve bounded latency in strictly serializable systems that have transactional writes.
+%% Previous work either potentially requires indefinite blocking and/or unbounded number of round trips.
+
+
+
+% Large-scale web services are built on distributed storage systems, that \textit{shard} (i.e., partition) data across many machines within a datacenter and \textit{geo-replicate} the data across several datacenters.
+% %Their distributed nature within and across datacenters suggests a fundamental tradeoff between performance and consistency.
+% At the heart of designing such systems is the trade-off between the strength of guarantees provided to overlying applications and the performance of the system.
+% %The performance-guarantee trade-off due to replication has been well studied with impossibility results such as FLP~\cite{Fischer:pds1983} and CAP~\cite{Brewer:pdc2000, Gilbert:sigact2002}. % with several well-known impossibility results that influence the design of practical systems.
+% The trade-off due to sharding, in contrast, is far less understood with only one result that is relevant for the \rots{} that dominate real-world workloads.
+% This result is the SNOW Theorem \cite{SNOW2016} that proves the ideal \rots{} that have optimal latency and the strongest guarantees---i.e., ``SNOW'' \rots{}---are impossible.
+% %This result is the SNOW Theorem, which proves that it is impossible for \rots{} to have all of the S, N, O, and W properties, where the SNOW properties represent the optimal latency and strongest guarantees.
+% Our work builds on the SNOW Theorem to clarify this fundamental trade-off by closing several open questions and provide rigorously proved results.
+% These questions relate to the possibility of SNOW with two clients, multiple writers and a single reader, and when client-to-client communication is allowed.
+% We prove that SNOW is possible in some of these settings, but that it is impossible in the most general case even with client-to-client communication.
+% %This general impossibility raises the question of what the best achievable latency is for \rots{} with the strongest guarantees.
+% %Surprisingly, no existing algorithm provides bounded latency.
+% We present the first algorithms with bounded latency for \rots{} with the strongest guarantees.
+% We provide rigorous proofs for the SNOW theorem for the three-client  and show the impossibility of SNOW properties for transaction system with two-clients. Our proofs require delicate reasoning about the inter-play of the SNOW properties and asynchrony,therefore, we rely heavily on I/O automata theory to derive these results.
+
+% %Surprisingly, no existing algorithm provides bounded latency.
+% %We present two algorithms with bounded latency that differ in the number of rounds they take and the number of versions of data they return.
+% %Our final algorithm provides optimal latency in its best case and has a worst case of two non-blocking rounds that return two versions of the requested data.
+
+
+% %% In this paper, we revisit SNOW with greater rigor to strengthen the fundamental understandings in sharding dimension.
+% %% We present a rigor proof of the SNOW Theorem using I/O automata and five new (im)possibility findings with different system settings and client-to-client communication.
+% %% We also present a set of novel {\sc READ} transaction algorithms that achieve bounded latency in strictly serializable systems that have transactional writes.
+% %% Previous work either potentially requires indefinite blocking and/or unbounded number of round trips.

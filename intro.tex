@@ -1,0 +1,98 @@
+\section{Introduction}
+\label{sec:intro}
+% what are distributed storage systems; why they are important.
+Today's web services are built on \textit{distributed storage systems} that provide fault tolerant and scalable access to data.
+%, i.e., a fundamental building block for large-scale applications such as Facebook, Google, and Amazon, which have a great impact on people's everyday life.
+Distributed storage systems scale their capacity and throughput by \textit{sharding} (i.e., partitioning) data across many machines within a datacenter, i.e., each machine stores a subset of the data.
+They also \textit{geo-replicate} the data across several geographically dispersed datacenters to tolerate failures and to increase their proximity to users.
+
+% consistency and performance tradeoff
+Distributed storage systems abstract away the complexities of sharding and replication from application code by providing guarantees for accesses to data.
+These \textit{guarantees} include consistency and transactions.
+\textit{Consistency} controls the values of data that accesses may observe
+and \textit{transactions} dictate what accesses may be grouped together.
+Stronger guarantees provide an abstraction closer to a single-threaded environment, greatly simplifying application code.
+Ensuring the guarantees hold, however, often comes with worse performance.
+Therefore, the tradeoff between performance and guarantees lies at the heart of designing such systems.
+
+%% Despite their distributed nature, these systems provide guarantees on \textit{consistency}, which arbitrates the commit order of distributed operations: stronger consistency provides an abstraction closer to a single-threaded environment, greatly simplifying application code. However, stronger consistency often comes with worse performance due to the overhead in coordinating an order among operations. Therefore, the tradeoff between performance and consistency lies at the heart of designing such systems.
+
+% earlier work on replication
+The performance-guarantee tradeoffs that result from replication have been well-studied with several well-known impossibility results~\cite{AW94, Fischer:pds1983,Gilbert:sigact2002, lipton88pram}.
+For instance, the CAP Theorem~\cite{Gilbert:sigact2002} proves that system designers must choose either availability during network partitions (performance) or strong consistency across replicas (guarantee).
+However, little prior work exists on what performance-guarantee tradeoffs result from sharding.
+%(splitting datasets across multiple servers).
+%, i.e., within the scope of a datacenter across hundreds of thousands of machines.
+
+Understanding the performance-guarantee tradeoff due to sharding is important because user requests are typically handled across many shards but within a single nearby datacenter (replica).
+This is particularly true for the reads needed to handle a user request, which are what dominate real-world workloads:
+Facebook reported 500 reads for every write in their TAO system~\cite{TAO2013} and
+Google reported three orders of magnitude more reads than general transactions for their F1 database that runs on their Spanner system~\cite{Corbett:osdi2012}.
+In this work we focus on clarifying the performance-guarantee tradeoff for reads that results from sharding.
+%, an impossibility result proving that there exists a fundamental tradeoff between the latency of {\
+%  \sc READ} transactions and the consistency systems provide.
+% SNOW
+%\subsection{\roT{} Guarantees and Latency}
+Distributed storage systems group read requests (that each individually access a separate shard) into \textit{\rots{}} that together return a consistent, cross-shard view of the system.
+Whether a view is consistent is determined by the consistency model a system provides.
+The ideal \rots{} would have the strongest guarantees:
+They would provide strict serializability~\cite{Papadimitriou79}, the strongest consistency model,
+and they could be used in a system that also includes \textit{\wots{}} that group write requests (each to a separate shard) together.
+The alternative to the latter property are \rots{} that can only be used in systems that have non-transactional, \textit{simple writes}.
+
+The ideal \rots{} would also provide the best performance.
+In particular, they would provide the lowest possible latency because the prevalence of reads makes them dominate the user response times that are aggressively optimized by web services~\cite{latency:shopzilla, latency:amazon,
+  latency:search}.
+The \textit{optimal latency} for a \rot{} is to match the latency of non-transactional, \textit{simple reads}:
+complete in a single round trip of non-blocking parallel requests to the shards that return only the requested data~\cite{SNOW2016}.
+
+
+\subsection{Previous Results and Open Questions}
+To the best of our knowledge, the only result in the sharding dimension that is relevant to \rots{} is the SNOW Theorem~\cite{SNOW2016}.
+The SNOW Theorem is an impossibility result that proves no \rot{} can provide \textbf{S}trict serializability with \textbf{N}on-blocking client-server communication that completes with \textbf{O}ne response per read in a system with \wotsSNOW{} (\S\ref{sec:snow}).
+It shows there is a fundamental tradeoff between the latency and guarantees of \rots{} that system designers must grapple with, they must pick either the strongest guarantees (S and W) or optimal latency (N and O).
+%Section~\ref{sec:snow} defines the four SNOW properties more precisely.
+
+SNOW is trivially possible in systems with a single client or a single server because the single entity naturally serializes all transactions.
+The SNOW Theorem shows SNOW is impossible in systems with at least three clients and at least two servers.
+It explicitly leaves open the question of the possibility of SNOW in a system with two clients.
+
+In addition, the model used in the prior work implicitly leaves open several questions.
+It assumed the three clients were a single writer and multiple readers (SWMR).
+This leaves open the possibility of SNOW with multiple writers and a single reader (MWSR).
+The SNOW Theorem also implicitly disallowed client-to-client communication (C2C).
+This leaves open the possibility of SNOW when client-to-client communication is allowed.
+
+In this work, the new impossibility results % built upon the SNOW Theorem 
+are philosophically similar to other impossibility results---such as FLP~\cite{Fischer:pds1983} and CAP~\cite{Brewer:pdc2000, Gilbert:sigact2002}---in that they help system designers avoid wasting effort in trying to achieve the impossible. That is, the SNOW Theorem identifies a boundary in the design space of \rots{}, beyond which no algorithms can possibly exist. By revisiting SNOW, our work makes this boundary more precise.
+
+
+\subsection{Our Results}
+Our work builds on the SNOW Theorem to clarify this fundamental tradeoff by providing a thorough proof for the SNOW Theorem~\cite{SNOW2016} and answers the open questions mentioned above.
+%Figure~\ref{fig:contr_table_a} summarizes our new findings.
+First, we present a new, rigorous proof, using I/O automata~\cite{Lynch1996}, of the impossibility of SNOW with three or more clients even when client-to-client communication is allowed (\S\ref{sec:formal_proof}). In our proof we use two writers and one reader.
+Then, we find that SNOW's possibility with two clients depends on whether client-to-client communication is allowed:
+when it is not allowed, SNOW is impossible (\S\ref{subsec:no_snow_no_c2c}) for any one writer and one reader system;
+when it is allowed, SNOW is possible (\S\ref{subsec:yes_snow_yes_c2c}) for any multi-writer and single reader client system.
+Our algorithm demonstrating the latter possibility also shows that SNOW is possible with multiple writers and a single reader using client-to-client communication.
+
+\remove{ KMK
+The general impossibility of SNOW, even with client-to-client communication, raises the question of what the best achievable latency is for \rot{}s with the strongest guarantees (S and W).
+Surprisingly, there are no existing algorithms with bounded latency.
+All algorithms either have an unbounded amount of blocking~\cite{Mu:osdi2016, Thomson:sigmod2012, Mu:osdi2014} or take an unbounded number of rounds~\cite{Wei:sosp2015, Lee:sosp2015, Aguilera:sosp2007}.
+One algorithm was previously believed to provide a bounded number of non-blocking rounds~\cite{Lloyd:nsdi2013}, but we show that it does not provide strict serializability (\S\ref{sec:eiger}).
+
+We present the first \rot{} algorithms with bounded latency that can be used in systems with the strongest guarantees.
+Figure~\ref{fig:contr_table_b} summarizes what our new algorithms achieve.
+Our algorithms all use only non-blocking operations, making them SNW algorithms.
+The one response per read (O) property requires one round trip from the client to the servers and that the responses contain only a single version of each requested object.
+While providing both parts of the O property is impossible for SNW algorithms, we show that either part is individually possible.
+
+Our first algorithm returns one version of each requested data item and finishes in two rounds (\S\ref{mwmr_snow_one_version}).
+Our second algorithm finishes in one round and returns $W$ versions, where $W$ is the number of ongoing \wots{} (\S\ref{mwmr_snow_one_round}).
+%Our third algorithm always completes with two or fewer versions returned in two or fewer rounds with its best case completing in a single round with single versions (\S\ref{mwmr_snow_one_round}).
+%This final algorithm thus provides SNOW in its best case and remains close to SNOW with only an extra round and version in its worst case.
+We prove that our algorithms are non-blocking, strictly serializable, and respect write isolation.
+}
+
+%\input{contr-table}

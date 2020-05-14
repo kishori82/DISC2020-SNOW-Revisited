@@ -1,0 +1,244 @@
+%\documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2019}
+\documentclass[a4paper,anonymous,USenglish]{lipics-v2019}
+\pdfminorversion=7 
+
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{ifthen}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amsmath,multicol}
+\usepackage{ioa_code}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{diagbox}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{subcaption}
+\usepackage{cleveref}
+
+\input{nn_macros}
+\newtheorem*{lemma*}{Lemma}
+\newcommand{\states}[1]{{\textit{states}(#1)}}
+\newcommand{\startstates}[1]{{\textit{start}(#1)}}
+\newcommand{\sig}[1]{{\textit{sig}(#1)}}
+\newcommand{\inactions}[1]{{\textit{in}(#1)}}
+\newcommand{\outactions}[1]{{\textit{out}(#1)}}
+\newcommand{\intactions}[1]{{\textit{int}(#1)}}
+\newcommand{\extactions}[1]{{\textit{ext}(#1)}}
+\newcommand{\trans}[1]{{\textit{trans}(#1)}}
+\newcommand{\encode}[3]{{\textit{encode}_{#1, #2}(#3)}}
+\newcommand{\decode}[3]{{\textit{decode}_{#1, #2}(#3)}}
+\newcommand{\writeop}[2]{{ \textit{write}( #1, #2) }}
+\newcommand{\readop}[1]{{ \textit{read}(#1)}}
+\newcommand{\Writetr}[1]{{\textit{WRITE}(#1)}}
+\newcommand{\Readtr}[1]{{\textit{READ}(#1)}}
+\newcommand{\rot}{READ transaction}
+\newcommand{\roT}{READ Transaction}
+\newcommand{\rots}{READ transactions}
+\newcommand{\wot}{WRITE transaction}
+\newcommand{\wots}{WRITE transactions}
+\newcommand{\wotsSNOW}{\textbf{W}RITE transactions}
+
+\newcommand{\INV}[1]{{\textit{INV}(#1)}}
+\newcommand{\RESP}[1]{{\textit{RESP}(#1)}}
+
+\newcommand{\inv}[1]{{\textit{inv}(#1)}}
+\newcommand{\resp}[1]{{\textit{resp}(#1)}}
+
+\newcommand{\prefix}[1]{{ P(#1)}}
+\newcommand{\frag}[2]{{ F_{#1}(#2)}}
+
+\newcommand{\frage}[3]{{ #1   \ifthenelse{    \equal{#3}{} } {  \ifthenelse{ \equal{#2}{}}{}{(#2)}   }  { \ifthenelse{ \equal{#2}{}}{}{(#2)}^{(#3)}}     }}
+\newcommand{\fragt}[3]{{ #1   \ifthenelse{    \equal{#3}{} } {  \ifthenelse{ \equal{#2}{}}{}{}   } 
+		{ \ifthenelse{ \equal{#2}{}}{}{}^{(#3)}}     }}
+\newcommand{\fragn}[3]{{ #1   \ifthenelse{    \equal{#3}{} } {  \ifthenelse{ \equal{#2}{}}{}{}   } 
+		{ \ifthenelse{ \equal{#2}{}}{}{}}     }}
+
+\newcommand{\suffix}[1]{{ S(#1)}}
+%\newcommand{\finiteprefix}[2]{{ \sigma_0, a_1,  \sigma_1, \cdots, a_{#1},  \sigma_{#1}, a_{#2}, \sigma_{#2} }}
+\newcommand{\finiteprefix}[2]{{ \sigma_0, a_1, \ldots,  a_{#2}, \sigma_{#2} }}
+\newcommand{\finiteprefixt}[2]{{ a_1, \ldots,  a_{#2} }}
+\newcommand{\finiteprefixA}[2]{{ P_{#2}}}
+
+\newcommand{\send}[2]{{\textit{send}(#1)_{#2}}}
+\newcommand{\recv}[2]{{\textit{recv}(#1)_{#2}}}
+
+%\newcommand{\idSet}{\textit{\mathcal I}}
+
+\newcommand{\GetR}{{ \it{read-get}}}
+\newcommand{\GetRV}{{ \it{read-value}}}
+\newcommand{\CompR}{{ \it{read-complete}}}
+\newcommand{\GetW}{{ \it{write-get}}}
+\newcommand{\PutW} {{ \it{write-put}}}
+\newcommand{\CommitW} {{ \it{write-commit}}}
+
+\newcommand{\readd}{{read}}
+\newcommand{\AckR} {{ \it{read-ack}}}
+\newcommand{\GetRResp}{{ \it{read-get}}}
+\newcommand{\GetRVResp}{{ \it{read-value}}}
+\newcommand{\CompRResp}{{ \it{read-complete}}}
+\newcommand{\GetWResp}{{ \it{write-get}}}
+\newcommand{\PutWResp} {{ \it{write-put}}}
+\newcommand{\BCastResp} {{ \it{broadcast}}}
+\newcommand{\writeGetTag}{{\sc write-get}}
+
+\newcommand{\readCompleteTag}{{\sc read-complete}}
+\newcommand{\writeCommitTag}{{\sc write-commit}}
+\newcommand{\readDisperseTag}{{\sc read-disperse}}
+\newcommand{\disperseTag}{{\sc disperse}}
+\newcommand{\valueTag}{{\sc value}}
+\newcommand{\metadataTag}{{\sc metadata}}
+\newcommand{\writeCodeElementTag}{{\sc write-code}}
+
+
+\newcommand{\getTag}{{\it get-tag}}
+\newcommand{\getTagArray}{{\it get-tag-array}}
+\newcommand{\writeValue}{{\it write-value}}
+\newcommand{\readValue}{{\it read-value}}
+\newcommand{\readValuesAndTags}{{\it read-values-and-tags}}
+\newcommand{\informReaders}{{\it inform-readers}}
+\newcommand{\informReader}{{\it inform-reader}}
+\newcommand{\informSerializer}{{\it update-coord}}
+\newcommand{\updateCoord}{{\it update-coord}}
+\newcommand{\commit}{{\it commit}}
+
+\newcommand{\getTagTag}{{\sc get-tag}}
+\newcommand{\getTagArrayTag}{{\sc get-tag-array}}
+\newcommand{\writeValueTag}{{\sc write-value}}
+\newcommand{\readValueTag}{{\sc read-value}}
+\newcommand{\readValuesTag}{{\sc read-values}}
+\newcommand{\informReadersTag}{{\sc inform-readers}}
+\newcommand{\informSerializerTag}{{\sc update-coord}}
+\newcommand{\informReaderTag}{{\sc inform-reader}}
+\newcommand{\updateCoordTag}{{\sc  update-coord}}
+\newcommand{\ackTag}{{\sc acknowledge}}
+\newcommand{\commitTag}{{\sc commit}}
+\newcommand{\commitedTag}{{\sc commited}}
+\newcommand{\tentativeTag}{{\sc tentative}}
+
+\newcommand{\getTagResp}{{\it get-tag-resp}}
+\newcommand{\writeValueResp}{{\it write-value-resp}}
+\newcommand{\readValueResp}{{\it read-value-resp}}
+\newcommand{\informReadersResp}{{\it inform-readers-resp}}
+\newcommand{\new}[1]{{\color{blue}[{#1}]}}
+\newcommand{\delete}[1]{{\color{red}[{#1}]}}
+%\newcounter{algorithm}
+%\setcounter {Algorithm} {1} 
+
+\definecolor{worange}{RGB}{245, 128, 37}
+\newcommand{\wl}[1]{{\color{worange} #1}}
+\newcommand{\true}[1]{{\color{blue} #1}}
+\definecolor{hpurple}{rgb}{0.6, 0.4, 0.8}
+
+%\graphicspath{{./graphics/}}%helpful if your graphic files are in another directory
+
+\bibliographystyle{plainurl}% the mandatory bibstyle
+
+\title{SNOW Revisited: Understanding When Ideal READ Transactions Are Possible}
+
+
+\titlerunning{SNOW Revisited} %TODO optional, please use if title is longer than one line
+
+
+%\ccsdesc[100]{\textcolor{red}{Replace ccsdesc macro with valid one}} %TODO mandatory: Please choose ACM 2012 classifications from https://dl.acm.org/ccs/ccs_flat.cfm 
+
+\keywords{impossibility results, strict-serializability, transactions, IO Automata} %TODO mandatory; please add comma-separated list of keywords
+
+\category{} %optional, e.g. invited paper
+
+\relatedversion{} %optional, e.g. full version hosted on arXiv, HAL, or other respository/website
+%\relatedversion{A full version of the paper is available at \url{...}.}
+
+\supplement{}%optional, e.g. related research data, source code, ... hosted on a repository like zenodo, figshare, GitHub, ...
+
+%\funding{(Optional) general funding statement \dots}%optional, to capture a funding statement, which applies to all authors. Please enter author specific funding statements as fifth argument of the \author macro.
+
+
+%Editor-only macros:: begin (do not touch as author)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\EventEditors{John Q. Open and Joan R. Access}
+\EventNoEds{2}
+\EventLongTitle{42nd Conference on Very Important Topics (CVIT 2016)}
+\EventShortTitle{CVIT 2016}
+\EventAcronym{CVIT}
+\EventYear{2016}
+\EventDate{December 24--27, 2016}
+\EventLocation{Little Whinging, United Kingdom}
+\EventLogo{}
+\SeriesVolume{42}
+\ArticleNo{23}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+%\input{abstract-v2.tex}
+\input{abstract}
+\end{abstract}
+
+
+\input{intro}
+
+%\section{Model and architecture}\label{model}
+%\input{system-model-arch-short-v1.tex}
+
+\input{prelim-kmk-v1}
+\input{snow-kmk-v1}
+\input{summary}
+\input{formal_proof}
+\input{2clients2servers}
+\input{c2c_mwsr}
+
+\remove{
+\section{Bounded Latency}
+\subsection{No Prior Bounded Latency for SW}\label{sec:eiger}
+%\input{no_bounded_latency.tex}
+
+\vspace{-1em}
+\subsection{SNW +  One Version,  MWMR setting}\label{mwmr_snow_one_version}
+%\input{SNW-one-version-short-v1.tex}
+%
+\subsection{SNW + One Round,  MWMR setting}\label{mwmr_snow_one_round}
+%\input{SNW-one-round-short-v1.tex}
+%
+\vspace{-0.8em}
+}
+
+%\section{Related Work}\label{related}
+%\input{related.tex}
+%
+\section{Conclusion}
+\input{conclusion-v1.tex}
+Finally, each of our algorithms assumes a set of readers and writers. Clients in real systems, however, dynamically 
+switch between reading and writing data and thus are both. 
+Does such a setting  change the bounds when SNOW is possible?
+
+\bibliography{biblio}
+
+
+\appendix
+%\input{system-model-arch-v1.tex}
+
+%\section{Impossibility of SNOW  with two clients with restricted communication }\label{two-client-app}
+%\input{2-clients-no-C2C-impossible-v1.tex}
+
+%\section{Impossibility of SNOW properties with  three clients}\label{three-client-app}
+%\input{3-clients-yes-C2C-impossible-v1.tex}
+
+%\input{appendix_snow.tex}
+
+\input{appendix_v1.tex}
+
+%\input{eiger_not_s.tex}
+
+\input{appendix_algrb.tex}
+
+\input{appendix_algrc.tex}
+
+
+
+
+
+\end{document}

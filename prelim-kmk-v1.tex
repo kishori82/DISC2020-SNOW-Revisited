@@ -1,0 +1,175 @@
+\section{Transactions Processing System}
+\label{sec:prelim}
+%\subsection{Web Service Architecture}
+%\label{subsec:web}
+Web services typically have two tiers of machines within a datacenter: a stateless
+frontend tier and a stateful storage tier.
+The frontends handle user requests by executing application logic that generates
+sub-requests to read/write data in the storage tier that shards (or splits) data across many machines.
+We refer to the front-ends as the \textit{clients}, the storage machines as
+the \textit{servers} and the stored data items as \textit{objects}, to match common terminology.
+While web services are typically geo-replicated, we focus on sharding within a datacenter because the reads that dominate their workloads are handled within a single datacenter.
+
+We consider a transaction processing system that comprises a set of read/write objects $\mathcal{O}$,
+ where each object 
+$o \in \mathcal{O}$ is maintained by a separate server process,
+%, and all processes are connected via a  communication network.
+and also another set of processes, we refer to as \emph{clients}, that can initiate transactions.
+ The system allows two types of transaction: {\sc READ} transaction, a group of read requests for the values stored in some subset of objects in $\mathcal{O}$; and {\sc WRITE} transaction, a group of write requests intending to update the values stored in some subset of objects  $\mathcal{O}$.
+ A read-client executes only READ transactions, while write-client executes only WRITE transactions; no client executes both types of transaction.
+
+A typical READ transaction, we denote as $\textit{R}(o_{i_1}, o_{i_2}, \ldots, o_{i_q})$ or in short by $R$, consists a set of individual read requests
+  $read(o_{i_1})$,  $read(o_{i_2})$ and  $read(o_{i_q})$ to read values in objects $o_{i_1}, o_{i_2}, \ldots, o_{i_q}$, respectively.
+   $read(o)$ denotes a read that intends to read the value of object $o$.
+ A typical WRITE, denoted as   
+ $\textit{W}((o_{i_1}, v_{i_1}), (o_{i_2}, v_{i_2}), \ldots, (o_{i_p}, v_{i_p}))$ or in short as $W$, consists of a set of which requests to update the values of objects $o_{i_1}, o_{i_2}, \ldots, o_{i_p}$ with  $v_{i_1}, v_{i_2}, \ldots, v_{i_p}$, respectively.
+  
+ A read (or write) client initiates a  READ (or WRITE) transaction with an invocation step  $\INV{R}$ (or $\INV{W}$), then it carries out the read or write operations in the transaction; and eventually completes  the transaction with a $\RESP{R}$ (or $\RESP{W}$).
+ After the completion of the reads or writes in a transaction the client responds, in the case of $R$, with the values of objects;  and, in the case of $W$, an \emph{ok} status, to the external client.
+
+We assume that the network channels are reliable but asynchronous, i.e., any message sent by a process will eventually arrive at its destination uncorrupted. We assume  local computations are  asynchronous, i.e., local computations at various processes proceed at arbitrary and unpredictable speeds. When a client receives a transaction request, usually from an external client, such as an user's device,  it  executes the transaction, denote by $R$ or $W$,  and finally, responds to the external client with the results.
+
+\remove{KMK
+The impossibility results we prove in this work involve showing the impossibility of algorithms for transaction processing where the executions are expected to guarantee  certain properties, such as the SNOW properties, described below. Our proofs rely on showing contradictions in some execution of an algorithm $\mathcal{A}$,  if such an algorithm was possible.  A typical proof assumes a simple set of transactions whose outcome is obvious,  satisfies the SNOW properties (described below) and also shows the existence of an execution $\alpha_0$, with desired properties,  of $\mathcal{A}$. Based on this,
+we inductively argue the existence of a sequence of executions, with the properties, of $\mathcal{A}$, and finally arrive at an execution that contradicts at least one of the properties.  Since $\mathcal{A}$ can be any algorithm,  simple or complex, as long as it (to be precise, its executions) respects the same properties, there are innumerable  types of executions due to the asynchrony and the steps of $\mathcal{A}$. To create a series of possible executions, $\{\alpha\}_{i=0}$ we create the new execution $\alpha_{i+1}$, with the properties,  by starting with $\alpha_i$ and then perturbing (delaying or speeding up, using the liberty allowed by asynchrony) the occurrence of some events of $\alpha_i$ and thereafter allowing $\mathcal{A}$ to execute.
+}
+
+%In order to carry out our proofs we use IO Automata, which is  useful for careful analysis of the executions of $\mathcal{A}$ in asynchronous setting. Below we describe the following using the IO Automata: $(i)$ The models for the client and the servers processes, and the channels; $(ii)$ any execution  of $\mathcal{A}$ in terms of transition steps of individual automata; $(iii)$ the SNOW properties  of the algorithm; and  $(iv)$ the SNOW theorem.
+
+\remove{
+%\subsection{System Model and Assumptions}
+\subsection{Algorithm Specification with I/O Automata}
+\label{subsec:model}
+
+\paragraph{\textbf{Processes and channels.}}
+We consider a set $\Omega$ of $n$ processes in the system: $P_1, P_2, \ldots, P_n$. Each process represents a machine in the datacenter. More specifically, we denote client machines (processes) that can issue reads (readers) by $r_1, r_2, \ldots, r_k$, the clients that can issue writes (writers) by $w_1, w_2, \ldots, w_l$, and servers that store the data by $s_1, s_2, \ldots, s_m$, with $r, w, s \in \Omega$. Each client can only have one outstanding transaction, i.e., it cannot issue a new transaction until the outstanding transaction finishes. As a result, each client can either be a reader or a writer but not both at a given time.
+
+%\paragraph{\textbf{Executions and I/O automata.}}
+We model a distributed algorithm using   the I/O Automata~\cite{Lynch1996}.
+%. A detailed account on IO Automata can be found in ~\cite{Lynch1996}. 
+Here we limit our discussion of I/O Automata to the relevant concepts, but for a detailed account the reader should refer 
+to ~\cite{Lynch1996}.
+An algorithm is a composition $\mathcal{A}$ of a set of \emph{automata} where each automaton  $A_i$ corresponds to a process (e.g., client or server) or a communication channel in the system.  $A_i$ is defined in terms of
+a set of deterministic transition functions  $\trans{A_i}$ (also called \textit{actions}), which can be thought of as the algorithmic steps of $A_i$;  and  a set of states $\states{A_i}$. 
+%Each process is an automation $A_i \in A$, i.e., a deterministic state machine. $A_i$ contains a set of states $\states{A_i} \subseteq \states{A}$. 
+%The set of possible initial state of $A_i$ is $\startstates{A_i} \subseteq \states{A_i}$. 
+An execution of $\mathcal{A}$ is a sequence of alternating states and actions of $A$,  $\sigma_0, a_1, \sigma_1, a_2, \sigma_2, \ldots, \sigma_n$. 
+A state change, called a \textit{step}, is a 3-tuple $(\sigma_i, a_i, \sigma_{i+1})$, with $\sigma_i, \sigma_{i+1} \in \states{A_i}$ and $a_i \in \trans{A_i}$. 
+%$a_i$ is an input action if it receives a message. 
+The set of input actions is denoted by $\inactions{A_i}$, e.g.,  $a_i \in \inactions{A_i}$ is an input action if it receives a message. The set of output actions is denoted by $\outactions{A_i}$. The input and output actions are also called external actions, denoted by $\extactions{A_i}$ and $\inactions{A_i} \cup \outactions{A_i}=\extactions{A_i}$. If an action $a_i \notin \extactions{A_i}$, then $a_i$ is an internal action.
+Communications between any two automata $A_i$ and $A_j$ is modeled by using channel automata $Channel_{i, j}$ for sending messages from $A_i$ to $A_j$; and $Channel_{j, i}$ for sending message from $A_j$ to $A_i$. When $A_i$ sends some
+message $m$ to $A_j$ the following sequence of actions occur: $send(m)_{i,j}$  occurs at $A_i$, then 
+$send(m)_{i,j}$ followed by $recv(m)_{i, j}$ occur at $Channel_{i,j}$; then finally, $A_j$ receives $m$ via the action $recv_{i,j}(m)$.
+In our model,  the communication channels are simple because we assume reliable communication between each pair of processes. Therefore, we ignore the actions in the $Channel_{i, j}$ and instead say   $send(m)_{i,j}$  occurs at $A_i$ and then $A_j$ receives $m$ via the action $recv_{i,j}(m)$.
+%$a_i$ is an external action, i.e., $a_i \in \extactions{A_i}$, if $a_i$ receives/sends a message from/to another automation, otherwise $a_i$ is an internal action of $A_i$. 
+%
+%An execution of algorithm $\pi$ is a composition $E$ of $E_i$, i.e., the execution on each automation. 
+An execution fragment $\alpha$ %is a continuous segment of $E$. $\alpha$ 
+can be either finite, i.e., having finite states, or infinite.
+% We use the notation $trace(\alpha)$ to denote the sequence of external actions in $\alpha$; and by $trace(\alpha) | A_i$ we denote the sequence of external actions in $trace(\alpha)$ that belongs to automaton $A_i$. 
+If $\alpha$ is a finite execution and $\beta$ is an execution fragment, such that $\beta$ starts with the final state of $\alpha$ then we use $\alpha \circ \beta$ to denote the concatenation of $\alpha$ and $\beta$.
+If $\epsilon$ and $\epsilon'$ are two execution fragments, such that they have the same sequence of states at automaton $A_i$, i.e., $\epsilon|A_i = \epsilon'|A_i$, then $\epsilon$ and $\epsilon'$ are indistinguishable at $A_i$, denoted by $\epsilon \stackrel{A_i}{\sim} \epsilon'$. When the context is clear, we simply use $\epsilon \sim \epsilon'$. 
+}
+We model a distributed algorithm using the I/O automata modeling framework (see ~\cite{Lynch1996} for a detailed account or the appendix, for a brief description).
+In the rest of this paper, for any execution of an automaton $\mathcal{A}$, 
+$\finiteprefix{k-1}{k}\ldots$, where $\sigma$'s and $a$'s are states and actions,
+we use the notation $\finiteprefixt{k-1}{k}\ldots$ which shows only the actions to simplify notation. 
+% The network is either asynchronous or partially synchronous, i.e., there do not exist perfect wall clocks in the system that atomically synchronize the sending and receiving of messages. That is, messages can be delayed and the delay is assumed to be either unbounded or bounded by some upper bound.
+We use the notation $\textit{prefix}(\alpha, a)$ to refer to the finite prefix of any execution $\alpha$ ending with action  $a$ such that $a$ occurs within $\alpha$.
+In our model, an individual read, such as $read(o)$, in some read transaction $R$ initiated by some read client $r$ consists of the following sequence of actions: after $\INV{R}$ at $r$, $r$ sends a message $m$ (requesting the value stored in $o$) to a server $s$ via action $\send{m}{r, s}$. When  $s$ receives $m$ via  action $\recv{m}{r, s}$ it sends the value $v$ (stored in $o$) to $r$  via action $\send{v}{s, r}$. Then $read(o)$ completes as soon as $r$ receives $v_j$ via action  $\recv{v}{s, r}$. 
+
+\remove{
+\subsection{Transactions Processing System}
+\label{subsec:notation}
+We consider a transaction processing system that comprises a set $\mathcal{O}$ of read/write objects,
+ where each object 
+$o \in \mathcal{O}$ is maintained by a separate server process, and we consider a set of client process,  and all processes are connected via  reliable and asynchronous communication channels.
+%The system has a set of physical objects (data items) sharded across many (server) processes. Without loss of generality, we treat the group of objects that reside on the same process $P_k$ as a single logical object $o_k$, where $o_k \in \mathcal{O}$ and $\mathcal{O}$ is the set of logical objects.  
+%We assume that between any pair of processes $p_1$ and $p_2$,   such that $p_1 \neq p_2$,   there are channel automata $Channel_{p_1, p_2}$ and $Channel_{p_2, p_1}$.
+%\hl{I commented out the text on assuming there is a channel between each pair of processes here.}
+\sloppy 
+The distributed algorithm $\mathcal{A}$  for the transaction processing system runs on these set of processes. In this setting,  there are two types of transactions: READ and WRITE transactions. The \textit{invocation} of a \rot{} $R$, denoted by $\INV{R}$, is the external action at a read client process $\textit{READ}(o_{i_1}, o_{i_2}, \ldots, o_{i_q})$, for any subset  of objects $o_{i_1}, o_{i_2}, \ldots, o_{i_q}$ in $\mathcal{O}$.
+%
+%, which sends messages to the server processes that hold objects $o_{i_1}, o_{i_2}, \ldots, o_{i_q}$. More specifically, $\INV{R}$ consists of a set of output actions, $\send{m_j^{r}}{r, s_j}$, which sends a message $m_j^{r}$ from reader $c_r$ to server $s_j$.
+%Server $s_j$ starts processing $R$ with an input action $\recv{m_j^{r}}{r, s_j}$ that receives the message $m_j^{r}$, and finishes processing $R$ by an output action $\send{v_j}{ s_j, r}$ that sends value $v_j$ to $c_r$. 
+The \textit{response} of $R$, denoted by  $\RESP{R}$,  occurs at the same read client by returning the value read from each of the  objects $o_{i_1}, o_{i_2}, \ldots, o_{i_q}$.
+%
+%\sloppy We model the processing of \wots{} in the same way.
+ The goal of a write transaction $\textit{WRITE}((o_{i_1}, v_{i_1}), (o_{i_2}, v_{i_2}), \ldots, (o_{i_p}, v_{i_p}))$,  we denote by $W$, is to update the 
+ value of object $o_{i}$ to $v_i$.  The invocation of a \wot{} $W$, denoted by $\INV{W}$, is 
+ $\textit{WRITE}((o_{i_1}, v_{i_1}), (o_{i_2}, v_{i_2}), \ldots, (o_{i_p}, v_{i_p}))$, which writes $o_i$ with value $v_i$. The response of $W$, denoted by $\RESP{W}$, is simply $\textit{ok}$. %The lifetime of a transaction is the time between invocation and response.
+}
+
+\subsection{SNOW Properties} 
+In this subsection, we define the SNOW properties for a transaction 
+processing system.  Namely, we require that any fair execution of the
+system satisfies the following
+ four properties: $(i)$ \emph{Strict serializability} (S), which means there is a total ordering  of the transactions such that  all transactions in the resulting execution  appear to be processed by  a single machine one at a time; $(ii)$ \emph{Non-blocking operations} (N), which  means that the servers respond immediately to the read requests of a READ transaction without waiting for any input from other processes; $(iii)$ \emph{One response per read} (O), which requires that any read operation  consists of one round trip of communication with a server,  and also, that  the server responds with a message that contains exactly  one version of the  object value; and $(iv)$ \emph{WRITE transactions that conflict} (W) implies the  existence of concurrent WRITE transactions that update the data objects  while READ transactions are in progress reading the same objects.  Below we describe the individual properties of the SNOW properties in more detail.
+
+{\bf Strict serializability (S).} By \emph{strict serializability} (for a formal definition please see~\cite{HW90}), we mean each WRITE or READ transaction appears to the clients to be executed atomically, at some point in an execution  between the invocation and response events.
+%In other words,  for  each transaction, we can associate a 
+%serialization point between the invocation and response actions, such that all  the read operations return values such that the transactions appear to  occur in the same order as the serialization points.
+
+Next, we describe the non-blocking and one-response 
+properties.  Both are defined as properties of read operations to an 
+individual object. For the purpose of elucidation, we consider an execution $\alpha$ of a transaction processing system $T$ that has a set of objects $\mathcal{O}$, where there is a READ transaction  $\textit{R}(o_{i_1}, o_{i_2}, \ldots, o_{i_q})$, in short $R$, invoked at some reader $r$, such that $R$ contains a read $read(o_j)$ for some $o_j \in \mathcal{O}$ maintained at server $s_j$.
+% By $\textit{prefix}(\alpha', a)$ we denote the execution fragment in $\alpha$ from the  beginning of $\alpha$ to the state immediately following any action $a$ in $\alpha$.
+ %Consider a READ transaction  $\textit{READ}(o_{i_1}, o_{i_2}, \ldots, o_{i_q})$,   denote it by $R$, initiated at read client $r$. 
+ % where $R$ contains the individual reads $read(o_{i_1})$,  $read(o_{i_2})$ and  $read(o_{i_q})$ to read values stored in $o_{i_1}, o_{i_2}, \ldots, o_{i_q}$, respectively.
+%
+  % and there is  a read operation in it  to  read the value of some object $o_i$ managed by some server $s_i$.
+% If The read operation involves $r$ communicating a \emph{send value} message   to $s_i$ requesting the stored value of $o_i$. 
+
+{\bf Non-blocking reads (N).} The \emph{non-blocking} property means that if $r$ sends any message to any $s_i$ ($s_i$ manages object $o_i$) during the transaction then  $s_i$ can  respond to  $r$ without waiting for any external input event, such as the arrival of messages, any mutex operations, time, etc. This property ensures that {\sc READ} transactions are delayed only due to delay in message delivery between $r$ and $s_i$. We define this property formally as follows.
+
+\begin{definition}[Non-blocking read (N)]
+%The one-round, one-version and non-blocking properties states the following properties for $\alpha$.
+ Suppose in  $\alpha$, following the action $\INV{R}$,  the actions  $\recv{m_j^{r}}{r, s_j}$ and   $\send{v_j}{ s_j, r}$
+   corresponding to $read(o_j)$, occurs at $s_j$.  Then there  exists an execution $\alpha'$ of $T$ such that
+  \begin{enumerate}
+  \item[ $(i)$ ] The execution fragments 
+ $\textit{prefix}( \alpha, \recv{m_j^{r}}{r, s_j})$ and $\textit{prefix}( \alpha', \recv{m_j^{r}}{r, s_j})$ are identical, where
+ $\textit{prefix}(\alpha, a)$.
+ \item [ $(ii)$] In $\alpha'$ the action  $\send{v_j}{ s_j, r}$ at $s_j$ occurs after $\recv{m_j^{r}}{r, s_j}$ without any input action in between.
+\end{enumerate}
+\end{definition}
+  
+{\bf One-response per read (O).} The \emph{one-response} property requires that each read operation, $read(o_i)$,  during any
+READ transaction, completes successfully in one round of client-to-server communication and the \emph{one-version}  states that exactly one version of the value is sent by server $s_i$, that manages $o_i$, to $r$. \emph{One-round} consists of 
+a read  request from the client initiating the read operation to the server  and  the response containing value sent by the server.
+%, and subsequently, the server sending only one version of the object value  in its response. 
+
+\begin{definition}[One response per read (O)]
+%The one-round, one-version properties states the following properties for $\alpha$.
+ Suppose in  $\alpha$, the action $\INV{R}$ occur at $r$  then in $\alpha$ there exists  exactly a pair of actions $ \recv{m_j^{r}}{r, s_j})$ and   $\send{v_j}{ s_j, r}$, corresponding to $R$,  occur at $s_j$, such that 
+ $v_j$ is the object value of $o_j$.
+\end{definition}
+If the reads,  of some READ transaction, of a transaction processing system respect the \emph{non-blocking} and \emph{one-response} properties then each read includes one-round trip from client to server,  where the server returns only the requested value as soon as it receives the request. It is worth noting that the READ transaction can complete only after all the $read(\cdot)$s in it complete.
+
+\begin{definition}[Conflicting writes (W)]
+%The one-round, one-version properties states the following properties for $\alpha$.
+ Suppose in  $\alpha$, the action $\INV{W}$, the actions  occur
+  at a write client $w$ then there is an action $\RESP{W}$ in $\alpha$ that appears after $\INV{W}$.
+\end{definition}
+
+
+%\paragraph{Concurrent and conflicting writes (W)} The \emph{concurrent and conflicting writes}
+{\bf WRITE transactions that conflict (W).} The \emph{conflicting writes}
+ property states that READ transactions complete even in the presence of concurrent WRITE
+  transactions, where the write operations  might update some objects that are also being read by read operations in READ transaction. 
+  This shows that READ transactions can be invoked at any point, even in the presence of ongoing WRITE
+   transactions.  Note that the liveness of any WRITE transaction is not implied by any of 
+   the SNOW properties;  however, for useful practical systems   the  WRITE transactions must eventually complete. 
+   % is essential in practical systems where \emph{WRITE}s complete if the writer 
+ % transactions is essential
+   % to avoid trivial and uninteresting  executions such as  executions where no \emph{WRITE} transaction ever completes 
+   % but the \emph{READ} transactions return the  initial values of the objects. 
+    Therefore, we assume that every WRITE
+    transaction eventually completes via the $RESP$ event, and think of this constraint as a part of the W property.  
+
+\remove{KMK
+\subsection{One-Version, Multi-Round Property (o)} 
+We also introduce a weaker version of the O property, denote it as ``o'',  where during a read operation the  server returns exactly one object value but there exists a finite bound on the number of rounds of communication between the client and the  server. We use the acronym SNoW to denote the S, N, o, and W properties.  Moreover,  it is easy to realize that if an algorithm satisfies the SNoW properties then READ transactions always complete, and hence, READ transactions are always live. This is because the N and o properties imply that the server must immediately respond to a read request due to a read operation with exactly one object value without waiting in expectation of incoming messages, and 
+there is a fixed upper bound on the number of such rounds for a READ.
+}
+%The system has a set of physical objects (data items) sharded across many (server) processes. Without loss of generality, we treat the group of objects that reside on the same process $P_k$ as a single logical object $o_k$, where $o_k \in \mathcal{O}$ and $\mathcal{O}$ is the set of logical objects. The \textit{invocation} of a \rot{} $R$, denoted by $\INV{R}$, is the external action on a client process: $READ(o_{i_1}, o_{i_2}, \ldots, o_{i_q})$, which sends messages to the server processes that hold objects $o_{i_1}, o_{i_2}, \ldots, o_{i_q}$. The \textit{response} of $R$, denoted by $\RESP{R}$, is the external action on the same client process: $RECV(v_{i_1}, v_{i_2}, \ldots, v_{i_q})$, which returns the value of each object. For simplicity, we often omit ``RECV" when the context is clear. The invocation of a \wot{} $W$, denoted by $\INV{W}$, is $WRITE((o_{i_1}, v_{i_1}), (o_{i_2}, v_{i_2}), \ldots, (o_{i_p}, v_{i_p}))$, which writes each object $o_i$ with new value $v_i$. The response of $W$, denoted by $\RESP{W}$, is $ok$. The lifetime of a transaction $T$ is the time between its invocation and response.

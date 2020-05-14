@@ -1,0 +1,15 @@
+In this work, the new impossibility results built upon the SNOW Theorem are philosophically similar to other impossibility results---such as FLP~\cite{Fischer:pds1983} and CAP~\cite{Brewer:pdc2000, Gilbert:sigact2002}---in that they help system designers avoid wasting effort in trying to achieve the impossible. That is, the SNOW Theorem identifies a boundary in the design space of \rots{}, beyond which no algorithms can possibly exist. By revisiting SNOW, our work makes this boundary more precise. 
+
+
+The SNOW Theorem and our revisitation in this work are the first set of results on the performance-guarantee tradeoff due to sharding with a focus on \rots{}. Most prior results related to sharding focus on the complexity-robustness tradeoff~\cite{Guerraoui:pods2017}, which states that transaction protocols become more complex when there are fewer restrictions on how servers fail. In contrast, our results apply to failure-free cases, which are arguably the most frequent in practice~\cite{Guerraoui:pods2017}, and scenarios where machines can fail.
+
+Besides making more precise conditions for the impossibility results, this work also
+introduces novel possible algorithms.
+Before our work, no existing algorithms achieved bounded latency with the strongest guarantees. They either required an unbounded number of round trips with single version~\cite{Lloyd:nsdi2013, Wei:sosp2015, Lee:sosp2015, Aguilera:sosp2007}, blocked read operations~\cite{Corbett:osdi2012, SNOW2016}, or settled for weaker guarantees~\cite{Corbett:osdi2012, Aguilera:sosp2015, Bailis:sigmod2014, Lloyd:sosp2011}.
+
+
+%\wl{We should discuss the work on atomic commit here:
+%``Most prior results in the sharding dimension are related to atomic commit, which are not applicable to \rots{} because it is always safe for them to ``commit'' because they do not update data.
+%\hl{I think this might raise confusion since read transactions do sometimes abort. people might question why we say it's always safe to commit? I think we could even take out this sentence.}
+%''
+%}

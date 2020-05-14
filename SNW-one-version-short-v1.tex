@@ -1,0 +1,177 @@
+%\section{SNoW for MWMR setting}\label{mwmr}
+In this section,  we present  algorithm  $B$, which satisfies  SNoW  properties, where ``o'' means a \rot{} may consist of more than one round trip of communication between the reader and the servers. We denote the type of object  that satisfies the SNoW properties by $\tilde{\mathcal{O}}_T$.   
+%Note that $B$ can also tolerate crash failure of writers and readers. 
+The steps of the algorithm for the writers, readers and the servers  are presented in appendix (Pseudocode~\ref{fig:algo_b}).
+We assume  a set of writers $\mathcal{W}$,  a set of readers $\mathcal{R}$ and a set of $k \geq 1$ servers,  $\mathcal{S}$, with ids $s_1, s_2\cdots s_k$ that stores the objects $o_1, o_2, \cdots, o_k$, respectively.  We define  key ${\kappa}$ is defined as a pair $(z, w)$, 
+where $z \in \mathbb{N}$ and $w \in \mathcal{W}$ the  id of a writer. We use $\mathcal{K}$ to denote the set of all possible keys. 
+In $B$, the keys are used to uniquely identify each transaction. Also, with each transaction we associate a tag $t \in \mathbb{N}$. 
+%We assume writers can send message to the reader, i.e., we allow client-to-client messages.
+% We assume that each process has a unique id. We assume that each server $s$ stores object $o_s$, due to sharding.  For the sake of simplicity, we assume that the \wots{} issued by a writer are of the form: \emph{ write value $v_1$ to object $o_1$, $v_2$ to $o_2$, and so on}. In other words, we assume that such a  transaction consists of the set of operations $\{ \writeop{o_1}{v^{(1)}}, \writeop{o_2}{v^{(2)}}\cdots \writeop{o_k}{v^{(k)}}\} $, which we denote by $write(v_1, v_2, \cdots, v_k)$.  \wots{} where only a subset of  the objects are updates will be discussed later. We also assume that  the \rots{} are of the form  $\{ \readop{o_1}, \readop{o_2}\cdots \readop{o_k}\}$ consisting of $k$ reads to $k$ distinct objects.	
+	
+In  $B$, we designate one of the servers as coordinator, we denote as $s^*$,
+ for the transactions. The coordinator $s^*$ is used to maintain the order of the \wots{} and the objects that are updated during the \wot{} in the variable $List$.  %Note that in a system, where there are many objects 
+%different objects may be use different servers  as coordinators based on some load-balancing rule. 
+
+\textit{\textbf{State variables:}} Each of the writers and servers maintain a set of state variables as follows: $(i)$ At  any  \emph{writer $w$}, there is  a counter $z$ to keep track of the
+ number of \wot{}  the writer has  invoked, initially $0$. $(ii)$ At any  \emph{server}, $s_i$, 
+ for $i \in [k]$, there is  a set variable $Vals$ 
+ with elements 
+ that are  key-value pairs $({\kappa}, v_i) \in \mathcal{K} \times \mathcal{V}_i$. Initially,
+  $Vals= \{ ({\kappa}^0, v_i^0)\}$. %This ensures that each \wot{} generates a unique key.
+A server also contains an
+ ordered list variable $List$  of elements  as $({\kappa}, (b_1, \cdots, b_k))$,  where 
+ ${\kappa}  \in \mathcal{K}$  and 
+ $(b_1, \cdots b_k) \in  \{0, 1\}^k$. Initially,  
+ $List= [ ({\kappa}^0, (1, \cdots 1) ]$, where ${\kappa}^0  \equiv (0, w_0)$, 
+ where $w_0$ is any
+  place holder identifier string for writer id. The elements in $List$ can be identified with an index, e.g., 
+  $List[0] =({\kappa}^0, (1, \cdots, 1))$.  Essentially, a $(k+1)$-tuple  $(\kappa, (b_1, \cdots, b_k))$ in $List$ corresponds to a \wot{} and 
+   identifies the set of objects that are updated during the \wot{}, i.e., if $b_i=1$ then object 
+   $o_i$ was updated  during the execution of the  \wot{}, otherwise $b_i=0$.
+			%labeled with phase names, viz., {\readGetTag}, {\readValueTag}, {\readCompleteTag} and {\writeGetTag}. The server to server messages are labeled as {\readDisperseTag}. Also, in some phases of {\SODA},  the message-disperse primitives {\mdmetaprim} and {\mdvalueprim} are used  as services. 
+					
+\textit{\textbf{Writer steps:}} A \wot{} updates
+			a  list of $p$ objects $o_{i_1}, o_{i_2}, \cdots o_{i_p}$  with values
+			 $v_{i_1}, v_{i_2}, \cdots v_{i_p}$, respectively, is invoked at $w$ via the procedure
+			$\Writetr{ (o_{i_1}, v_{i_1}), (o_{i_2}, v_{i_2}), \cdots, (o_{i_p}, v_{i_p}) }$.
+We use the notations:  $I \triangleq \{i_1, i_2, \cdots, i_p\}$  and $S_I\triangleq \{s_{i_1}, s_{i_2}, \cdots, s_{i_p}\}$.
+This procedure  consists of two phases: {\writeValue} and {\updateCoord}. 
+%We denote the set of servers involved   in the \wot{}  by  $S_I=\{s_{i_1}, s_{i_2}, \cdots, s_{i_p}\}$.   
+During the {\writeValue} phase,  $w$ creates a new key ${\kappa}$ as 
+ $ {\kappa}  \equiv (z + 1, w)$, where $w$ identifies the writer; and also increments the local counter $z$ by one.  Then $w$ sends $(${\writeValueTag}$, ({\kappa}, v_{i}))$ to each server in $S_I$, and awaits {\ackTag}  
+from all servers in $S_I$.
+After receiving {\ackTag} from all servers in $S_I$,  $w$
+initiates the {\updateCoord} phase where it sends 
+(\updateCoordTag, $({\kappa}, (b_{1}, \cdots b_{k})$) to $s^*$, where for any $i \in [k]$,  $b_i=1$ if $s_i \in S_I$, 
+otherwise $b_i=0$,   and finishes after it receive a   {\ackTag} message from $s^*$.  
+	  After receiving message  ({\ackTag}, $t_w$),  $w$ completes the \wot{}.
+
+%At $s^*$, upon receiving  (\updateCoordTag, $({\kappa}, (b_{1}, \cdots, b_{k})$) from $w$ appends  
+%			 $({\kappa}, (b_{1}, \cdots, b_{k}))$ to its  $List$,  and responds with  
+%			 {\ackTag} and $t_{w}$ (set to be the number of elements in the local list $List$)  to $w$.
+%			 The order of the  elements in  $List$ corresponds to  the order  
+%the \wots{}, the order of the incoming  {\updateCoordTag} updates,  as seen by $s^*$.
+%			  After receiving an ({\ackTag}, $t_w$),  $w$ completes the \wot{}.
+
+\textit{\textbf{Reader steps:}}
+Note that we use the same notations for $I$ and $S_I$ as above by the set of indices are not necessarily similar across different 
+transactions.
+The procedure  \Readtr{$ o_{i_1},  o_{i_2}, \cdots, o_{i_p}$} can be 
+initiated by  some reader  $r$,   as a \rot{}, intending to read the values of 
+subset $o_{i_1},  o_{i_2}, \cdots, o_{i_p}$ of the objects. The procedure 
+consists of two consecutively executed phases of communication rounds
+between the $r$ and the  servers, viz.,  {\getTagArray} and {\readValue}. 
+%
+During  the  phase {\getTagArray},  $r$ sends $s^*$ the message  {\getTagArrayTag}  
+ requesting the  list of the latest added keys for each object. 
+ Once $r$ receives a list of tags, such as, $(t_r, ({\kappa}_1, {\kappa}_2, \cdots,  {\kappa}_k))$ from $s^*$   the phase completes.
+%
+%
+In the subsequence phase, {\readValue},   $r$ requests each server $s_i$ in $S_I$ by sending the message 
+$(\text{\readValueTag}, \kappa_i)$. 
+% Then upon receiving such a request, any server $s_i$ responds with  $(${\readValueTag}$, {\kappa}^{s_i})$, i.e., one version of  $o_i$ corresponding to the key $t_i$ to $r$, stored in its $Vals$. 
+%
+%During  phase {\readValue}, 	 the reader sends to each of the servers in 
+%$\mathcal{S}$, say $s_i$ the key ${\kappa}^{s_i}$ corresponding 
+%			 to $(k+1)$-tuple of $List$ with the latest  index $j^*$ such that $b_i =1$ such that 
+%$i \in I$, where $I \triangleq  \{{i_1},  {i_2}, \cdots, {i_p}\}$,  requesting the corresponding value.  
+%Any server $s_i$ upon receiving 
+%such a message with $(${\readValueTag}$, {\kappa}^{s_i})$ responds with $v$ such that $({\kappa}^{s_i}, v_i)$ is in its variable $Vals$. 
+After  receiving the values $v_{i_1}$, $v_{i_2}, \cdots v_{i_p}$ from the servers in $\mathcal{S_I}$, 
+ $r$ completes the transaction  by 
+ returning the tuple of values $(v_{i_1}, \cdots v_{i_p})$.
+ % and set the tag $t_r$ as  the latest index in $List$ corresponding to a \wot{} that updated  one of the object in the \rot{}, i.e., $\max_{1 \leq j \leq |List|} \{ j : List[j].b_i = 1 \wedge i \in I\}$.
+
+\textit{\textbf{Server steps:}}  
+When a server $s_i$ receives a message of type $(${\writeValueTag}$, ({\kappa}, v_{i}))$ from a writer $w$ then 
+%to each server in $S_I$, and awaits {\ackTag}  
+%from all servers in $S_I$.
+it  adds $({\kappa}, v_i)$ to its set variable  
+$Vals$ and sends {\ackTag} back to $w$.
+
+If the coordinator $s^*$ receives  (\updateCoordTag, $({\kappa}, (b_{1}, \cdots, b_{k})$) from writer $w$, then it appends  
+			 $({\kappa}, (b_{1}, \cdots, b_{k}))$ to its  $List$,  and responds with  
+			 {\ackTag} and $t_{w}$ (set to be the number of elements in the local list $List$)  to $w$.
+			 The order of the  elements in  $List$ corresponds to  the order  
+the \wots{}, the order of the incoming  {\updateCoordTag} updates,  as seen by $s^*$.
+	
+Again, when $s^*$  receives  the message  {\getTagArrayTag} from $r$  it responds with a message 
+$(\kappa_1, \cdots, \kappa_k)$ such that for each $i \in [k]$, $\kappa_i$ is the key  part of the $(k+1)$-tuple that was modified
+last, i.e., 	${\kappa}_i = List[j^*].{\kappa}$ such that 	 $j^* \triangleq\max \{ j : List[j].b_i =1 \}$, and 
+$t_r$, $t_r \triangleq \max_{1 \leq j \leq |List|} \{ j : List[j].b_i = 1 \wedge i \in I\}$.
+
+  	If any server $s_i$ receives a message  $(${\readValueTag}$, {\kappa})$ from a reader $r$ then it responds to $r$ with 
+   the value $v_i$ corresponding to key with value  $\kappa$ in  $Vals$. 
+
+The following result states that algorithm $B$ respects SNoW  property, whose proof appears in Appendix~\ref{app:algrithmB}.
+% and the proof is omitted for now since it is very straightforward. Note that the liveness property of \rot{} and \wot{}  transactions are a part of the SNOW properties.
+%Consider any failure-free and fair execution of algorithm $B$. 
+%For the purpose of proving the $S$ property, for every transaction transaction  $\phi$ in an execution of $B$ we associate a tag $tag(\phi)$ as described below.
+% the variable $t_r$ in a reader and $t_w$ in 
+%a writer are used to associate a tag as described below.
+% $ \triangleq \max_{1 \leq j \leq |List|} \{ j : List[j].b_i = 1 \wedge i \in I\}$, which is presented as a comment in the pseudo-code for $A$.
+%If $\phi$ is a \wot{} (\rot{}) then  $tag(\phi)$ is the value of the variable $t_w$ ($t_r$) immediately before the 
+%operation completes.
+
+	\begin{theorem} Any well-formed  and fair execution of algorithm $B$  satisfies the SNoW  properties. %Algorithm $B$ also tolerates any client crash failures.
+	\end{theorem}
+
+%	\begin{theorem} Any well-formed  and fair execution of algorithm $B$ is an implementation of  an object of type $\tilde{\mathcal{O}}_T$ in the MWMR setting, 	with no client-to-client communication,  comprising of objects $o_1, o_2, \cdots o_k$ stored in servers $s_1, s_2, \cdots, s_k$, respectively; and it satisfies the SNoW  properties. %Algorithm $B$ also tolerates any client crash failures.\end{theorem}
+
+
+
+\remove{
+\begin{proof} Below we show that algorithm $B$ satisfies the  SNoW properties. 
+	
+	\noindent{\emph{\underline{S property:}}} 
+	Let $\beta$ be any fair execution  of  $B$ and 
+ suppose all clients in $\beta$ behave in a well-formed
+manner. Suppose $\beta$ contains no incomplete transactions and let  $\Pi$ be the set of transactions in $\beta$.  We define an irreflexive partial ordering ($\prec$) in $\Pi$ as follows:  if $\phi$ and $\pi$ are any two distinct transactions in $\Pi$ then we say 
+	$\phi \prec \pi$ if either $(i)$ $tag(\phi) < tag(\pi)$ or $(ii)$ $tag(\phi) = tag(\pi)$ and $\phi$ is a \wot{} and $\pi$ is a \rot{}. Below we prove the $S$  property of $B$ by showing that  properties $P1$, $P2$, $P3$ and $P4$ of Lemma~\ref{lem:equivalence} hold for $\beta$. 
+	
+	\emph{P1:}   Clearly, from an inspection of the algorithm, 
+	 $tag(\pi) \in \mathbb{N}$. From inspection of the algorithm, each \wot{} increases the size of 
+	 $List$, and the value of the tags are  defined by the size of $List$. Therefore, there can be at 
+	 most a finite number of \wots{} such that can precede $\pi$ (w.r.t. $\prec$) in $\beta$.
+	  On the other hand, if $\pi$ is a \rot{} then since all \rot{}s are invoked by readers  in a well-formed manner,  and there are only finite number of readers 
+	therefore, there cannot be an infinite number of \rot{}s such that they all 
+	precede $\pi$ (w.r.t $\prec$).
+	
+	 
+	  
+	\emph{P2:}  Suppose $\phi$ and $ \pi$ are any two transactions in $\Pi$, such that, $\pi$ begins after $\phi$ completes. Then we show that we have  we cannot have $\pi \prec \phi$. Now, we consider four cases, depending on whether $\phi$ and $\pi$ are \rot{}s or \wots{}.	
+	\begin{enumerate}
+	    \item [$(a)$] $\pi$ and $\phi$ are \wots{} invoked by writers $w_{\pi}$ and $w_{\phi}$, respectively. Since the size of $List$, in $s^*$ grows monotonically due to each \wot{}  hence  $w_{\pi}$ receives the  tag  from $s^*$ at least as high as $tag(\phi)$, so $\pi\not \prec \phi$.
+	      %
+	       \item [$(b)$] $\pi$ is a \rot{}, $\phi$ is a \wot{} invoked by reader  $r_{\pi}$ and writer $w_{\phi}$, respectively.  
+	        Since the size of $List$, in $s^*$,  grows monotonically,  because  $r_{\pi}$  invokes $\pi$ after $\phi$ completes hence $tag(\pi)$ is at least as high as $tag(\phi)$, so $\pi\not \prec \phi$.
+	      %
+	        \item[$(c)$]$\pi$ and $\phi$ are both \rot{}s  invoked by readers $r_{\pi}$ and $r_{\phi}$, respectively. 
+	           Since the size of $List$, in $s^*$, grows monotonically,  because   $w_{\pi}$ invokes $\pi$ after $\phi$ completes hence $tag(\pi)$ is at least as high as $tag(\phi)$, so $\pi\not \prec \phi$.
+	        %
+	         \item [$(d)$] $\pi$ is a \wot{}, $\phi$ is a \rot{}  invoked by writer $w_{\pi}$ and reader $r_{\phi}$, respectively.
+	         This case is simple because new values are added to $List$, in $s^*$,  only  by writers, and $tag(\pi)$  has to be larger than the tag of $\phi$ and hence   $\pi\not \prec \phi$. 
+	\end{enumerate}
+	
+	
+	\emph{P3:} This is from  the fact that any \wot{} always creates a unique tag and all tags are totally ordered since they all belong to $\mathbb{N}$
+	
+		\emph{P4:} Consider a \rot{} $\rho$ as $READ(o_{i_1}, o_{i_2}, \cdots, o_{i_q})$, in $\beta$. 
+Let the returned value from $\rho$ be $\mathbf{v} \equiv $$(v_{i_1}, v_{i_2}, \cdots, v_{i_q})$ such that 
+$1 \leq {i_1} <  {i_2} <  \cdots <  {i_q} \leq k$, where value  $v_{i_j}$ corresponds to $o_{i_j}$. 
+	Suppose $tag(\rho) \in \mathbb{N}$ was created during some \wot{}, say $\phi$, i.e., $\phi$ is the \wot{} that 
+	added the elements in index $(tag(\rho)-1)$ of $List$ at the coordinator $s^*$. Note that element in index $0$ contains the initial value.
+	%because \rots{} do not generate new tags as they do not add any new item to the $Vals$ of any server.
+	 Now we consider two cases:
+	 
+	\emph{Case $tag(\rho) = 1$.} We  know that it corresponds the initial default value $v_i^0$ at each sub-object $o_i$, and this equates to $\rho$ returning the default initial value for each sub-object.
+	 %
+	% Therefore, $tag(\rho) = tag(\phi)$. 
+	 
+	 \emph{Case $tag(\rho) > 1$.} Then we argue that there exists no \wot{}, say $\pi$, that updated object $o_{i_j}$,   in $\beta$, such that,  $\pi \neq \phi$ and $\rho$ returns values written by $\pi$ and $\phi \prec \pi \prec \rho$. Suppose we assume the 	contrary, which means $tag(\phi) < tag(\pi) < tag(\rho)$. The latter implies $tag(\phi)  = tag(\pi)$ which is not possible because 
+	this contradicts the fact that for any two distinct \wots{} $tag(\phi) \neq tag(\pi)$  in any execution of   $B$.
+
+	\noindent{\emph{\underline{N, o and W properties:}}}  Evident from an inspection of the algorithm.
+	% for the  response steps  of the servers to the reader.
+	\end{proof}
+}

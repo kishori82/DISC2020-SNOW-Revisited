@@ -1,0 +1,45 @@
+\begin{figure}[t]
+  \centering
+  \begin{subfigure}[b]{0.49\columnwidth} {
+      \begin{center}
+\begin{tabular}{@{}c c c@{}}
+  \midrule
+                   \multicolumn{3}{c}{\phantom{ABCDef}\textbf{Client-to-Client?}}\\
+  \textbf{Setting} & \textbf{Yes}        & \textbf{No}\\
+  \hline\\[-1.8ex]
+  2 clients        & $\checkmark$   & $\times$ \\
+  MWSR             & $\checkmark$   & $\times$ \\
+  $\ge 3$ clients  & $\times$       & ($\times$)\\
+  \midrule
+\end{tabular}
+      \end{center}
+    }
+    \caption{Is SNOW possible?}
+    \label{fig:contr_table_a}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.49\columnwidth} {
+      \begin{center}
+\begin{tabular}{@{}c c c c@{}}
+  \midrule          
+  & \multicolumn{3}{c}{\phantom{a}\textbf{Rounds}}\\
+  \textbf{Versions} & \textbf{1}    & \textbf{2}    & $\boldsymbol{\infty}$ \\
+  \hline\\[-1.8ex]
+                1   & $(\times)$    & $\checkmark$  & $(\checkmark)$ \\
+%                2   &               & $\checkmark$  & \\
+              $|W|$ & $\checkmark$  &  & \\
+  \midrule\\
+\end{tabular}
+      \end{center}
+    }
+    \caption{Bounded SNW algorithms.}
+    \label{fig:contr_table_b}
+  \end{subfigure} 
+  \caption{A summary of our new results.  Previous results are marked in parentheses.
+    $\times$ indicates we have proved that such \rots{} are impossible.
+    $\checkmark$ indicates we have described such a new \rot{} algorithm. % and proved it correct.
+    %C2C is client-to-client communication and
+    \textbf{|\textit{W}|} is the number of concurrent \wots{}.}
+  \label{tbl:result_map}
+  %\setlength{\belowcaptionskip}{-50pt}
+\end{figure}

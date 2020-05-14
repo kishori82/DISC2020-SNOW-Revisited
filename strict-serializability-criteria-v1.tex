@@ -1,0 +1,129 @@
+%\section{Condition for proving strict serializability}\label{sc_condition_app}
+In this section, we derive a useful property for  executions of  algorithms that implement  objects of data type $\mathcal{O}_T$  that will later  help us  show the \emph{strict serializability} property (S property) of algorithms presented in later sections.  
+
+Although the strict serializability property in transaction-processing systems is a well-studied topic,  
+the specific setting considered  in this paper is much simpler. Therefore, this allows  us to derive
+ simpler conditions to prove the safety of these algorithms.  A wide range of transaction types and 
+ transaction processing systems are considered in the literature. For example, in ~\cite{Papadimitriou79}, Papadimitriou   
+defined the strict serializability conditions as a part of developing a  theory for analyzing transaction 
+processing systems. In this work, each transaction $T$ consists of a set of write operations $W$, at 
+individual objects, and a set of read operations $R$  from individual objects, where  the operations in 
+$W$  must complete before the operations in $R$ execute.  
+Other types of transaction processing systems allow nested transactions
+%~\cite{Liskov1988, Lynch1994, Gary1993},
+\cite{Gary1993},
+ where the transactions may contain sub-transactions~\cite{Bernstein:1987} which may 
+further contain a mix of read or write operations, or even child-transactions. 
+In most transaction processing systems considered in the literature,  transactions can be 
+\emph{aborted} so as  to handle  failed  transactions. As a result, the serializability theories are 
+developed  while  considering the presence of  aborts. 
+However, in our system, we do not consider any abort, nor any  client or  server failures.  A transaction 
+in our system is either a set of independent writes or a set of reads %(see Section~\ref{datatype_app}) 
+with 
+all the reads or writes in a transaction operating on different  objects. Such simplifications allow us to 
+formulate an equivalent condition for the execution of an algorithm  to prove the S  
+property of such algorithms while  implementing an object of data type $\mathcal{O}_T$.
+
+\sloppy We note that an execution of a variable of type $\mathcal{O}_T$ is a finite sequence 
+$\mathbf{v}_0, INV_1, RESP_1,$ $\mathbf{v}_1, INV_2,$ $ RESP_2, \mathbf{v}_2, \cdots, \mathbf{v}_r$ or an infinite sequence 
+$\mathbf{v}_0, INV_1, RESP_1, \mathbf{v}_1, INV_2, RESP_2, \mathbf{v}_2, \ldots$, where $INV$'s and 
+$RESP$'s are invocations and 
+responses, respectively. The $\mathbf{v}_i$s are tuples  of the the form $(v_{1}, v_{2}, \cdots, v_{k}) \in \Pi_{i=1}^{q} V_{i}$, that 
+corresponds to the latest values stored across the objects $o_1, o_2\cdots o_k$, and the values in  $\mathbf{v}_0$ are  the initial 
+values of the objects. Any adjacent quadruple such as  $\mathbf{v}_i, INV_{i+1}, RESP_{i+1},$ $\mathbf{v}_{i+1}$  is consistent with the $f$ 
+function for an object of type $\mathcal{O}_T$ (see  Section~\ref{datatype_app}) . Now, the safety property of such an 
+object is a trace that describes the 
+correct response to a sequence of $INV$s when all the transactions are executed sequentially. The \emph{strict serializability} of 
+$\mathcal{O}_T$ says that each trace produced by an execution of $\mathcal{O}_T$ with concurrent transactions appears as some trace of $\mathcal{O}_T$. We describe this below in more detail. 
+% For each completed transaction $\pi$ we assume 
+%$INV$ and $RESP$ occur consecutively at $\pi_*$. Also, for each $\pi \in \Phi$ put $INV$ at $\pi_*$ and remove all invocations.
+
+\begin{definition}[Strict-serializability] Let us consider an execution $\beta$ of an object of type $\mathcal{O}_T$, such that the invocations of any transaction at any 
+client respects the well-formedness property.  Let $\Pi$ denote the set of complete transactions in $\beta$ then we say $\beta$ satisfies the strict-serializability property for 
+$\mathcal{O}_T$ if the following are possible:
+\begin{enumerate}
+\item[$(i)$] For every complete {\sc read} or {\sc write} transaction $\pi$ we insert a point (serialization point) $\pi_*$ between the actions   $\INV{\pi}$ and $\RESP{\pi}$.
+\item[$(ii)$] We select a set $\Phi$ of incomplete transactions in $\beta$ such that for 
+each $\pi \in \Phi$ we   select a response $\RESP{\pi}$.
+\item[ $(iii)$] For each $\pi \in \Phi$ we insert $\pi_*$ somewhere after $\INV{\pi}$ in $\beta$, and remove the $INV$ for the rest of the incomplete transactions in $\beta$.
+\item[$(iv)$] If we assume for each $\pi \in \Pi \cup \Phi$ both $\INV{\pi}$ and $\RESP{\pi}$ to occur consecutively at $\pi_*$, with the interval of the transaction shrunk to $\pi_*$,   then the sequence of transactions in this  new trace  is a trace of an object of data type  $\mathcal{O}_T$.
+\end{enumerate}
+\end{definition}
+Now, we consider any automaton $\mathcal{B}$ that implements an object of  type $\mathcal{O}_T$, and prove a result that serves us an  equivalent condition for proving  the strict serializability property of $\mathcal{B}$. Any trace property $P$ of an automaton  is a \emph{safety property}  if the set of executions in $P$ is non-empty; \emph{prefix-closed}, meaning any prefix of an execution in $P$ is also in $P$; and \emph{limit-closed}, i.e., if $\beta_1$, $\beta_2, \cdots$ is any infinite sequence of executions in $P$ is such that $\beta_i$ is prefix of $\beta_{i+1}$ for any $i$, then the limit $\beta$ of the sequence of executions $\{\beta_i\}_{i=0}^{\infty}$  is also in $P$. From Theorem~13.1 in~\cite{Lynch1996}, we know that the trace property, which we denote by $P_{SC}$, of 
+any well-formed execution of $\mathcal{B}$ that satisfies the strict-serializability property is a safety property. Moreover, from 
+Lemma 13.10 in~\cite{Lynch1996} we can deduce that  if  every execution of $\mathcal{B}$ that is well-formed and failure-free, and also contains no incomplete transactions,  satisfies $P_{SC}$, then any well-formed  execution of $\mathcal{B}$ that can possibly have incomplete transactions is also in $P_{SC}$. 
+Therefore, in the following lemma,  which gives us an equivalent condition for the strict serializability property of an execution $\beta$, we consider only executions without any incomplete transactions.
+The lemma is proved in a manner similar to Lemma 13.16 in~\cite{Lynch1996}, for atomicity guarantee of a single multi-reader multi-writer object.
+
+
+\begin{lemma}\label{lem:equivalence_app}
+Let $\beta$ be an execution (finite or infinite) of  an  automaton $\mathcal{B}$ that implements an object of type $\mathcal{O}_T$, which consists of  a set of $k$ sub-objects.
+%, with strictly serializability  property.
+%such that for each transaction that are only finitely many transactions in $\beta$  precessing it with respect to (w.r.t.) $\prec$.
+ Suppose all clients in $\beta$ behave in an well-formed
+manner. Suppose $\beta$ contains no incomplete transactions and let  $\Pi$ be the set of transactions in $\beta$. Suppose there exists an irreflexive partial ordering ($\prec$)  among  the transactions
+ in $\Pi$, such that,
+ \begin{enumerate}
+  \item [$P1$] For any transaction $\pi \in \Pi$ there are only a finite number of transactions $\phi \in \Pi$ such that 
+    $\phi \prec \pi$;
+ \item [$P2$] If the response event for $\pi$ precedes the invocation event for $\phi$ in $\beta$, then it cannot be that $\phi \prec \pi$;
+ \item [$P3$]If $\pi$ is a {\sc write} transaction  in $\Pi$ and $\phi$ is any transaction in $\Pi$, then either $\pi \prec \phi$ or $\phi \prec \pi$; and 
+ \item [$P4$] \sloppy A tuple 
+ $ \mathbf{v} \equiv $$(v_{i_1}, v_{i_2}, \cdots, v_{i_q})$  
+returned by a
+$READ(o_{i_1}, o_{i_2}, \cdots, o_{i_q})$,  where $q$ is any positive integer, $1 \leq q \leq k$, 
+ is such that  $v_{i_j}$  $j \in \{1, \cdots, q\}$ is written in $\beta$ by the last preceding (w.r.t. $\prec$)  {\sc write} transaction that contains a $\writeop{o_{i_j}}{*}$,
+ or the initial value $v_{i_j}^0$ if no such {\sc write} exists in $\beta$. 
+ \end{enumerate}
+Then execution $\beta$ is strictly serializable.
+\end{lemma}
+
+\begin{proof}We discuss how to insert a serialization point $*_{\pi}$ in $\beta$ for every transaction $\pi \in \Pi$. 
+First, we add  $*_{\pi}$ immediately after the latest of the invocations of $\pi$ or $\phi \in \Pi$ such that $\phi \prec \pi$.
+We want to stress that any complete operation $\pi$ in $\Pi$  refers to an operation, with the invocation and response events, whereas
+$\pi_*$ refers to a point in the executions.
+Note that according to condition $P1$ for $\pi$ there are only finite number of such  invocations in
+ $\beta$, therefore, $\pi_*$ is well-defined for any $\pi \in \Pi$. Now, since the order of the invocation events of the 
+transactions in $\Pi$ are already defined, therefore,  the order of the corresponding set of serialization points are 
+well-defined, except for the case when more than one serialization points are placed immediately after an 
+invocation.
+ In the case such multiple  serialization points corresponding to an invocation we order  these 
+serialization points  in accordance with the $\prec$  relation of  the underlying transactions.
+
+Next, we show that for any pair of transactions $\phi$, $\pi \in \Pi$ if $\phi \prec \pi$ then in $\beta$ we have $*_{\phi}$ precedes $*_{\pi}$.
+Suppose $\phi \prec \pi$. By construction,  each of $\pi_*$ and $\phi_*$ appear immediately after 
+some invocation, in $\beta$,  of some transaction in $\Pi$. If both $\pi_*$ and $\phi_*$ appear immediately  after 
+the same invocation, then since $\phi \prec \pi$,  by construction of $\pi_*$,  the serialization point $\pi_*$ appears in $\beta$ after 
+$\phi_*$.  Also, if the invocations after which $\pi_*$ and $\phi_*$ appear are distinct,  then by 
+construction of $\pi_*$ the serialization point  $\pi_*$ appear after $\phi_*$ in $\beta$ since $\phi \prec \pi$.
+
+ %Observe that, by the property of a partial order relation,  for any $\psi \in \Pi$ if $\psi \prec \phi$ then $\psi \prec \pi$. Therefore, according to the above scheme for ordering serialization point for operation we have $*_{\phi}$ precedes $*_{\pi}$. 
+
+Next we argue that each $*_{\pi}$  serialization point  for any $\pi \in \Pi$ is placed between the 
+invocation $\INV{\pi}$ and responses $\RESP{\pi}$. By construction, $*_{\pi}$ is after $\INV{\pi}$ in $\beta$. To 
+show that $*_{\pi}$ is before $\RESP{\pi}$ for the sake   of contradiction assume that  $*_{\pi}$  
+appears after $\RESP{\pi}$. By construction, $*_{\pi}$ must be after $\INV{\psi}$ for some 
+$\psi \in \Pi$ and $\psi \neq \pi$, then by the condition of construction of $\pi_*$ we have $\psi \prec 
+\pi$. But from above 
+$\INV{\psi}$ occurs after $\RESP{\pi}$, i.e., $\pi$ completes before $\psi$ is invoked which means, by 
+property $P2$,  we cannot have $\psi \prec \pi$, which is a contradiction.
+
+Next, we show that 
+if we were to shrink  the transactions intervals to  their corresponding serialization points, the 
+ resulting  trace would be a trace of the underlying data type $\mathcal{O}_T$. 
+In other words, we show any {\sc read}
+%a {\sc read}s in $\beta$ must  return the values $(v_1, v_2, \cdots v_k)$, for every  $i \in [k]$ $v_i$.
+$READ(o_{i_1}, o_{i_2}, \cdots, o_{i_q})$
+%,  where $o_{i_1}, o_{i_2}, \cdots, o_{i_q}$ is a set of distinct objects,  $q$ is any positive integer, $1 \leq q \leq k$, which upon completion  
+returns the  values   $(v_{i_1}, v_{i_2}, \cdots, v_{i_q})$, such that each value
+$v_{i_j}$, $j \in [q]$,  was written by the immediately preceding  (w.r.t. the serialization points)  {\sc 
+write} that contained  $\writeop{o_{i_j}}{v_{i_j}}$ or the initial values if no such previous {\sc write} exists.
+%
+Let us denote the set of {\sc write}s that precedes (w.r.t. $\prec$) $\pi$ by $\Pi_W^{\prec\pi}$, i.e., 
+$\phi \in \Pi^{\prec\pi}_W$  $\phi$ is a write and $\phi \prec \pi$.  By property $P3$, all transactions in 
+$\Pi_{W}^{\prec\pi}$ are totally-ordered.  By property $P4$,  $v_{i_j}$ must be the value updated by
+ the most recent {\sc write} in $\Pi_W^{\prec\pi}$.  Since the total order of serialization points are  consistent with 
+ $\prec$ and hence the $v_{i_j}$ corresponds to the write operation of a {\sc write} transaction with 
+  the most recent serialization point and  contains a operation of  type $\writeop{o_{i_j}}{*}$.
+\end{proof}
+

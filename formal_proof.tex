@@ -1,0 +1,566 @@
+%\section{Impossibility of SNOW properties with  three clients}\label{three-client}
+\section{No SNOW with Three Clients and C2C}
+\label{sec:formal_proof}
+\sloppy This section provides a formal proof of the SNOW Theorem with 3 clients, i.e., SNOW is impossible in a system with 3 or more clients even when client-to-client communication is allowed. The main result of this section is captured by the following theorem. 
+\begin{theorem}\label{thm:snow3}
+	The SNOW properties cannot be implemented in a system with two readers and one writer, for two servers even in the presence of client-to-client communication.
+\end{theorem}
+
+Our proof strategy is to assume the existence of an algorithm $\mathcal{A}$ that satisfies all SNOW properties and create an execution $\alpha$ of $\mathcal{A}$ that contradicts the S property. 
+We begin with an execution of $\mathcal{A}$ that contains \rots{} $R_1$ and $R_2$, which both read $s_x$ and $s_y$, and \wot{} $W$ that writes $(x_1, y_1)$ to $s_x$ and $s_y$ respectively (both servers have initial values $x_0$, $y_0$). $R_1$ begins after $W$ completes, and $R_2$ begins after $R_1$ completes. By the S property both  $R_1$   and $R_2$ should return $(x_1, y_1)$.
+%First we show that any finite execution of $\mathcal{A}$ that ends with $\INV{R_i}$  has an extension which contains
+%an execution fragment of the form
+%$\frage{I}{\alpha}{} \circ \frage{F_{1}}{\alpha}{} \circ \frage {F_{2}}{\alpha}{} \circ \frage{E}{\alpha}{}$ that corresponds to $R_i$. 
+Then we create a sequence of 
+executions of $\mathcal{A}$  (Fig.~\ref{fig:executions3}), where we interchange the fragments until we  finally reach
+ an execution in which $R_2$ completes before $R_1$ begins, but $R_2$ returns 
+$(x_1, y_1)$ and $R_1$ returns $(x_0, y_0)$ which contradicts the  S property.
+
+The following lemma shows that in an execution of $\mathcal{A}$ with a \wot{} $W$ and a \rot{} $R_1$, there exists a point  in the execution
+such that if $R_1$ is invoked before that point then $R_1$ returns $(x_0, y_0)$ and if $R_1$ invoked after 
+that point then $R_1$ returns $(x_1, y_1$).
+
+\begin{lemma}[Existence of $\alpha_0$ and $\alpha_1$] \label{lem:exec3_alpha1} 
+There exist  executions $\alpha_0$ and $\alpha_1$ of $\mathcal{A}$ that contain transactions $W$ and  $R_1$ 
+%   with  the following properties:
+that satisfy the following properties where $k$ is some positive integer and $\finiteprefixt{k-1}{k}$ is a prefix of $\finiteprefixt{k}{k+1}$:
+\begin{enumerate}
+\item[$(i)$] $\alpha_0$ can be written as 
+$\finiteprefixt{k-1}{k} \circ 
+\frage{R_1}{\alpha_0}{x_0, y_0}
+%\fragt{I_1}{\alpha_0}{} \circ \fragt{F_{1,x}}{\alpha_0}{x_0} \circ \fragt{F_{1,y}}{\alpha_0}{y_0} \circ \fragt{E_1}{\alpha_0}{x_0, y_0}
+ \circ \frage{S}{\alpha_0}{}$ ;
+ %and  $\beta_0$  as $\finiteprefixt{k-1}{k} \circ \fragt{R_1}{}{x_0, y_0} \circ \fragt{S}{\beta_0}{}$;
+\item[$(ii)$]   $\alpha_1$ can be written as 
+$\finiteprefixt{k}{k+1} \circ 
+\frage{R_1}{\alpha_1}{x_1, y_1}  \circ \frage{S}{\alpha_1}{}$; and  
+%$\beta_1$  as $\finiteprefixt{k}{k+1} \circ  \fragt{R_1}{}{x_1, y_1}
+%\fragt{I_1}{\alpha_1}{} \circ \fragt{F_{1,x}}{\alpha_1}{x_1} \circ \fragt{F_{1,y}}{\alpha_1}{y_1}  \circ \fragt{E_1}{\alpha_1}{x_1, y_1} \circ \fragt{S}{\alpha_1}{}$; and 
+\item[$(iii)$] $a_{k+1}$ in $\alpha_1$  occurs at  $r_1$, 
+\end{enumerate} 
+%where $k$ is some positive integer and $\finiteprefixt{k-1}{k}$ is a prefix of $\finiteprefixt{k}{k+1}$.
+%, i.e., the actions  $recv(m_x^r)_{r, s_x}$ and  $send(x)_{r, s_x}$ appear in $trace(\alpha)|s_x$, where  there is no input action of  $s_x$  between these actions.
+% \item[$(ii)$]  $R(\alpha)$ returns  $(x_1, y_1)$. 
+\end{lemma}
+
+\begin{proof}
+Now we describe the construction of a sequence  of finite executions of $\mathcal{A}$, $\{\gamma_k\}_{k=0}^{\infty}$  such that each $\gamma_k$ contains $W$ and $R_1$.
+Consider an execution $\alpha$ of $\mathcal{A}$ that contains $W$. 
+%Let us denote $\alpha$ as 
+%$\finiteprefix{\ell}{\ell+1}\ldots$, where the  $\sigma$'s and the $a$'s are states and actions, of $\mathcal{A}$,  respectively, and $\ell$ is some positive integer. 
+Suppose $R_1$ is invoked at $r_1$ after the execution fragment 
+$\finiteprefixt{k}{k+1}$,  a
+prefix of $\alpha$. Allowed by network asynchrony, let $\INV{R}$ be followed by only internal and external actions at $r_1$ until both
+ $\send{m_x^{r_1}}{ r_1, s_x}$ and $\send{m_y^{r_1}}{ r_1, s_y}$ occur, thereby creating an execution fragment of the form
+$\finiteprefixt{k}{k+1}\circ I_1(\alpha)$. We denote $\finiteprefixt{k}{k+1}$ by $\finiteprefixA{k}{k+1}$.
+
+Next, consider the network delivers the message $m_x^{r_1}$ at $s_x$, and delays 
+all actions at other automata and also any  input action at $s_x$ until $s_x$ sends $x$ to $r_1$. Therefore, we achieve the execution fragment   
+$\finiteprefixA{k}{k+1}\circ \frage{ I_{1,x}}{\alpha}{} \circ \frage{F_{1,x}}{\alpha}{}$  of  ${\mathcal A}$. 
+Next, the network delivers $m_y^{r_1}$ at $s_y$ and delays all actions at other automata and input actions at $s_y$ until $s_y$ sends $y$ to $r_1$. 
+Then the network delivers $x$ and $y$ at $r_1$ but it delays  actions at other automata and any other input action at $r_1$ until $\RESP{R_1}$ occurs. Now we have an execution fragment of $\mathcal{A}$, which can be written as 
+ $\finiteprefixA{k}{k+1}\circ \frage{I_1}{\alpha}{} \circ \frage{F_{1,x}}{\alpha}{x} \circ \frage{F_{1,y}}{\alpha}{y} \circ \frage{E_1}{\alpha}{x,y}$, where $R_1$ responds with $(x, y)$ such that $(x, y) \in \{ (x_0, y_0), (x_1, y_1) \}$.  We denote this finite execution prefix as $\gamma_k$. Therefore, there exists a sequence of such finite executions  
+ $\{\gamma_k\}_{k=0}^{\infty}$.
+
+Because $R_1$ precedes  $W$, by the S property $R_1$ must respond with $(x_0, y_0)$ in $\gamma_0$. If $k$ is large enough such that $a_{k}$ occurs in $\alpha$ after the completion of $W$ then by  the S property,  $R_1$ must return  $(x_1, y_1)$ in 
+$\gamma_{k+1}$ due to the S property.  Therefore, there exists a minimum $k$  where in $\gamma_k$
+\rot{} $R_1$ returns  $(x_0, y_0)$ and 
+ in $\gamma_{k+1}$,
+$R_1$ returns  $(x_1, y_1)$. 
+%Note that here we used the fact that the version of both $x$ and $y$ change together due to the S property. 
+Note that $\gamma_{k}$ corresponds to $\alpha_0$ and $\gamma_{k+1}$ corresponds to $\alpha_1$ in $(i)$ and $(ii)$ respectively. 
+
+Now, we prove case $(iii)$ by eliminating the possibility of  $a_{k+1}$ occurring at $s_x$, $s_y$, $w$ or $r_2$.
+% by showing contradictions.
+%Our proof is based on the following argument. 
+%
+The S property requires that $R_1$ must return the same version from both $s_x$ and $s_y$, which implies that $s_x$ and  $s_y$ must send values of the same version.
+%
+%Note that for $R_1$, to respond with values for either version 
+%$0$ or $1$, requires both $s_x$ and  $s_y$ to send object values of the same version, which is due to
+% S property. 
+%
+Observe that $R_1$ returns the $0^{\textit{th}}$ version in $\alpha_0$ and the $1^{\textit{st}}$ version in $\alpha_1$,
+ %$0$ (i.e., $(x_0, y_0)$)  and $1$ (i.e., $(x_1, y_1)$), respectively, 
+ while the prefixes $\fragt{P_k}{\alpha_0}{}$ and 
+ $\fragt{P_{k+1}}{\alpha_1}{}$ differ by a single action $a_{k+1}$. Importantly, just one action at any of  $s_x$, $s_y$, $r_2$
+or $w$ is not enough for $s_x$ and $s_y$ to coordinate the same version to send. Therefore, $a_{k+1}$ must occur at $r_1$, which can 
+possibly help coordinate by sending some information via $m_x$ and $m_y$ sent to $s_x$ and $s_y$ respectively.
+
+\emph{ \underline{Case $a_{k+1}$ occurs at $s_x$}:} Consider the  prefix of execution $\alpha_0$ up to $a_k$.  Suppose the network invokes 
+$R_1$ immediately after action $a_{k}$ via $\INV{R_1}$. By Lemma~\ref{lem:read_format} there exists  
+an execution $\alpha'$ that contains an  execution fragment of the form
+$\fragt{P_k}{\alpha'}{}
+  \circ\frage{I_1}{\alpha'}{} \circ  \frage{F_{1,x}}{\alpha'}{x} 
+  \circ\frage{F_{1,y}}{\alpha'}{y}
+  \circ \frage{E}{\alpha'}{x, y}$.
+Then, $\frage{I_1}{\alpha_1}{} \stackrel{r_1}{\sim} \frage{I_1}{\alpha'}{}$ and
+  $\frage{F_{1,y}}{\alpha_1}{} \stackrel{s_y}{\sim} \frage{F_{1,y}}{\alpha'}{}$
+  because in both executions the actions of $\frage{I_1}{}{}$ occur entirely at $r_1$
+  and those of $\frage{F_{1,y}}{}{}$ occur entirely at $s_y$,
+  and thus they are unaffected by the addition of the single action $a_{k+1}$ at $s_x$.  
+As a result,  $\frage{F_{1,y}}{\alpha'}{}$ must send the same value $y_1$ to $r_1$ as 
+ in  $\frage{F_{1,y}}{\alpha_1}{}$.
+%
+% at $s_x$ and 
+%proceeds to time the delivery of messages so as to create an  execution fragment $\alpha'$,  of $\mathcal{A}$, with $\beta'$ of  the form 
+%$\finiteprefixA{k-1}{k} \circ\fragt{I_1}{\alpha'}{} \circ  \fragt{F_{1,x}}{\alpha'}{} \circ\fragt{F_{1,y}}{\alpha'}{}$ such that, 
+%$\frage{F_{1,y}}{\alpha_1}{} \stackrel{s_y}{\sim} \frage{F_{1,y}}{\alpha'}{}$. 
+%This is possible because
+%$\frage{I_1}{\beta}{} \circ  \fragt{F_{1,x}}{\beta}{}$ does not contain any input action at $s_y$.
+Then in $\alpha'$, $R_1(\alpha')$ returns $y_1$ by Lemma~\ref{lem:exec3_equiv}, and thus $R_1(\alpha')$ returns $(x_1, y_1)$ by the 
+S property. However, this contradicts the 
+definition of $k$, i.e., the minimum value of $k$ such that $R_1$ responds with $(x_0, y_0)$.
+
+\emph{ \underline{Case $a_{k+1}$ occurs at $s_y$}:} A  contradiction can be shown by following a line of reasoning similar to the  preceding case.
+
+\emph{\underline{Case $a_{k+1}$ occurs at $w$}:}
+This can be argued in a similar manner as the previous case with the trivial fact that $\frage{F_{1,x}}{\alpha_1}{} \stackrel{s_x}{\sim} \frage{F_{1,x}}{\alpha'}{}$ and $\frage{F_{1,y}}{\alpha_1}{} \stackrel{s_y}{\sim} \frage{F_{1,y}}{\alpha'}{}$.
+
+
+\emph{\underline{Case $a_{k+1}$ occurs at $r_2$}:} 
+A contradiction can be derived using a line of  reasoning as in the previous case.
+
+So we conclude that $a_{k+1}$ must occur at $r_1$ in $\alpha_1$.
+\end{proof}
+
+In the remainder of the section, we suppress the explicit reference to the execution. For instance, we use $\fragt{I_i}{\alpha}{}$, $\fragt{F_{i,x}}{\alpha}{x}$, 
+$\fragt{F_{i,y}}{\alpha}{y}$, $\fragt{E_i}{\alpha}{x, y} $ and $ \fragt{S}{\alpha}{}$
+instead of $\frage{I_i}{\alpha}{}$, $\frage{F_{i,x}}{\alpha}{x}$, 
+$\frage{F_{i,y}}{\alpha}{y}$, $\frage{E_i}{\alpha}{x, y} $ and $ \frage{S}{\alpha}{}$.
+%Moreover, for any execution $\alpha_i$ of 
+%$\mathcal{A}$ we denote the trace $trace(\alpha_i)$ as $\beta_i$, and  for executions $\alpha$, $\alpha'$ and $\alpha''$ their corresponding traces  as $\beta$, $\beta'$ and $\beta''$, respectively. 
+If a 
+\rot{} $R_i$ has an  execution fragment of the form 
+$\fragt{I_i}{\alpha}{} \circ \fragt{F_{i,x}}{\alpha}{x} \circ 
+\fragt{F_{i,y}}{\alpha}{y} \circ \fragt{E_i}{\alpha}{x, y} $
+we denote it  as  $\fragt{R_i}{}{x, y}$. 
+%Also, whenever the returned values are unknown, clear from the context or irrelevant we omit them.
+In the rest of the section, $\alpha_0$, $\alpha_1$, and the value of $k$ are the same as in the discussion above. We denote  the execution fragments  $\finiteprefixt{k}{k}$ and $\finiteprefixt{k}{k+1}$ as 
+$\finiteprefixA{k}{k}$ and $\finiteprefixA{k}{k+1}$ respectively.
+%, which are the same irrespective of the execution they appear in.
+
+Our proof proceeds with a set of lemmas. Due to space limit, we omit the proof of some lemmas from the main paper, and present them in Appendix~\ref{app:sec5_lemmas} as they are relatively straightforward.
+The first lemma proves there exists an execution in which two consecutive \rots{} follow a \wot{}, and both \rots{}
+return the new values by the \wot{}.
+
+\begin{lemma}[Existence of $\alpha_2$] \label{lem:exec3_alpha2} 
+\sloppy There exists an execution $\alpha_2$  of $\mathcal{A}$ that contains 
+$W$, $R_1$, and $R_2$, and can be written in the form 
+$\finiteprefixA{k}{k+1} \circ 
+\frage{R_1}{}{x_1, y_1}
+% \fragt{I_1}{\alpha_2}{} \circ  \fragt{F_{1,x}}{\alpha_2}{x_1} \circ \fragt{F_{1,y}}{\alpha_2}{y_1} \circ \fragt{E_1}{\alpha_2}{x_1, y_1}
+ \circ
+ \frage{R_2}{}{x_1, y_1}
+ %\fragt{I_2}{\alpha_2}{}  \circ \fragt{F_{2,x}}{\alpha_2}{x_1} \circ \fragt{F_{2,y}}{\alpha_2}{y_1} \circ \fragt{E_2}{\alpha_2}{x_1, y_1}
+\circ \fragt{S}{\alpha_2}{}$, where both $R_1$ and $R_2$ return $(x_1, y_1)$.
+\end{lemma}
+
+%\begin{proof}
+%Presented in Appendix~\ref{app:sec5_lemmas}.
+%\end{proof}
+
+\remove{
+\begin{proof}
+We can construct an execution  $\alpha_2$ of $\mathcal{A}$ as follows. Consider the prefix 
+$\finiteprefixt{k}{k+1} \circ 
+\frage{R_1}{\alpha_1}{x_1, y_1}$
+of the execution $\alpha_1$, from Lemma~\ref{lem:exec3_alpha1}. At the end of this prefix, the network invokes $R_2$. Now, by 
+Lemma~\ref{lem:read_format}, due to $\INV{R_2}$
+there is an extension of the prefix of the form 
+$\finiteprefixt{k}{k+1} \circ  \frage{R_1}{\alpha_1}{x_1, y_1} \circ 
+\frage{I}{\alpha}{} \circ \frage{F_{1}}{\alpha}{x} \circ \frage{F_{2}}{\alpha}{y} \circ \frage{E}{\alpha}{x, y}$. 
+By the S property, we have $x = x_1$ and $y= y_1$. Therefore, $\alpha_2$ (Fig.~\ref{fig:executions3}) can be written in the form
+$\finiteprefixA{k}{k+1} \circ 
+\frage{R_1}{}{x_1, y_1}
+% \fragt{I_1}{\alpha_2}{} \circ  \fragt{F_{1,x}}{\alpha_2}{x_1} \circ \fragt{F_{1,y}}{\alpha_2}{y_1} \circ \fragt{E_1}{\alpha_2}{x_1, y_1}
+ \circ
+ \frage{R_2}{}{x_1, y_1}
+ %\fragt{I_2}{\alpha_2}{}  \circ \fragt{F_{2,x}}{\alpha_2}{x_1} \circ \fragt{F_{2,y}}{\alpha_2}{y_1} \circ \fragt{E_2}{\alpha_2}{x_1, y_1}
+\circ \fragt{S}{\alpha_2}{}$, where $\fragt{S}{\alpha_2}{}$ is the rest of the execution.
+%
+\end{proof}
+}
+
+Based on the previous execution, the following lemma proves that there is an execution of 
+$\mathcal{A}$ where $I_2$ occurs earlier than the action $a_{k+1}$ and the invocation of  $R_1$.
+\begin{lemma}[Existence of $\alpha_3$] \label{lem:exec3_alpha3} 
+\sloppy There exists  execution $\alpha_3$  of $\mathcal{A}$ that contains transactions $W$, $R_1$ and $R_2$, and can be written in the form  
+$\finiteprefixA{k-1}{k} \circ  \fragt{I_2}{\alpha_3}{} \circ  a_{k+1} \circ 
+\frage{R_1}{}{x_1, y_1}
+%  \fragt{I_1}{\alpha_3}{} \circ \fragt{F_{1,x}}{\alpha_3}{x_1} \circ \fragt{F_{1,y}}{\alpha_3}{y_1} 
+%\circ \fragt{E_1}{\alpha_3}{x_1, y_1}
+\circ \fragn{F_{2,x}}{\alpha_3}{x_1} \circ \fragn{F_{2,y}}{\alpha_3}{y_1} \circ \fragn{E_2}{\alpha_3}{x_1, y_1}
+\circ \fragt{S}{\alpha_3}{}$,  where both $R_1$ and $R_2$ return $(x_1, y_1)$.
+\end{lemma}
+
+%\begin{proof}
+%Presented in Appendix~\ref{app:sec5_lemmas}.
+%\end{proof}
+
+%\remove{
+\begin{proof}
+Consider the execution $\alpha_2$ as in  Lemma~\ref{lem:exec3_alpha2}. 
+In the execution fragment $ \fragt{I_1}{\alpha_2}{} \circ  \fragt{F_{1,x}}{\alpha_2}{x_1} \circ \fragt{F_{1,y}}{\alpha_2}{y_1} 
+\circ \fragt{E_1}{\alpha_2}{x_1, y_1}$  in $\alpha_2$,  none of the actions occur at $r_2$ and  by Lemma~\ref{lem:exec3_alpha1}, $a_{k+1}$ occurs at $r_1$, 
+also the actions in $\fragt{I_2}{}{}$ occur only at $r_2$.
+%
+Starting with $\alpha_2$, and by repeatedly using Lemma~\ref{lem:exec3_commute}, we create a sequence of four executions of $\mathcal{A}$ by repeatedly swapping 
+ $\fragt{I_2}{\alpha_2}{}$ with the execution fragments 
+$\fragt{E_1}{\alpha_2}{x_1, y_1}$, $\fragt{F_{1,y}}{\alpha_2}{y_1}$, $ \fragt{F_{1,x}}{\alpha_2}{x_1}$
+and $\fragt{I_1}{\alpha_2}{}$, which appears in   $ \fragt{I_1}{\alpha_2}{} \circ  \fragt{F_{1,x}}{\alpha_2}{x_1} \circ \fragt{F_{1,y}}{\alpha_2}{y_1} 
+\circ \fragt{E_1}{\alpha_2}{x_1, y_1}
+\circ \fragt{I_2}{\alpha_2}{}$, 
+where the following sequence of execution fragments
+ $ \fragt{I_1}{\alpha_2}{} \circ  \fragt{F_{1,x}}{\alpha_2}{x_1} \circ \fragt{F_{1,y}}{\alpha_2}{y_1}  \circ \fragt{I_2}{\alpha_2}{} \circ \fragt{E_1}{\alpha_2}{x_1, y_1}$ (by commuting  $\fragt{I_2}{\alpha_2}{}$  and $\fragt{E_1}{\alpha_2}{x_1, y_1}$); ~
+ $ \fragt{I_1}{\alpha_2}{} \circ  \fragt{F_{1,x}}{\alpha_2}{x_1} \circ \fragt{I_2}{\alpha_2}{}  \circ \fragt{F_{1,y}}{\alpha_2}{y_1} \circ \fragt{E_1}{\alpha_2}{x_1, y_1}$ (by commuting $\fragt{I_2}{\alpha_2}{}$  and $\fragt{F_{1,y}}{\alpha_2}{y_1}$); ~
+ $ \fragt{I_1}{\alpha_2}{} \circ  \fragt{I_2}{\alpha_2}{}  \circ \fragt{F_{1,x}}{\alpha_2}{x_1} \circ \fragt{F_{1,y}}{\alpha_2}{y_1} \circ \fragt{E_1}{\alpha_2}{x_1, y_1}$ (by commuting   $\fragt{I_2}{\alpha_2}{}$  and $\fragt{F_{1,x}}{\alpha_2}{x_1}$)
+appear. Finally, we have an  execution $\alpha'$ of the form 
+$ \finiteprefixA{k}{k+1} \circ  \fragt{I_2}{\alpha''}{} \circ 
+\frage{R_1}{}{x_1, y_1}
+%  \fragt{I_1}{\alpha_3'}{} \circ \fragt{F_{1,x}}{\alpha_3'}{x_1} \circ \fragt{F_{1,y}}{\alpha_3'}{y_1} 
+%\circ \fragt{E_1}{\alpha_3'}{x_1, y_1}
+\circ \fragt{F_{2,x}}{\alpha'}{x_1} \circ \fragt{F_{2,y}}{\alpha'}{y_1} \circ \fragt{E_2}{\alpha_3'}{x_1, y_1}
+\circ \fragt{S}{\alpha'}{}$ (by commuting $\fragt{I_2}{\alpha_2}{}$ and $\fragt{I_1}{\alpha_2}{}$)
+Next, from $\alpha'$, by using Lemma~\ref{lem:exec3_commute}  and swapping $a_{k+1}$ with $\fragt{I_2}{\alpha_2}{}$ 
+we have shown the existence  of  an execution 
+ $\alpha_3$.
+\end{proof}
+%}
+
+In the following lemma, we show that we can create an execution $\alpha_4$ of $\mathcal{A}$, where 
+$\fragt{F_{2,y}}{\alpha_4}{}$ occurs immediately before  $ \fragt{E_1}{\alpha_4}{x_1, y_1}$, while $\fragt{R_1}{\alpha_4}{}$ and 
+$\fragt{R_2}{\alpha_4}{}$ both return 
+$(x_1, y_1)$.
+\begin{lemma}[Existence of $\alpha_4$] \label{lem:exec3_alpha4} 
+\sloppy There exists  execution $\alpha_4$  of $\mathcal{A}$ that contains transactions $W$, $R_1$ and $R_2$ and  can be written in the form
+$ \finiteprefixA{k-1}{k} \circ \fragt{I_2}{\alpha_4}{}  \circ a_{k+1} $$ \circ \fragt{I_1}{\alpha_4}{}
+\circ \fragn{F_{1,x}}{\alpha_4}{x_1} \circ   \fragn{F_{1,y}}{\alpha_4}{y_1} 
+\circ \fragn{F_{2,y}}{\alpha_4}{y_1} 
+\circ \fragn{E_1}{\alpha_4}{x_1, y_1}
+$$\circ \fragn{F_{2,x}}{\alpha_4}{x_1} \circ  \fragn{E_2}{\alpha_4}{x_1, y_1}\circ \fragt{S}{\alpha_4}{}$, where both $R_1$ and $R_2$ return $(x_1, y_1)$.
+\end{lemma}
+
+%\begin{proof}
+%Presented in Appendix~\ref{app:sec5_lemmas}.
+%\end{proof}
+
+\remove{
+\begin{proof}
+We start with an execution  $\alpha_3$, as in  Lemma~\ref{lem:exec3_alpha3}, and apply Lemma~\ref{lem:exec3_commute} twice.  
+
+First, by  Lemma~\ref{lem:exec3_commute}, we know there exists an execution $\alpha'$ of $\mathcal{A}$
+where  $\fragt{F_{2,x}}{\alpha_3}{}$ (identify as $G_1$) and 
+$\fragt{F_{2,y}}{\alpha_3}{}$ (identify as $G_2$)  are interchanged since actions of 
+$\fragt{F_{2,x}}{\alpha_3}{}$ occurs solely at $s_x$ and those of $\fragt{F_{2,y}}{\alpha_3}{}$ at $s_y$, 
+and  $\fragt{F_{2,x}}{\alpha_3}{}$ and $\fragt{F_{2,y}}{\alpha_3}{}$ return $x_1$ and $y_1$, respectively, to $r_2$.
+
+
+Next, by Lemma~\ref{lem:exec3_commute} there is 
+execution  of $\mathcal{A}$,  say $\alpha_4$ where
+the fragments 
+$\fragt{E_1}{\alpha_3}{}$ (identify as $G_1$)  and 
+$\fragt{F_{2,y}}{\alpha_3}{}$ (identify as $G_2$) are interchanged, with respect to $\alpha'$, because  the actions in  $\fragt{E_1}{\alpha'}{}$ occur at $r_1$ and 
+those of $\fragt{F_{2,y}}{\alpha_3}{}$ at $s_y$. Furthermore, $\alpha_4$
+  can be written in the form
+ $  \finiteprefixA{k-1}{k}  \circ  \fragt{I_2}{\alpha''}{} \circ  a_{k+1}  \circ $$
+  \fragt{I_1}{\alpha''}{} \circ \fragt{F_{1,x}}{\alpha''}{x_1}
+   \circ \fragt{F_{1,y}}{\alpha''}{y_1} 
+  \circ \fragt{F_{2,y}}{\alpha''}{y_1} 
+\circ \fragt{E_1}{\alpha''}{x_1, y_1}
+\circ \fragt{F_{2,x}}{\alpha''}{x_1} \circ \fragt{E_2}{\alpha''}{x_1, y_1}
+\circ \fragt{S}{\alpha''}{}$.
+\end{proof}
+}
+
+ Next, we create an execution  $\alpha_5$ where 
+    $\fragt{F_{2,y}}{\alpha_5}{}$ occurs before  $ \fragt{F_{1,y}}{\alpha_5}{}$. 
+    %However, because the actions in both execution fragments occur at the same automaton care has to be taken to swap these fragments 
+    %compared to $\alpha_4$.
+%\blue{
+\begin{lemma}[Existence of $\alpha_5$] \label{lem:exec3_alpha4b} 
+\sloppy There exists  execution $\alpha_5$  of $\mathcal{A}$ that contains transactions $W$, $R_1$ and $R_2$ and  can be written in the form
+$ \finiteprefixA{k-1}{k} \circ \fragt{I_2}{\alpha_5}{}  \circ a_{k+1} $$ \circ \fragt{I_1}{\alpha_5}{}
+\circ \fragn{F_{1,x}}{\alpha_5}{x_1} \circ \fragn{F_{2,y}}{\alpha_5}{y_1} \circ  \fragn{F_{1,y}}{\alpha_5}{y_1} \circ \fragn{E_1}{\alpha_5}{x_1, y_1}
+$$\circ \fragn{F_{2,x}}{\alpha_5}{x_1} \circ  \fragn{E_2}{\alpha_5}{x_1, y_1}\circ \fragt{S}{\alpha_5}{}$, 
+where both $R_1$ and $R_2$ return $(x_1, y_1)$.
+\end{lemma}
+%}
+
+\begin{proof}
+%\blue{
+Given all actions  in $ \fragt{F_{1,y}}{\alpha_4}{} $ and 
+  $\fragt{F_{2,y}}{\alpha_4}{}$ occur at $s_y$ in $\alpha_4$, consider the prefix of $\alpha_4$ that ends with $\fragn{F_{1,x}}{\alpha''}{x_1}$. We extend this prefix as follows.
+In this prefix,  the actions $send(m_y^{r_2})_{r_2, s_y}$ and 
+ $send(m_y^{r_1})_{r_1, s_y}$ do not have their corresponding $recv$ actions.  Suppose  the network 
+delivers $m_y^{r_2}$ at $s_y$ (via the action $recv(m_y^{r_2})_{r_2, s_y}$) and delays all actions, other than internal and output actions at $s_y$, until $s_y$ responds with $y$, via  action $send(y)_{s_y, r_2}$. This extended execution fragment is of the form $\fragt{F_{2,y}}{\alpha_4}{}$. Similarly, the network further extends the execution by placing  the 
+action $recv(m_y^{r_1})_{r_1, s_y}$ at $s_y$  and creates the execution fragment of the form $\fragt{F_{1,y}}{\alpha_4}{}$. Note that, so far, the actions due to the above extensions are entirely at $s_y$. Suppose the network makes the execution 
+fragments $\fragt{E_1}{\alpha''}{}$ happen next by delivering values sent during $\fragt{F_{1,x}}{\alpha_4}{}$ and $\fragt{F_{1,y}}{\alpha_4}{}$ via the actions  $recv(x)_{s_x, r_1}$ and $recv(y)_{s_y, r_1}$ respectively at $r_1$. Then $\fragt{F_{2,x}}{\alpha''}{}$ occurs next, such that this fragment contains exactly the same sequence of actions as  in the corresponding execution fragment in  $\alpha_4$.
+This is possible because they are not influenced by  any output action in $\fragt{F_{2,y}}{\alpha_4}{}$  or $\fragt{F_{1,y}}{\alpha_4}{}$. 
+Suppose the network places the execution fragment  $\fragt{E_2}{\alpha''}{}$ next.
+Let us denote the execution that is an extension of this finite execution so far as $\alpha_5$, which is of the form $ \finiteprefixA{k-1}{k} \circ \fragt{I_2}{\alpha_5}{}  \circ a_{k+1} $$ \circ \fragt{I_1}{\alpha_5}{}
+\circ \fragt{F_{1,x}}{\alpha_5}{} \circ \fragt{F_{2,y}}{\alpha_5}{} \circ  \fragt{F_{1,y}}{\alpha_5}{} \circ \fragt{E_1}{\alpha_5}{}
+$$\circ \fragt{F_{2,x}}{\alpha_5}{} \circ  \fragt{E_2}{\alpha_5}{}\circ \fragt{S}{\alpha_5}{}$.
+ Now we need to argue about the values returned by the reads.
+ %}
+ 
+ %\blue{
+Note that both $\alpha_4$ and $\alpha_5$ have the same execution fragment  $\frage{F_{1,x}}{\alpha_4}{}$. Therefore,   $\frage{F_{1,x}}{\alpha_4}{} \stackrel{s_x}{\sim} \frage{F_{1,x}}{\alpha_5}{}$, and thus $s_x$ also returns $x_1$ in $\fragt{F_{1,x}}{\alpha_4}{}$ in $\alpha_5$. Next  by Lemma~\ref{lem:exec3_equiv} for $R_1$,  $s_y$ returns $y_1$ in $\fragt{F_{1,y}}{\alpha_5}{}$  and  hence by the S property, $R_1(\alpha_5)$ returns $(x_1, y_1)$, i.e.,   that $r_1$ returns the new version of object values. Therefore, $\frage{F_{1,x}}{\alpha_4}{}$,  $\fragt{F_{1,y}}{\alpha_5}{}$ and $\fragt{E_1}{\alpha_5}{}$ are of the form $ \fragt{F_{1,x}}{\alpha_5}{x_1}$, $\fragt{F_{1,y}}{\alpha_5}{y_1}$ and  $\fragt{E_1}{\alpha_5}{x_1, y_1}$, respectively.
+%}
+
+%\blue{
+Note that by construction of $\alpha_5$ above,  the execution fragment  $\fragt{F_{2,x}}{\alpha_4}{}$ in both $\alpha_4$ and $\alpha_5$ is the same, therefore,   $\frage{F_{2,x}}{\alpha_4}{} \stackrel{s_x}{\sim} \frage{F_{2,x}}{\alpha_5}{}$. Hence as in 
+$\alpha_4$,  $s_x$  returns $x_1$  in the execution fragment  $\frage{F_{2, 1}}{\alpha_5}{}$  in   $\alpha_5$,  i.e.,  of the form $\frage{F_{2, 1}}{\alpha_5}{x_1}$.
+Since $s_x$ returns $x_1$ in $\fragt{F_{2, 1}}{\alpha_5}{}$ in $\alpha_5$,  by   
+Lemma~\ref{lem:exec3_equiv}  and   the S property,
+  $R_2$ returns $(x_1, y_1)$  and hence $\fragt{E_2}{\alpha_5}{}$ is of the form $\fragt{E_2}{\alpha_5}{x_1, y_1}$.
+%}
+
+%\blue{
+From the above argument we know that  $\alpha_5$ is of the form $ \finiteprefixA{k-1}{k} \circ \fragt{I_2}{\alpha_5}{}  \circ a_{k+1} $$ \circ \fragt{I_1}{\alpha_5}{}
+\circ \fragt{F_{1,x}}{\alpha_5}{x_1} \circ \fragt{F_{2,y}}{\alpha_5}{y_1} \circ  \fragt{F_{1,y}}{\alpha_5}{y_1} \circ \fragt{E_1}{\alpha_5}{x_1, y_1}
+$$\circ \fragt{F_{2,x}}{\alpha_5}{x_1} \circ  \fragt{E_2}{\alpha_5}{x_1, y_1}\circ \fragt{S}{\alpha_5}{}$.
+%}
+\end{proof}
+
+
+In the next lemma, we show the existence of an execution of $\mathcal{A}$ where $R_1$ returns $(x_0, y_0)$  and $I_2$ occurs immediately after $a_{k}$ and 
+ $R_2$ responds with $(x_1, y_1)$. 
+%In fact, this is the most important of the sequence of executions of  
+%$\mathcal{A}$  (Fig.~\ref{fig:executions3})  because later with this  we prove in Theorem~\ref{thm:snow3} the existence of a
+%execution of $\mathcal{A}$ where a \rot{} returns object-values of an earlier version compared to a previous \rot{} that is not
+%concurrent with it.
+\begin{lemma}[Existence of $\alpha_6$] \label{lem:exec3_alpha5} 
+\sloppy There exists  execution $\alpha_6$  of $\mathcal{A}$ that contains transactions $W$, $R_1$ and $R_2$ and can be
+written in the form 
+$ \finiteprefixA{k-1}{k} \circ\fragt{I_2}{\alpha_6}{} \circ  \fragt{I_1}{\alpha_6}{} \circ\fragn{F_{1,x}}{\alpha_6}{x_0}
+\circ\fragn{F_{2,y}}{\alpha_6}{y_1}\circ \fragn{F_{1,y}}{\alpha_6}{y_0} \circ\fragn{E_1}{\alpha_6}{x_0, y_0}
+\circ\fragn{F_{2,x}}{\alpha_6}{x_1} \circ \fragn{E_2}{\alpha_6}{x_1, y_1}\circ \fragt{S}{\alpha_6}{}$, 
+where  $R_1$ returns $(x_0, y_0)$  and $R_2$ returns $(x_1, y_1)$.
+\end{lemma}
+
+\begin{proof}
+The crucial part of this proof is to carefully use the result of  Lemma~\ref{lem:exec3_alpha1} so that $R_1$ returns $(x_0, y_0)$, instead of $(x_1, y_1)$.
+Note that the same prefix $\finiteprefixA{k-1}{k}$ appears in $\alpha_5$ of Lemma~\ref{lem:exec3_alpha4b} as well as in $\alpha_0$ and $\alpha_1$ of Lemma~\ref{lem:exec3_alpha1}, where
+ $k$ is defined as in Lemma~\ref{lem:exec3_alpha1}.
+
+By Lemma~\ref{lem:exec3_alpha1}, action $a_{k+1}$ occurs at $r_1$.
+ In the execution fragment 
+ $a_{k+1} $$ \circ \fragt{I_1}{\alpha_5}{}
+\circ \fragt{F_{1,x}}{\alpha_5}{x_1} \circ \fragt{F_{2,y}}{\alpha_5}{y_1}$ of $\alpha_5$, the actions in
+ $a_{k+1} $$ \circ \fragt{I_1}{\alpha_4}{}$ occur at $r_1$; actions in 
+$\fragt{F_{1,x}}{\alpha_4}{x_1}$ occur at $s_x$; and  actions in $\fragt{F_{2,y}}{\alpha_4}{y_1}$ occur at $s_y$. 
+Now consider the  prefix of execution $\alpha_4$ ending with $I_2$ and the network invokes $R_1$ immediately after $I_2$  (instead of 
+after $a_{k+1}$) and  extends it by the execution fragment  $ \fragt{I_1}{\epsilon}{} \circ \fragt{F_{1,x}}{\epsilon}{} \circ  \fragt{F_{2,y}}{\epsilon}{}$ to create a new finite execution $\epsilon$, which is of the form $\finiteprefixA{k-1}{k}  \circ \fragt{I_2}{\epsilon}{} \circ \fragt{I_1}{\epsilon}{} \circ \fragt{F_{1,x}}{\epsilon}{} \circ  \fragt{F_{2,y}}{\epsilon}{}$. As a result, $a_{k+1}$ may not be in $\epsilon$ because we introduce changes before $a_{k+1}$ occurs.
+
+Note  that if  in the prefix
+ $\finiteprefixA{k-1}{k}  \circ \frage{I_2}{\epsilon}{} \circ \frage{I_1}{\epsilon}{} \circ \frage{F_{1,x}}{\epsilon}{} \circ  \frage{F_{2,y}}{\epsilon}{}$  of $\epsilon$ 
+we ignore the actions in $\frage{I_2}{\epsilon}{}$
+ then the remaining execution is the same as the prefix  
+ $\finiteprefixA{k-1}{k}  \circ  \frage{I_1}{\alpha_0}{} \circ \frage{F_{1,x}}{\alpha_0}{} \circ  \frage{F_{2,y}}{\alpha_0}{}$ of $\alpha_0$ in 
+Lemma~\ref{lem:exec3_alpha1}. Here we explicitly use the notations $\epsilon$ and $\alpha_0$ to avoid confusion. Since the actions in 
+$\frage{I_2}{\epsilon}{}$ have no impact on the actions in 
+ $\frage{I_1}{\epsilon}{} \circ \frage{F_{1,x}}{\epsilon}{} \circ  \frage{F_{2,y}}{\epsilon}{}$,
+we have $\frage{F_{1,x}}{\epsilon}{} \stackrel{s_x}{\sim} \frage{F_{1,x}}{\alpha_0}{}$. Therefore, by Lemma~\ref{lem:exec3_consistent} 
+  $\frage{F_{1,x}}{\epsilon}{}$ returns $x_0$ as in  $\frage{F_{1,x}}{\alpha_0}{}$, i.e., $s_x$ returns $x_0$ in $\fragn{F_{1,x}}{\epsilon}{x_0}$. 
+Now by Lemma~\ref{lem:exec3_equiv} we  conclude that 
+%Then, by Lemma~\ref{lem:exec3_alpha1}, 
+for  any  extension of $\epsilon$, say $\gamma$, \rot{} 
+ $R_1(\gamma)$ returns $x_0$ at $s_x$ and by the S property  $R_1(\gamma)$ returns  $(x_0, y_0)$. Also, since 
+$\frage{F_{2,y}}{\alpha_5}{} \stackrel{s_y}{\sim} \frage{F_{2,y}}{\epsilon}{} \stackrel{s_y}{\sim} \frage{F_{2,y}}{\gamma}{}$  by Lemma~\ref{lem:exec3_equiv} and the S property,  $R_2(\gamma)$ must return $(x_1, y_1)$.  Therefore, $\gamma$ has an extension of $\alpha_6$ (Fig.~\ref{fig:executions3}) which is of  the form $ \finiteprefixA{k-1}{k}  \circ\fragt{I_2}{\alpha_6}{} \circ  \fragt{I_1}{\alpha_6}{} \circ\fragt{F_{1,x}}{\alpha_6}{x_0}
+\circ\fragt{F_{2,y}}{\alpha_6}{y_1}\circ \fragt{F_{1,y}}{\alpha_6}{y_0} \circ\fragt{E_1}{\alpha_6}{x_0, y_0}
+\circ\fragt{F_{2,x}}{\alpha_6}{x_1} \circ \fragt{E_2}{\alpha_6}{x_1, y_1}\circ \fragt{S}{\alpha_6}{}$ as in the statement of the lemma.
+\end{proof}
+
+
+The  following lemma shows that there exists  an execution $\alpha_7$ for $\mathcal{A}$ where $\fragt{F_{2,x}}{\alpha_7}{}$ 
+appears  before $\fragn{F_{1,y}}{\alpha_7}{y_0} \circ\fragn{E_1}{\alpha_7}{x_0, y_0}$, where $R_1$ returns $(x_0, y_0)$ and $R_2$ returns $(x_1, y_1)$.  The lemma can be proven by  starting from $\alpha_6$ in Lemma~\ref{lem:exec3_alpha5} and  moving the execution fragments  of $R_2$ earlier, a little at a time, until finally we have $R_2$ finishing before $R_1$ starts.  This simply uses commutativity since the actions in the swapped execution fragments occur at different automata.
+
+%\wl{Is the preceeding paragraph describing just lemma 5.7, or the rest of the proof, or some combination of both. I cannot tell. Please update the text to make it clear.}
+
+\begin{lemma}[Existence of $\alpha_7$] \label{lem:exec3_alpha6} 
+\sloppy There exists  execution $\alpha_7$  of $\mathcal{A}$ that contains transactions $W$, $R_1$ and $R_2$, and   can be written in the form
+$\finiteprefixA{k-1}{k} \circ \fragt{I_2}{\alpha_7}{}  \circ \fragt{I_1}{\alpha_7}{} \circ \fragn{F_{1,x}}{\alpha_7}{x_0} 
+\circ \fragn{F_{2,y}}{\alpha_7}{y_1}\circ \fragn{F_{2,x}}{\alpha_7}{x_1} 
+ \circ \fragn{F_{1,y}}{\alpha_7}{y_0} \circ\fragn{E_1}{\alpha_7}{x_0, y_0}\circ
+ \fragn{E_2}{\alpha_7}{x_1, y_1}\circ \fragt{S}{\alpha_7}{}$ where $R_1$ returns $(x_0, y_0)$ and $R_2$ returns $(x_1, y_1)$.
+\end{lemma}
+
+\remove{
+\begin{proof}
+\sloppy This result is proved by applying the result of Lemma~\ref{lem:exec3_commute}  to the execution created in Lemma~\ref{lem:exec3_alpha5}. 
+Suppose,  $\alpha_6$ (Fig.~\ref{fig:executions3}) is a  execution as  in Lemma~\ref{lem:exec3_alpha5}, 
+where in  the   execution fragment 
+$\fragt{E_1}{\alpha_6}{x_0, y_0}\circ\fragt{F_{2,x}}{\alpha_6}{}$  we identify 
+ $\fragt{E_1}{\alpha_6}{x_0, y_0}$  as $G_1$ and 
+$\fragt{F_{2,x}}{\alpha_6}{y_0}$  as $G_2$. The actions of $G_1$ and $G_2$ occur at two distinct automata, therefore,  we  can use the result of Lemma~\ref{lem:exec3_commute}, to argue that there exists an execution $\alpha'$ of $\mathcal{A}$  that  contains the  execution fragment 
+$\fragt{F_{2,x}}{\alpha_7}{}  \circ\fragt{E_1}{\alpha_7}{x_0, y_0}$, and $\alpha_6$ and $\alpha'$ are identical in the prefixes and suffixes corresponding to $G_1$ and $G_2$.
+
+ Now,  $\alpha'$ contains  $\fragt{F_{1,y}}{\alpha''}{} \circ \fragt{F_{2,x}}{\alpha'}{}$, where  
+  the actions in  $\fragt{F_{1,y}}{\alpha''}{}$ (identified as $G_1$) and $\fragt{F_{2,x}}{\alpha''}{}$ (identify as $G_2$)  occur  at distinct automata. Hence, by  Lemma~\ref{lem:exec3_commute} there exists  an execution $\alpha_7$ of the form
+$\finiteprefixA{k-1}{k}  \circ \fragt{I_2}{\alpha_7}{}  \circ \fragt{I_1}{\alpha_7}{} \circ \fragt{F_{1,x}}{\alpha_7}{x_0} 
+\circ \fragt{F_{2,y}}{\alpha_7}{y_1}\circ \fragt{F_{2,x}}{\alpha_7}{x_1} 
+ \circ \fragt{F_{1,y}}{\alpha_7}{y_0} \circ\fragt{E_1}{\alpha_7}{x_0, y_0}\circ
+ \fragt{E_2}{\alpha_7}{x_1, y_1}\circ \fragt{S}{\alpha_7}{}$.
+%
+\end{proof}
+}
+
+The following lemma leverages Lemma~\ref{lem:exec3_commute} to show the existence of an execution $\alpha_8$ of $\mathcal{A}$ where $\fragt{F_{2,y}}{\alpha_8}{}$ appears before $\fragt{I_1}{\alpha_8}{} \circ \fragt{F_{1,x}}{\alpha_8}{}$, and $R_1$ returns $(x_0, y_0)$ while $R_2$ returns $(x_1, y_1)$.
+
+\begin{lemma} [Existence of $\alpha_8$]  \label{lem:exec3_alpha7} 
+\sloppy There exists  execution $\alpha_8$  of $\mathcal{A}$ that contains transactions $W$, $R_1$ and $R_2$
+and   can be written in the form 
+$\finiteprefixA{k-1}{k}  \circ  \fragt{I_2}{\alpha_8}{} \circ \fragn{F_{2,y}}{\alpha_8}{y_1} \circ 
+$$\fragt{I_1}{\alpha_8}{} \circ \fragn{F_{1,x}}{\alpha_8}{x_0} 
+\circ  \fragn{F_{2,x}}{\alpha_8}{x_1} 
+$$ \circ \fragn{F_{1,y}}{\alpha_8}{y_0} \circ \fragn{E_1}{\alpha_8}{x_0, y_0}
+\circ \fragn{E_2}{\alpha_8}{x_1, y_1}\circ \fragt{S}{\alpha_8}{}$, where $R_1$ returns $(x_0, y_0)$ and $R_2$ returns $(x_1, y_1)$.
+\end{lemma}
+
+\remove{
+\begin{proof}
+ Consider the execution $\alpha_7$ of $\mathcal{A}$ as in Lemma~\ref{lem:exec3_alpha6}. In the context of 
+  of  Lemma~\ref{lem:exec3_commute}, in $\alpha_7$ (Fig.~\ref{fig:executions3}) the actions in  
+ $ \fragt{F_{1,x}}{\alpha_8}{}$ (identify as $G_1$)  occur at $s_x$  and  those in $\fragt{F_{2,y}}{\alpha_8}{}$ (identify as $G_2$) at  $s_y$. Then by  
+ Lemma~\ref{lem:exec3_commute} there exists an execution $\alpha'$ of $\mathcal{A}$,  of the form 
+ $ \finiteprefixA{k-1}{k}  \circ \fragt{I_2}{\alpha'}{}  \circ \fragt{I_1}{\alpha''}{} 
+ \circ \fragn{F_{2,y}}{\alpha'}{y_1} 
+\circ \fragn{F_{1,x}}{\alpha'}{x_0} 
+\circ \fragn{F_{2,x}}{\alpha'}{x_1} 
+ \circ \fragn{F_{1,y}}{\alpha'}{y_0} \circ\fragn{E_1}{\alpha'}{x_0, y_0}\circ
+ \fragn{E_2}{\alpha''}{x_1, y_1}\circ \fragt{S}{\alpha'}{}$, where $ \fragt{F_{2,y}}{\alpha_8}{}$ and 
+  $ \fragt{F_{1,x}}{\alpha_8}{}$  are interchanged.
+ 
+ Since  actions in  $ \fragt{F_{2,y}}{\alpha_8}{}$ (identify as $G_1$)  occur at $s_y$ and those in 
+  $ \fragt{I_{1}}{\alpha_8}{}$ (identify as $G_1$)  occur at $r_1$ then by Lemma~\ref{lem:exec3_commute}
+  there is a  execution of $\mathcal{A}$, $\alpha_8$ where $\fragt{F_{2,y}}{\alpha_8}{}$ appear before $\fragt{I_1}{\alpha_8}{}$, i.e., of the form  $\finiteprefixA{k-1}{k}  \circ \fragt{I_2}{\alpha_8}{} \circ \fragt{F_{2,y}}{\alpha_8}{}  \circ
+ \fragt{I_1}{\alpha_7}{} \circ \fragt{F_{1,x}}{\alpha_8}{} 
+\circ \fragt{F_{2,x}}{\alpha_8}{} 
+ \circ \fragt{F_{1,y}}{\alpha_8}{} \circ\fragt{E_1}{\alpha_8}{} \circ
+ \fragt{E_2}{\alpha_8}{}\circ \fragt{S}{\alpha_8}{}$, where $ \fragt{F_{2,y}}{\alpha_8}{}$ and 
+  $ \fragt{I_{1}}{\alpha_8}{}$  are interchanged.
+ 
+ By $(ii)$ of Lemma~\ref{lem:exec3_equiv} we have 
+$\frage{F_{2,x}}{\alpha'}{} \stackrel{s_x}{\sim} \frage{F_{2,x}}{\alpha_8}{}$ hence $\fragt{F_{2,x}}{\alpha_8}{}$ sends $x_1$ and 
+$\fragt{F_{1,x}}{\alpha_8}{}$ and $\fragt{F_{1,y}}{\alpha_8}{}$ sends $x_0$ and $y_0$, respectively. So considering these returned values we have $\alpha_8$ 
+(Fig.~\ref{fig:executions3}) in the form as stated in the lemma.
+\end{proof}
+}
+
+%\wl{Please replace all language ``forward past'' with ``earlier than'', which is much clearer about where things are moving. I think i have fixed all of these.}
+
+The following lemma shows the existence of an execution  $\alpha_9$, of $\mathcal{A}$, where 
+$\fragt{F_{2,x}}{}{}$ appears before $\fragt{F_{1,x}}{}{}$.
+%\blue{
+\begin{lemma} [Existence of $\alpha_9$]  \label{lem:exec3_alpha8} 
+\sloppy There exists  execution $\alpha_9$  of $\mathcal{A}$ that contains transactions $W$, $R_1$ and $R_2$
+and   can be written in the form 
+$\finiteprefixA{k-1}{k}  \circ  \fragt{I_2}{\alpha_8}{} \circ \fragt{F_{2,y}}{\alpha_8}{y_1} \circ 
+$$\fragt{I_1}{\alpha_8}{} \circ \fragt{F_{2,x}}{\alpha_8}{x_1} 
+\circ  \fragt{F_{1,x}}{\alpha_8}{x_0} 
+$$ \circ \fragt{F_{1,y}}{\alpha_8}{y_0} \circ \fragt{E_1}{\alpha_8}{x_0, y_0}
+\circ \fragt{E_2}{\alpha_8}{x_1, y_1}\circ \fragt{S}{\alpha_8}{}$
+where $R_1$ returns $(x_0, y_0)$ and $R_2$ returns $(x_1, y_1)$.
+\end{lemma}
+%}
+
+\remove{
+\begin{proof}
+%\blue{
+In $\alpha_8$ from Lemma~\ref{lem:exec3_alpha7}, all the actions in  
+ $ \fragn{I_1}{\alpha_8}{}$  occur at $r_1$; those in   $ \fragn{F_{1,x}}{\alpha_8}{x_1}$  occur at $s_x$; and  the  
+actions in $ \fragn{F_{2,x}}{\alpha_8}{y_1}$ occur only  at $s_x$. 
+%
+Note that actions of  both execution fragments $ \fragt{F_{2,x}}{\alpha_8}{}$  and   
+$\fragt{F_{1,x}}{\alpha_8}{}$ occur at $r_1$.  
+Consider the prefix of $\alpha_8$ that ends with $\fragt{I_1}{}{}$ then suppose the network  extends this prefix by adding an execution fragment of the form
+$ \fragt{F_{2,x}}{\alpha_8}{} \circ  \fragt{F_{1,x}}{\alpha_8}{}$ as follows.  
+%
+First note that  the actions $send(m_x^{r_2})_{r_2, s_x}$ and 
+ $send(m_x^{r_1})_{r_1, s_x}$ appears in the prefix but do not have corresponding $recv$ actions.
+ %}
+%\blue{
+The  network places action $recv(m_x^{r_2})_{r_2, s_x}$, and allows an execution fragment of the form 
+$ \fragt{F_{2,x}}{\alpha_8}{}$ to appear. Now, immediately after this the network further extends it with 
+an execution fragment of the form  $\fragt{F_{1,x}}{\alpha_8}{}$  by placing action $recv(m_x^{r_1})_{r_1, s_x}$. 
+ Next the fragment $\fragn{F_{1,y}}{\alpha_8}{y_0}$ is added  and is the same as $ \frage{F_{1,y}}{\alpha_8}{}$.
+This last step can be argued by the fact that none of the actions in  $ \fragn{F_{1,y}}{\alpha_8}{y_0}$ can be affected by 
+any of the output actions at $ \fragt{F_{2,x}}{\alpha_8}{}$ and  $\fragt{F_{1,x}}{\alpha_8}{}$. Note that a careful argument can be done by using Theorem~\ref{thm:fairtrace} to conclude the same. Following this the network allows the rest of the execution by adding an execution fragment of the form $\fragn{E_1}{\alpha_8}{x_0, y_0}
+\circ \fragn{E_2}{\alpha_8}{x_1, y_1}\circ \fragn{S}{\alpha_8}{}$. The resulting execution is of the form 
+$\finiteprefixA{k-1}{k}  \circ  \fragt{I_2}{\alpha_8}{} \circ \fragt{F_{2,y}}{\alpha_8}{y_1} \circ 
+$$\fragt{I_1}{\alpha_8}{} \circ \fragn{F_{2,x}}{\alpha_8}{x_1} 
+\circ  \fragn{F_{1,x}}{\alpha_8}{x_0} 
+$$ \circ \fragt{F_{1,y}}{\alpha_8}{y_0} \circ \fragn{E_1}{\alpha_8}{x_0, y_0}
+\circ \fragn{E_2}{\alpha_8}{x_1, y_1}\circ \fragt{S}{\alpha_8}{}$, where we retained the values wherever it is known, and we denote this  execution by $\alpha_9$.
+%}
+
+%\blue{
+Now, we argue about the return values in $\alpha_9$. 
+Applying Lemma~\ref{lem:exec3_equiv} to $R_2$ and $\fragn{F_{2,y}}{\alpha_8}{y_1}$ implies that $R_2$ 
+returns $(x_1, y_1 )$. Similarly, 
+applying Lemma~\ref{lem:exec3_equiv} to $R_1$ and $\fragn{F_{1,y}}{\alpha_8}{y_0}$ implies that $R_1$ 
+must return $(x_0, y_0 )$ in $\alpha_9$.
+%}
+\end{proof}
+}
+
+%\wl{below should be ``where $R_1$ returns $(x_0, y_0)$ and $R_2$ completes by returning $(x_1, y_1)$'' I think! (the first $R_2$ should be a $R_1$.)}
+
+Now we show the existence of an execution of $\mathcal{A}$ where the execution fragments corresponding to $R_2$ appears 
+before $R_1$, where  $R_1$ returns $(x_0, y_0)$ and $R_2$ completes by returning $(x_1, y_1)$.
+%\blue{
+\begin{lemma} [Existence of $\alpha_{10}$]  \label{lem:exec3_alpha11} 
+\sloppy There exists an execution $\alpha_{10}$  of $\mathcal{A}$ that contains transactions $W$, $R_1$ and $R_2$
+and   can be written in the form 
+$\finiteprefixA{k-1}{k}   \circ
+\frage{R_2}{}{x_1, y_1} \circ
+ \frage{R_1}{}{x_0, y_0}
+ \circ \fragt{S}{\alpha_{10}}{}$.
+where $R_1$ returns $(x_0, y_0)$ and $R_2$ returns $(x_1, y_1)$.
+\end{lemma}
+%}
+\begin{proof}
+%\blue{
+Now, by applying Lemma~\ref{lem:exec3_commute} to $\alpha_{9}$, we can swap 
+ $\fragt{F_{2,x}}{}{}$  and $ \fragt{I_1}{}{}$ to create an execution $\alpha_{10}$  (Fig.~\ref{fig:executions3}) of $\mathcal{A}$, which is
+of the form 
+$ \finiteprefixA{k-1}{k}   \circ 
+\fragt{I_2}{\alpha_9}{} \circ \fragt{F_{2,y}}{\alpha_9}{y_1} 
+\circ   \fragt{F_{2,x}}{\alpha_9}{x_1}  \circ 
+\frage{R_1}{}{x_0, y_0} \circ \fragt{E_2}{\alpha_8}{x_1, y_1}
+%\fragt{I_1}{\alpha_9}{} \circ \fragt{F_{1,x}}{\alpha_9}{x_0}  \circ \fragt{F_{1,y}}{\alpha_9}{y_0} \circ \fragt{E_1}{\alpha_9}{x_0, y_0}\circ \fragt{E_2}{\alpha_9}{x_1, y_1}
+ \circ \fragt{S}{\alpha_9}{}$, where the returned values are determined by  Lemma~\ref{lem:exec3_consistent}.
+ %}
+ 
+%\blue{
+Note that none of the actions in 
+$\fragt{I_1}{\alpha_9}{} \circ \fragt{F_{1,x}}{\alpha_9}{x_0} 
+ \circ \fragt{F_{1,y}}{\alpha_9}{y_0} \circ \fragt{E_1}{\alpha_9}{x_0, y_0}$
+occur at $r_2$ and all actions in $\fragt{E_2}{\alpha_9}{x_1, y_1} $ occur at $r_2$. Therefore, by 
+applying Lemma~\ref{lem:exec3_commute}, we can consecutively swap $\fragt{E_2}{}{}$ with 
+%
+$\fragt{E_1}{}{}$, $\fragt{F_{1,y}}{}{}$,  $\fragt{I_1}{}{}$,  and $\fragt{F_{1,x}}{}{}$. Therefore, we create a sequence of 
+four executions of $\mathcal{A}$ to arrive at execution $\alpha_{10}$ (Fig.~\ref{fig:executions3}) of the form
+$\finiteprefixA{k-1}{k}   \circ
+\frage{R_2}{}{x_1, y_1}
+ %\fragt{I_2}{\alpha_10}{} \circ \fragt{F_{2,y}}{\alpha_10}{y_1} 
+%\circ   \fragt{F_{2,x}}{\alpha_10}{x_1}  \circ \fragt{E_2}{\alpha_10}{x_1, y_1} \circ
+%\fragt{I_1}{\alpha_10}{} \circ \fragt{F_{1,x}}{\alpha_10}{x_0} 
+ % \fragt{F_{1,y}}{\alpha_10}{y_0} \circ \fragt{E_1}{\alpha_10}{x_0, y_0}
+ \circ
+ \frage{R_1}{}{x_0, y_0}
+ \circ \fragt{S}{\alpha_{10}}{}$.
+%}
+\end{proof}
+
+Using the above results,  we prove Theorem ~\ref{thm:snow3} for 3-clients by showing the existence of $\alpha_{10}$,  where $R_2$ completes before $R_1$ is invoked and  $R_2$ returns $(x_1, y_1)$ whereas $R_1$ returns $(x_0, y_0)$, which  violates the S property. 
+
+
+\begin{proof}
+\sloppy 
+$\alpha_{10}$ as shown in Fig.~\ref{fig:executions3} provides a contradicting execution, where $R_1$ returns $(x_0, y_0)$ and $R_2$ returns $(x_1, y_1)$, but $R_1$ is in real time after $R_2$, which violates the S property.
+\end{proof}
+
+\setcounter{algorithm}{3}
+
