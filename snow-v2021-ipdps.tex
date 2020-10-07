@@ -17,7 +17,8 @@
 \usepackage{cleveref}
 
 \input{nn_macros}
-%\newtheorem*{lemma*}{Lemma}
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
 \newcommand{\states}[1]{{\textit{states}(#1)}}
 \newcommand{\startstates}[1]{{\textit{start}(#1)}}
 \newcommand{\sig}[1]{{\textit{sig}(#1)}}
@@ -180,23 +181,24 @@ lynch@csail.mit.edu}
 \input{snow-kmk-v1}
 \input{summary}
 \input{formal_proof}
-\input{2clients2servers}
+\input{2clients2servers-v2}
 \input{c2c_mwsr}
 
-\remove{
+
 \section{Bounded Latency}
 \subsection{No Prior Bounded Latency for SW}\label{sec:eiger}
-%\input{no_bounded_latency.tex}
+\input{no_bounded_latency.tex}
+\input{eiger_not_s.tex}
 
 \vspace{-1em}
 \subsection{SNW +  One Version,  MWMR setting}\label{mwmr_snow_one_version}
-%\input{SNW-one-version-short-v1.tex}
+\input{SNW-one-version-short-v1.tex}
 %
 \subsection{SNW + One Round,  MWMR setting}\label{mwmr_snow_one_round}
-%\input{SNW-one-round-short-v1.tex}
+\input{SNW-one-round-short-v1.tex}
 %
 \vspace{-0.8em}
-}
+
 
 %\section{Related Work}\label{related}
 %\input{related.tex}

@@ -1,0 +1,143 @@
+%\section{Impossibility of SNOW properties with two clients with restricted communication }\label{two-client}
+\section{Two Client Open Question}
+\label{sec:2c2s}
+This section closes the open question of whether SNOW properties can be implemented with two clients. We first prove that SNOW remains impossible in a 2-client 2-server system if the clients cannot directly send messages to each other.
+% We prove our result by showing 
+ %a contradiction. 
+ However, in the presence of client to client communication, it is possible to have all SNOW properties with two clients and at least two servers.
+ %Fig~\ref{fig:architecture2a}.
+ 
+ \subsection{No  SNOW Without C2C  Messages}
+ \label{subsec:no_snow_no_c2c}
+ In this section, we use the same system model as in Section~\ref{sec:formal_proof}: two servers $s_x$ and $s_y$ with two clients, a reader $r_1$ that issues only 
+\rots{} and a writer $w$ that issues only \wots{}. A \wot{} $W$ writes $(x_1, y_1)$ to $s_x$ and $s_y$, and a \rot{} $R$ reads both servers. We assume that there is a bi-directional communication channel between any pair of client and server and any pair of servers. There is no communication channel between clients. We assume that each transaction can be identified by a unique number, e.g., transaction identifier. 
+
+%We denote the automata for servers $s_x$ and $s_y$ by $s_x$ and $s_y$, respectively, and the automata for the clients  $r$ and $w$ by $r$ and $w$, respectively.   
+ %We denote by $S_1$  the subsystem consisting of $s_x$, $s_y$ and $w$,  and  by $S_1$  the  automata composed of  $s_x$, $s_y$ and $w$, i.e., $s_x \times s_y \times w$. 
+ %Also, we  denote by $\mathcal{A}$, which can also be interpreted as the algorithm, the automaton representing the entire system consisting of $S_1$ and $r$ (i.e., $s_x \times  s_y$ $ \times w$ $ \times r$).  
+% We assume that between any client $c$, 
+ %$c \in \{r, w \}$ and any server $s$,  $s \in \{s_x, s_y\}$ there are  channel automata $Channel_{c, s}$ and $Channel_{s, c}$.
+%Again, with abuse of notation we denote by $\mathcal{S}$ the automata composed of the automatons $s_x$, $s_y$ and $w$. Also, by $\mathcal{T}$ we denote the composition of automaton $\mathcal{S}$ and $r$, i.e., represents the entire system.  
+%We used the notation $\writeop{o}{v}$ to mean a write operation with value $v$ on object $o$; and similarly, by $\readop{o}$ we mean a read operation on $o$.
+%We  denote by $S_2$ the system, and also the  composed automaton,  consisting of  $s_x$, $s_y$, $r$ and  $w$, by composing the automatons $S_1$ and $r$, i.e., the automaton $S_1 \times r$.
+%We assume that clients are non-faulty.
+%Here, we consider only   executions of some algorithm ${\mathcal A}$ that satisfied SNOW properties.
+%For contradiction, we  also assume that  any execution of $\mathcal{A}$  respects  the SNOW properties. 
+% Also, we assume that in an execution $\epsilon$ of $\mathcal{A}$  we can identify each transaction with a unique identifier.
+
+%\sloppy Consider an execution of ${\mathcal A}$ with  two transactions in it as:   a \wot{}  $W \equiv $ $WRITE($$ (o_1, x_1),  (o_2, y_1) )$ invoked by  $w$, where $x_1 \neq x_0$ and $y_1 \neq y_0$; and a \rot{}   $R \equiv READ$$(o_1, o_2)$, invoked by $r_1$.  
+%Let us denote by 
+%$op_x^{r_1}$ and $op_y^{r_1}$  the read operations $\readop{o_1}$ and  $ \readop{o_2} $, respectively.
+%Due to the wait-free requirement for  the \wots{}, $W$ completes, and we denote by $\INV{W}$ the invocation action and $\RESP{W}$ the response action in $\alpha$. 
+%
+%\paragraph{Notations and Definitions:}
+%We  introduce  the following notations and definitions in the context of an execution $\epsilon$, of $\mathcal{A}$, with transactions $R_1$ and $W$ in it.
+%
+%\begin{notation}
+%We introduce the following notations for   actions relevant to $R$ in $\epsilon$,
+% where  $ j \in \{1, 2\}$:
+%\begin{enumerate}
+%\item $\INV{R}$ and  $\RESP{R}$:  invocation and  response actions for  $R$,  at  $r$; 
+%\item $\INV{W}$ and   $\RESP{W}$: invocation and  response actions for  $W$, at $w$;
+
+%\item $\send{m_j^{r}}{r, s_j}$: an  output action at $r$,  which sends a message $m_j^{r}$ from reader $r$ to server $s_j$, requesting the value for $o_j$;
+%\item $\recv{m_j^{r}}{r, s_j}$: an input action at $s_j$, that receives the message $m_j^{r}$, sent from $r$;
+%\item $\send{v_j}{ s_j, r}$: an output action at $s_j$,  that  sends value $v_j$, for   $o_j$, to $r$.
+%\item $\recv{v_j}{ s_j, r}$: an input action at $r$,  to receive a message $v_j$ from $s_j$ at  $r$.
+%
+%\end{notation}
+%
+%\begin{definition}
+%\item  \emph{Non-blocking fragments $\frag{i}{\epsilon}$, $i \in \{1, 2\}$.}
+ %Suppose there is a fragment of  execution  in $\epsilon$  where the first action is   $recv(m_i^r)_{r, s_i}$ and  the last action is 
+ %$send(v_i)_{s_i, r}$ , both of which  occur  at $s_i$. Moreover, suppose there is  
+% no other input action at $s_i$ in this fragment. Then we call this execution fragment 
+  % a \emph{non-blocking response fragment} for $op_i^r$ at  $s_i$.  We use the notation  $\frag{i}{\epsilon}$ to denote this fragment of 
+  %execution of $\epsilon$. %Similarly, if such an execution fragment occurs  with $m_y^r$, $y$ and $s_y$ then we denote this by  $\frag{1,y}{\epsilon}$ and refer to it as a non-blocking response fragment for $op_2^r$ at  $s_y$.
+ %\end{definition} 
+
+
+%\begin{notation}
+ %\item  We use the notations $R(\epsilon)$ and $W(\epsilon)$ to denote the transactions $R$ and $W$, in $\epsilon$. When the underlying execution is clear from the context we simply use $R$ and $W$.
+%\end{notation}
+
+%\begin{notation}
+% \item If the non-blocking fragment $\frag{1,x}{\epsilon}$ appears in $\epsilon$ such that $recv(m^{r_1}_2)_{r, s_y}$, at $s_y$,  does not occur before
+% $\frag{1,x}{\epsilon}$ completes and $\epsilon$ is of the form 
+% $\finiteprefix{\ell-1}{\ell} \circ \frag{1,x}{\epsilon} \circ \frage{S}{\epsilon}{}$, where 
+%$\frage{S}{\epsilon}{}$ is any continuation of the execution, then we denote $\finiteprefix{\ell-1}{\ell} $ by $\prefix{\epsilon}$.
+ 
+%\item \sloppy If $\epsilon$ is of the form  
+% $\finiteprefix{\ell-1}{\ell}  \circ \frag{1,x}{\epsilon} \circ \kappa \circ \frag{1,y}{\epsilon} , a_p, \sigma_p, \ldots$  or 
+% $\finiteprefix{\ell-1}{\ell}  \circ \frag{1,y}{\epsilon} \circ \kappa \circ \frag{1,x}{\epsilon} \circ \frage{S}{\epsilon}{}$, where  
+% $\ell$ is a positive integer, 
+% $\kappa$ is a segment of $\epsilon$,  possibly even of length zero and $\frage{S}{\epsilon}{}$ is any suffix part of the execution 
+% then we denote $\finiteprefix{\ell-1}{\ell} $ by $\prefix{\epsilon}$. Clearly,  we can write $\epsilon$ as $\prefix{\epsilon} \circ \frag{1,x}{\epsilon}\circ \kappa \circ \frag{1,y}{\epsilon} \circ \suffix{\epsilon}$ or $\prefix{\epsilon} \circ \frag{1,y}{\epsilon}\circ \kappa \circ \frag{1,x}{\epsilon} \circ \suffix{\epsilon}$.
+%\end{notation}
+%\end{enumerate}
+
+ %However, unlike in the case of \rots{}, for \wots{} the SNOW properties do not impose strict conditions on the occurrence of external events at the clients or the servers. 
+%However,  the  W property guarantees termination of any \wot{}. Therefore, all we can claim is  $\RESP{W}$ eventually appears after  $\INV{W}$.
+
+
+Our strategy is still proof by contradiction: We assume there exists some algorithm $\mathcal{A}$ that satisfies all SNOW properties, and then we show the existence of a sequence of executions of $\mathcal{A}$, eventually leading to an execution that contradicts  the S property.
+ %If $\epsilon$ is an execution of $\mathcal{A}$, with \rot{} $R$.
+%  We denote by  $\frag{1,x}{\epsilon}$ and $\frag{1,y}{\epsilon}$  the execution fragments of $\epsilon$  between  the actions $recv(x)_{ s_x, r}$ and  $send(m_x^r)_{r, s_x}$ at $s_x$; and   $recv(x)_{ s_x, r}$ and  $send(m_y^r)_{r, s_y}$ at $s_y$, respectively, and in  $\frag{1,x}{\epsilon}$ and $\frag{1,y}{\epsilon}$  no other internal actions occur at $s_x$ and $s_y$, respectively.
+ First,  we show the existence of an execution $\alpha$ of $\mathcal{A}$ where 
+$R_1$ is invoked after $W$ completes, where the  send actions $send(m_x^{r_1})_{r_1, s_x}$ and $send(m_y^{r_1})_{r_1, s_y}$  at the  $r_1$  occur consecutively 
+in  $P(\alpha)$, which is a prefix of $\alpha$. 
+ Then we show that $\alpha$  can be written in the form  
+$\prefix{\alpha} \circ \frag{1,x}{\alpha}$ (Fig.~\ref{fig:execution1} $(a)$, Lemma~\ref{lem:exec_alpha}). 
+%\delete{where  the receive and response occurs at $s_x$ without any input action at $s_x$ between these two actions (Fig.~\ref{fig:execution1} $(a)$). }
+ We then prove the existence of  another  execution $\beta$, which can be written in the form $\prefix{\beta} \circ \frag{1,x}{\beta} \circ \frag{1,y}{\beta}$ by extending $\alpha$ with an execution fragment $\frag{1,y}{\beta}$, such that $\frag{1,x}{\beta} \stackrel{s_x}{\sim} \frag{1,x}{\alpha}$
+  (Fig.~\ref{fig:execution1} $(b)$; Lemma~\ref{lem:exec_beta}).
+Note that in  any arbitrary extension of $\beta$, $R_1$ eventually returns $(x_1, y_1)$.
+  %
+Next, we show the existence of an execution $\gamma$ of the form  $\prefix{\gamma} \circ \frag{1,x}{\gamma} \circ \frag{1,y}{\gamma}$,  
+ where the send actions $send(m_x^{r_1})_{r_1, s_x}$ and $send(m_y^{r_1})_{r_1, s_y}$  at  $r_1$ occur before $W$ is invoked (Fig.~\ref{fig:execution1} $(c)$; $\gamma$), but 
+$\frag{1,x}{\gamma}$  and $\frag{1,y}{\gamma}$
+occur after $\RESP{W}$ as in $\beta$.
+%
+%
+Based on $\gamma$, we show the existence of an execution $\delta$ 
+of the form  $\prefix{\eta} \circ \frag{1,x}{\eta} \circ \frag{1,y}{\eta}\circ \suffix{\eta}$, where 
+  $R_1$ responds with $(x_1, y_1)$.
+%
+ %of $\mathcal{A}$ such that, $R$ is invoked before $W$ is invoked and $R$ completes after $W$.
+ % Additionally, in $\beta$ the servers
+  %$s_x$ and $s_y$ receive the object value requests from $r$ after $W$ completes and $R$ responds with $(x_1, y_1)$
+   %From $\gamma$, we show the existence of an execution  $\eta$ of $\mathcal{A}$ where $F_1$ occurs before $F_2$,   and eventually  $R$ responds with $(x_1, y_1)$. 
+   %
+    Finally, starting with  $\eta$, we create a sequence of executions $\delta (\equiv \eta)$, $\delta^{(1)}$, $\cdots$ $\delta^{(f)}$, of $\mathcal{A}$, 
+     where in each of them $R_1$ responds with $(x_1, y_1)$  (Fig.~\ref{fig:execution2} $(e)$ and $(g)$; Lemma~\ref{thm:two-snow}). Additionally,  for any $\delta^{(i)}$, the fragments   $\frag{1,x}{\delta^{(i)}}$ and
+    $\frag{1,y}{\delta^{(i)}}$  appear before $\delta^{(i-1)}$.
+    % i.e., $\prefix{\delta^{(i)}}$ is a prefix of $\prefix{\delta^{(i-1)}}$. 
+    Based on $\delta^{(f)}$, we prove the existence of an execution $\phi$ (Fig.~\ref{fig:execution2} $(h)$), where $R_1$ returns 
+    $(x_1, y_1)$ even before $W$ begins, which violates the $S$ property.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%555
+
+
+
+  The following theorem proves that it is impossible to have all SNOW properties with two clients without client-to-client communication. We start with an execution $\eta$ and create a sequence of executions of 
+  $\mathcal{A}$, where each one is of the form $\prefix{\cdot} \circ \frag{1,x}{\cdot}\circ \frag{1,y}{\cdot}\circ \suffix{\cdot}$, with progressively shorter $\prefix{\cdot}$ until we have a final execution that contradicts the $S$ property.
+
+ \begin{theorem}\label{thm:two-snow}
+ The SNOW properties cannot be implemented in a system with two clients and two servers, where the clients do not communicate with each other.
+\end{theorem}
+
+
+
+\remove{
+ 
+ \begin{figure}[!ht]
+      \centering
+         \includegraphics[width=0.50\textwidth]{figures/architecture3_1.png}  \vspace{-2.5em}
+         \caption{
+\small{The architecture of a typical web service with clients, servers, and 
+         % The external requests and responses  at the clients  to and from the end-users are represented as invocation and responses for the transaction.
+         the communication channels, between every pair of processes, inside a datacenter is modeled as a collection of I/O automata. Note that, unlike the architecture in Fig.~\ref{fig:architecture2a}, in this setup there are communication channels between every pair of clients.}} 
+         \label{fig:architecture2c}
+ \end{figure}
+
+}
