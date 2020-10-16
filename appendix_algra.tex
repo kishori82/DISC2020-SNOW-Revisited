@@ -1,0 +1,270 @@
+\subsection{SNOW with C2C Communication}
+\label{app:algorithm-a}
+In this section,  we show that SNOW is possible in the   \emph{multiple-writers single-reader} 
+(MWSR) setting %, and prove that any fair and well-formed execution  of $A$ satisfies  the SNOW properties.  
+%In practice, a system with a single reader may not be very useful but this algorithm serves a counter example 
+%algorithm
+when client-to-client communication is allowed. In particular, we present an algorithm $A$, which has all SNOW properties in such setting.
+%Algorithm $A$ 
+%shows that if client-to-client communication is allowed, it is possible to have algorithms  that satisfies all of the SNOW properties with two clients. 
+We consider a system that has $\ell \geq 1$ writers with ids $w_1, 
+w_2 \cdots w_{\ell} \in \mathcal{W}$ 
+%(we denote this set by $\mathcal{W}$)
+, one reader $r$, and  $k \geq 1$ servers with ids $s_1, s_2\cdots s_k \in \mathcal{S}$. 
+%(denote as $\mathcal{S}$) that maintains the  objects $o_1, \cdots, o_k$, respectively. 
+Client-to-client communication is allowed. 
+%Note that for a two-client system, when both  clients are of the same type, i.e., two writers or two readers, the SNOW properties are trivially satisfied.
+%			
+% For any two tags $t_1, t_2 \in \mathcal{T}$ we say  $t_2 > t_1$ if $(i)$ $t_2.z > t_1.z$ or $(ii)$ $t_2.z = t_1.z$ and $t_2.w > t_1.w$. Therefore, the set $\mathcal{T}$ is totally ordered set. We also assume that every client and servers has a unique id and the ids can be compared w.r.t. some lexicographic order.
+%
+The pseudocode for algorithm $A$ is presented in Pseudocode~\ref{fig:algo_a}. 
+%We assume that each of the processes is run in a single-threaded manner.
+%, and therefore, each of the servers or the clients executes the algorithmic steps sequentially. 	
+%
+We use keys to uniquely identify a \wot{}.  A key $\kappa \in \mathcal{K}$ is defined as a pair $(z, w)$, 
+where $z \in \mathbb{N}$, and $w \in \mathcal{W}$ is the id of a writer. $\mathcal{K}$ denotes the set of all possible keys. 
+Also, with each transaction we associate a tag $t \in \mathbb{N}$. % which will help us define an order among the transactions. 
+
+%For version control of the  object values  we use tags.  A tag $t$ is defined as a pair $(z, w)$, where $z \in \mathbb{N}$ and $w \in \mathcal{W}$  is the id of a writer. We use $\mathcal{T}$ to denote the set of all possible tags.
+
+\textit{\textbf{State variables:}} %The state variables in  writer, reader and  server processes are as follows. 
+$(i)$ Each  \emph{writer $w$} stores a counter $z$ corresponding to the
+number of \wots{}  it  has  invoked so far, initially $0$.
+$(ii)$ The  \emph{reader} $r$ has an 
+ordered list of elements, $List$, as $(\kappa, (b_1, \cdots, b_k))$,  where 
+$\kappa  \in \mathcal{K}$  and 
+$(b_1, \cdots b_k) \in  \{0, 1\}^k$. Initially,  
+$List= [ ({\kappa}^0, (1, \cdots 1) ]$, where ${\kappa}^0  \equiv (0, w_0)$, 
+and $w_0$ is any
+place holder identifier for writer id. 
+%$List$ can be thought of as an array, with $0$ as the starting index.
+$(iii)$ Each   \emph{server} $s_i \in \mathcal{S}$  stores a set variable $Vals$ 
+with elements 
+of key-value pairs $({\kappa}, v_i) \in \mathcal{K} \times \mathcal{V}_i$. Initially,
+$Vals= \{ ({\kappa}^0, v_i^0)\}$. 
+%This ensures that each \wot{} generates a unique key.
+%labeled with phase names, viz., {\readGetTag}, {\readValueTag}, {\readCompleteTag} and {\writeGetTag}. The server to server messages are labeled as {\readDisperseTag}. Also, in some phases of {\SODA},  the message-disperse primitives {\mdmetaprim} and {\mdvalueprim} are used  as services. 
+
+\textit{\textbf{Writer steps:}} Any writer client, $w \in \mathcal{W}$, may invoke a \wot{} $\Writetr{ (o_{i_1}, v_{i_1}), (o_{i_2}, v_{i_2}), \cdots, (o_{i_p}, v_{i_p}) }$, comprising a set of write operations,
+%for a \wot{},
+%can be  invoked at any writer $w$, 
+where  $I = \{i_1, i_2, \cdots, i_p\}$ is some subset of $p$ indices of $[k]$. We define the set  $S_I\triangleq \{s_{i_1}, s_{i_2}, \cdots, s_{i_p}\}$.      
+This procedure consists of two consecutive phases: {\writeValue} and {\informReader}.  In the {\writeValue} phase,  $w$ creates a key ${\kappa}$ as  $ {\kappa}  \equiv (z + 1, w)$; and also increments the local counter $z$ by one.   Then it sends $(${\writeValueTag}$, ({\kappa}, v_{i}))$ to each server $s_i$ in $S_I$, and awaits {\ackTag}s  
+from each server  in $S_I$.  After receiving all {\ackTag}s,    $w$ initiates the {\informReader} phase during which  it sends 
+(\informReaderTag, $({\kappa}, (b_{1}, \cdots b_{k})$) to $r$, where for any $i \in [k]$, $b_i$ is a boolean variable, such that $b_i=1$ if $s_i \in S_I$, otherwise $b_i=0$. 
+Essentially, such a $(k+1)$-tuple
+identifies the set of objects that are updated during that \wot{}, i.e., if $b_i=1$ then object 
+$o_i$ was updated 
+during the execution of the  \wot{}, otherwise $b_i=0$.  
+After $w$ receives    {\ackTag} 
+%tag $t_w$ 
+from $r$ it completes the \wot{}. 
+
+\textit{\textbf{Reader steps:}}  
+We use the same notations for $I$ and $S_I$ as above for the set of indices and corresponding servers, possibly 
+different across transactions.
+The procedure  \Readtr{$ o_{i_1},  o_{i_2}, \cdots, o_{i_p}$}, 
+for any  \rot{}, 
+is  initiated at  reader  $r$, where   $o_{i_1},  o_{i_2}, \cdots, o_{i_p}$  denotes the  subset  of  
+objects $r$ 
+intends to read. This procedure
+consists of only one phase,  {\readValue},  of communication 
+between the reader and the servers in $S_I$.   Here $r$ sends  the message
+(\readValueTag, ${\kappa}_i$) to each server $s_i \in S_I$, where 
+the ${\kappa}_i$ is the key in  the tuple $({\kappa}_{i}, (b_{1}, \cdots, b_{k}))$  in  $List$ located at  index $j^*$ such that $b_i =1$ such that 
+$i \in I$. % where $I \triangleq  \{{i_1},  {i_2}, \cdots, {i_p}\}$.
+After
+receiving the values $v_{i_1}$, $v_{i_2}, \cdots v_{i_p}$ from all  servers in $\mathcal{S_I}$,  where $S_I \triangleq \{s_{i_1},  s_{i_2}, \cdots, s_{i_p}\}$, the transaction completes by 
+returning $(v_{i_1}, \cdots v_{i_p})$.
+
+If  reader $r$ receives a message  
+(\informReaderTag, $({\kappa}, (b_{1}, \cdots, b_{k})$) from any writer $w$, then $r$ appends  
+$({\kappa}, (b_{1}, \cdots, b_{k})$ to its  $List$,  and responds to $w$ with  
+{\ackTag} and $t_w = |List|$, i.e., number of elements in $List$.
+The order of the  elements in  $List$ corresponds to  the order  
+the \wots{}, the order of the incoming  {\informReaderTag} updates,  as seen by the reader.
+
+
+\textit{\textbf{Server steps:}} The server responds to messages containing the tags 
+{\writeValueTag} and \readValueTag.  The first procedure is used if a server $s_i$ receives a 
+message  $(${\writeValueTag}$, ({\kappa}, v_{i}))$  from a writer $w$,  it  adds $({\kappa}, v_i)$ to its set variable   $Vals$ and sends {\ackTag} back to $w$.
+The second procedure is used  if  $s_i$ receives a message, i.e., $(${\readValueTag}$, {\kappa}_{i})$, from $r$, then it responds with $v_i$ such that $({\kappa}_{i}, v_i)$ is in its $Vals$.
+
+\begin{algorithm}[!h]
+	\begin{algorithmic}[2]
+		%\vspace{-2em}
+		\begin{multicols}{2}{\footnotesize
+				%\Statex  
+				\Statex {\bf At writer $w$}
+				\Part{{\it State Variables at $w$}}{ 	
+					\Statex $z \in \mathbb N$, initially   $0$
+				}\EndPart
+				\Statex\Statex
+				{\bf  \Writetr{$(o_{i_1}, v_{i_1}), \cdots, (o_{o_p},  v_{i_p})$}}
+				\Part{ \underline{\writeValue}} {
+					\State ${\kappa} \leftarrow (z +1,  w)$
+					\State $z \leftarrow z +1 $
+					\State $I\triangleq \{i_1, i_2, \cdots, i_p \}$
+					%\State $S_{I}\triangleq \{s_{i_1}, s_{i_2}, \cdots, s_{i_p} \}$
+					\For{$i \in I$} 
+					\State Send (\writeValueTag, $({\kappa}, v_{s_i})$) to  $s_i$
+					\EndFor 
+					\State  Await {\ackTag}  from  $s_i$ $\forall$ $i \in I$.
+				}\EndPart
+				\Statex
+				\Part{ \underline{\informReader}} {
+					\For{$i \in [k]$} 
+					\If{$i \in I$}
+					\State $b_i \leftarrow 1$
+					\Else
+					\State $b_i \leftarrow 0$
+					\EndIf
+					\EndFor 
+					%      \State $b_{i}\triangleq$   $v_i$ if  $i \in I$, otherwise $\bot$
+					\State  Send  (\informReaderTag,
+					 \\~~~~~~$({\kappa}, (b_{1}, \cdots, b_{k}))$) to   $r$
+					\State  Receive ({\ackTag}, $t_w$) from  $r$
+				}\EndPart
+		}\end{multicols}	
+		\vspace{-1.5em} 
+		\\\hrulefill 	
+		\vspace{-1.5em}
+		\begin{multicols}{2}{\footnotesize	
+				\Statex {\bf At reader $r$}
+				\Part{{\it State Variables at $r$}}{ 	
+					\Statex $List$, a list  of elements in  $\mathcal{K} \times \{ 0, 1 \}^k $,\\ ~~~~~initially  $[({\kappa}^0, 1, \cdots 1)]$
+				}\EndPart
+				
+				\Statex
+				\Statex  {\bf \Readtr{$ o_{i_1},  o_{i_2}, \cdots, o_{i_p}$}}	
+				\Part{{\underline{{\readValue}}}}{ 
+					% \State $\forall i, 1 \leq i \leq k$: $t_i^{max}  \leftarrow \max\{ t: (i, t) \in  Tags\}$
+					\State $I\triangleq \{i_1, i_2, \cdots, i_p \}$
+					%\State $S_{I}\triangleq \{s_{i_1}, s_{i_2}, \cdots, s_{i_p} \}$
+					\For{$i \in I$} 
+					\State $j^* \leftarrow \max_{1 \leq j \leq |List|} \{j:$
+					\\~~~~~~~~~~~$List[j].b_i = 1\}$
+					\State ${\kappa}_i \leftarrow List[j^*].{\kappa}$
+					\State  Send (\readValueTag, ${\kappa}_i$) to $s_i$
+					\EndFor
+					\Statex 
+					\State  Await responses  $v_{i}$ from  $s_i$ $\forall$ $i\in I$
+					%\Statex /* $t_r \triangleq \max_{1 \leq j \leq |List|} \{ j : List[j].b_i = 1 \wedge i \in I\}$ */
+					\State Return  $(v_{i_1}, v_{i_2}, \cdots, v_{i_p})$
+				}\EndPart
+				%	\Statex
+				\\\hrulefill
+				\Statex
+				\Statex {\bf Response routines}
+				\Part{{\underline{On recv  (\informReaderTag,}
+						\\\underline{$({\kappa}, (b_{1}, \cdots b_{k}))$) from  $w$}}}{ 
+					\Statex %// $\bigoplus$ denotes append to list
+					\State $List  \leftarrow List \bigoplus~ ({\kappa}, (b_{1}, \cdots b_{k}))$ 
+					\\~~~/* $\bigoplus$ for append */
+					\State $tag \leftarrow |List|$ /* $| \cdot |$ list size */
+					\State Send  ({\ackTag}, $tag$) to  $w$
+				}\EndPart
+				%\Statex
+		}\end{multicols}
+		
+		\vspace{-1.5em}
+		\\\hrulefill %	
+		\vspace{-1.5em}
+		\begin{multicols}{2}{\footnotesize
+				\Statex {\bf At server $s_i$ for any $i \in [k]$}
+				\Part{{\it State Variables}}{ 
+					
+				\Statex $Vals\subset \mathcal{K} \times \mathcal{V}_i$, initially   $\{(t^0_{key}, v_i^0)\}$
+					%							pair with a tag and a coded element, initially $(t_0, c_0)$.
+					%\Statex $t_c$,  the commited tag, initially $t_0$
+				}\EndPart
+				\Statex
+				
+				\Part {\underline{On recv (\writeValueTag, $({\kappa}, v)$) 
+						from $w$}} {
+					\State $Vals \gets   Vals \cup \{({\kappa}, v)\}$ 
+					\State Send {\ackTag} to $w$.
+				}\EndPart
+				\Statex
+				\Part{ \underline{On recv (\readValueTag, ${\kappa}$) from  $r$ }} {
+					\State   Send $v$ s.t. $({\kappa}, v) \in Vals$  to $r$
+				}\EndPart	
+		}\end{multicols}
+	\end{algorithmic}	
+	\caption{Steps at writer $w$, reader $r$ and server $s_i$ in $A$.}\label{fig:algo_a}
+\end{algorithm}	
+%	Below we show that algorithm $C$ satisfies the SNOW properties. For the property ``S'' we will lean on an equivalence condition result from atomicity (strong consistency). We reproduce the lemma below. \blue{Note that this lemma for atomicity on read/write atomic register but we will have to adapt it to atomic transactions carefully. For now,  we will assume it and later we will prove it for atomic transactions. }
+$A$ respects the SNOW properties as stated below.
+% Due to space constraints, the proof of the theorem can be found in Appendix~\ref{app:algorithm-a}. %, where \wots{} are live. % and the proof is omitted, for now, since it is very straightforward. 
+
+
+%Consider any failure-free execution of algorithm $A$. In the steps for the reader assume the quantity
+%$t_r \triangleq \max_{1 \leq j \leq |List|} \{ j : List[j].b_i = 1 \wedge i \in I\}$, which is presented as a comment in the pseudo-code for $A$.
+%We associate with any transaction $\phi$ a tag
+%$tag(\phi)$ such that if  $\phi$ is a \wot{}  $tag(\phi)=t_w$, i.e., the value of $t_w$ before the completion of the operation, and $tag(\phi)=t_r$ when $\phi$ is a \rot{}.
+
+\begin{theorem} Any well-formed  and fair execution of $A$ 
+	%transaction processing in the MWSR setting, % 
+%	with for objects of type $\mathcal{O}_T$, 
+	%consisting of  objects $o_1, o_2, \cdots o_k$ maintained by the  servers $s_1, s_y, \cdots, s_k$, respectively; and it
+		 guarantees all of the SNOW properties.
+	\end{theorem}
+\remove{	
+
+	\begin{proof} Below we show that $A$ satisfies the  SNOW properties. 
+	
+	\noindent{\emph{\underline{S property:}}} 
+	Let $\beta$ be any fair execution  of  $A$ and 
+ suppose all clients in $\beta$ behave in a well-formed
+manner. Suppose $\beta$ contains no incomplete transactions and let  $\Pi$ be the set of transactions in $\beta$.  We define an irreflexive partial ordering ($\prec$) among the transactions in $\Pi$ as follows:  if $\phi$ and $\pi$ are any two distinct transactions in $\Pi$ then we say 
+	$\phi \prec \pi$ if either $(i)$ $tag(\phi) < tag(\pi)$ or $(ii)$ $tag(\phi) = tag(\pi)$ and $\phi$ is a {\sc write} and $\pi$ is a {\sc read}. We will prove the $S$  (strict-serializability) property of $A$ by proving that the properties $P1$, $P2$, $P3$ and $P4$ of Lemma~\ref{lem:equivalence} hold for $\beta$. 
+	
+	\emph{P1:}   If $\pi$ is a {\sc read} then since all {\sc read}s are invoked by a single reader $r$ and in a well-formed manner, 
+	therefore, there cannot be an infinite number of {\sc read}s such that they all 
+	precede $\pi$ (w.r.t $\prec$).
+	 Now, suppose $\pi$ is a {\sc write}. Clearly, from an inspection of the algorithm, 
+	 $tag(\pi) \in \mathbb{N}$. From inspection of the algorithm, each {\sc write} increases the size of 
+	 $List$, and the value of the tags are  defined by the size of $List$. Therefore, there can be at 
+	 most a finite number of {\sc write}s such that can precede $\pi$ (w.r.t. $\prec$) in $\beta$.
+	  
+	\emph{P2:}  Suppose $\phi$ and $ \pi$ are any two transactions in $\Pi$, such that, $\pi$ begins after $\phi$ completes. 
+	Then we show that we cannot have $\pi \prec \phi$. Now, we consider four cases, depending on whether $\phi$ and $\pi$ are {\sc read}s or {\sc write}s.	
+	\begin{enumerate}
+	    \item [$(a)$] $\phi$ and $\pi$ are {\sc write}s invoked by writers $w_{\phi}$ and $w_{\pi}$, respectively. Since the size of $List$, in $r$,  grows monotonically with each {\sc write}  hence  $w_{\pi}$ receives the  tag at least as high as $tag(\phi)$, so $\pi\not \prec \phi$.
+	      %
+	       \item [$(b)$] $\phi$ is a {\sc write}, $\pi$ is a {\sc read} transactions invoked by writer $w_{\phi}$ and $r$, respectively.  
+	        Since the size of $List$, in $r$,  grows monotonically, and because  $w_{\pi}$ invokes $\pi$ after $\phi$ completes hence  $tag(\pi)$ is at least as high as $tag(\phi)$, so $\pi\not \prec \phi$.
+	      %
+	        \item[$(c)$] $\phi$ and $\pi$ are {\sc read}s  invoked by reader $r$. 
+	           Since the size of $List$, in $r$,  grows monotonically,  hence  $w_{\pi}$ invoked $\pi$ after $\phi$ completes hence $tag(\pi)$ is at least as high as $tag(\phi)$, so $\pi\not \prec \phi$.
+	        %
+	         \item [$(d)$] $\phi$ is a {\sc read}, $\pi$ is a {\sc write}  invoked by reader $r$ and $w_{\pi}$, respectively.
+	         This case is simple because new values are added to $List$  only  by writers, and $tag(\pi)$ 
+	         is larger than the tag of $\phi$ and hence   $\pi\not \prec \phi$. 
+	\end{enumerate}
+	
+	\emph{P3:} This is clear by the fact that any {\sc write} transaction always creates a unique tag and all tags are totally ordered since they all belong to $\mathbb{N}$
+	
+	\emph{P4:} Consider a {\sc read} $\rho$ as $READ(o_{i_1}, o_{i_2}, \cdots, o_{i_q})$, in $\beta$. 
+Let the returned value from $\rho$ be $\mathbf{v} \equiv $$(v_{i_1}, v_{i_2}, \cdots, v_{i_q})$ such that 
+$1 \leq {i_1} <  {i_2} <  \cdots <  {i_q} \leq k$, where value  $v_{i_j}$ corresponds to $o_{i_j}$. 
+	Suppose $tag(\rho) \in \mathbb{N}$ was created during some {\sc write} transaction, say $\phi$, i.e., $\phi$ is the {\sc write} that 
+	added the elements in index $(tag(\rho)-1)$ of $List$. Note that element in index $0$ contains the initial value.
+	%because {\sc read} transactions do not generate new tags as they do not add any new item to the $Vals$ of any server.
+	 Now we consider two cases:
+	 
+	\emph{Case $tag(\rho) = 1$.} We  know that it corresponds the initial default value $v_i^0$ at each sub-object $o_i$, and this equates to $\rho$ returning the default initial value for each sub-object.
+	 %
+	% Therefore, $tag(\rho) = tag(\phi)$. 
+	 
+	 \emph{Case $tag(\rho) > 1$.} Then we argue that there exists no {\sc write} transaction, say $\pi$, that updated object $o_{i_j}$,   in $\beta$, such that,  $\pi \neq \phi$ and $\rho$ returns values written by $\pi$ and $\phi \prec \pi \prec \rho$. Suppose we assume the 	contrary, which means $tag(\phi) < tag(\pi) < tag(\rho)$. The latter implies $tag(\phi)  = tag(\pi)$ which is not possible because 
+	this contradicts the fact that for any two distinct {\sc write}s $tag(\phi) \neq tag(\pi)$  in any execution of   $A$.
+	
+	\noindent{\emph{\underline{N property:}}}  By inspection of algorithm $A$ for the  response steps  of the servers to the reader.
+	
+	\noindent{\emph{\underline{O property:}}} By inspection of the  {\readValue} phase: it consists of one round of communication between the reader and the servers, where the servers send only one version of the value of the object it maintains.
+	
+	\noindent{\emph{\underline{W property:}}}  By inspection of the {\sc write} transaction steps, and  and  that writers always get to complete the transactions they invoke.
+	%Finally, the liveness property of {\sc write} transactions can be realized by inspecting the steps of  algorithm $A$.
+	\end{proof}
+}

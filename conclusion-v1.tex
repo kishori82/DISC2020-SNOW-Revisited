@@ -1,7 +1,7 @@
 We revisited the SNOW Theorem and when it is possible for READ transactions to have the same latency as simple reads.
 We provided a new and more rigorous proof of the original result.
-We also closed several open questions that were either explicitly posed by the original work or that emerged from our increased rigor.
-We found that READ transactions can match the latency of simple reads when client-to-client communication is allowed and there is at most one reader.
+We also closed several open questions that were either explicitly posed by the original work or that emerged from our careful analysis.
+We found that READ transactions can match the latency of simple reads when client-to-client communication is allowed in MWSR setting.
 We found that they cannot and must have higher worst-case latency when client-to-client communication is disallowed or there are at least two readers.
 We also presented the first algorithms that provide bounded worst-case latency for read-only transactions in strictly serializable systems with 
 WRITE transactions.

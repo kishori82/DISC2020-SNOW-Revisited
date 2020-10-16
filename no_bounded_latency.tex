@@ -1,5 +1,5 @@
-The original SNOW work claimed that after examining existing work there existed one system, Eiger~\cite{Lloyd:nsdi2013}, whose \rots{} had bounded latency---i.e., non-blocking and finish in three rounds---while providing the strongest guarantees--i.e., having properties W and S---because Eiger claimed that its \rots{} provide strict serializability within a datacenter, even if providing strict serializability was not a focus of Eiger. 
-
-In this section, we correct this claim and show there were no existing algorithms that had bounded latency while providing the strongest guarantees by proving Eiger's \rots{} are not strictly serializable. The insight is that Eiger uses logical timestamps to track the ordering of operations while logical clocks are not able to enforce the real-time ordering between operations. Strict serializability, however, requires the real-time ordering to be respected. For details of the proof, please see Appendix~\ref{app:eiger_not_s}.
-
-In the following subsections, we provide the first set of novel algorithms that have bounded latency and  strongest guarantees.
+The SNOW work~\cite{SNOW2016} claimed, after examining existing, work there existed only one system, Eiger~\cite{Lloyd:nsdi2013}, whose \rots{} had bounded latency---i.e., non-blocking and finish in three rounds---while providing the strongest guarantees--i.e., having properties W and S---because Eiger claimed that its \rots{} provide strict serializability within a datacenter.
+%, even if providing strict serializability was not a focus of Eiger. 
+%
+In this section, we correct this claim and show there were no existing algorithms that had bounded latency while providing the strongest guarantees by proving Eiger's \rots{} are not strictly serializable. 
+%The insight is that Eiger uses logical timestamps to track the ordering of operations while logical clocks are not able to enforce the real-time ordering between operations. Strict serializability, however, requires the real-time ordering to be respected.

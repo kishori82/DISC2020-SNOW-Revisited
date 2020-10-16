@@ -1,0 +1,195 @@
+\begin{algorithm*}[!ht]
+\label{app:algrithmB}
+  \begin{algorithmic}[2]
+  
+    \begin{multicols}{0}{\footnotesize
+          \Statex  {\bf At writer $w$}
+          \Part{{\it State Variables}}{   
+          \Statex $z \in \mathbb N$, initially   $0$
+            }\EndPart
+
+    \Statex  {\bf  \Writetr{$(i_1, v_{i_1}), (i_2, v_{i_2}), \cdots, (i_p,  v_{i_p})$}   }
+          \State $I\triangleq \{i_1, i_2, \cdots, i_p \}$
+          %\State $S_{I}\triangleq \{s_{i_1}, s_{i_2}, \cdots, s_{i_p}\}$
+        \Part{ \underline{\writeValue}} {
+            %    \State $t_w \leftarrow (z +1,  \text{``id''})$; $z \leftarrow z +1 $
+                \State ${\kappa} \leftarrow (z +1,  w)$; $z \leftarrow z +1 $
+                 \For{$i \in I$} 
+            \State Send \writeValueTag, $({\kappa}, v_{s_i})$ to server $s_i$
+           \EndFor 
+          \State  Await {\ackTag} from servers in  $S_I$.
+        }\EndPart
+        \Statex
+            \Part{ \underline{\informSerializer}} {
+
+                                      \For{$i \in [k]$} 
+            \If{$i \in I$}
+             \State $b_i \leftarrow 1$
+             \Else
+               \State $b_i \leftarrow 0$
+            \EndIf
+           \EndFor 
+      %      \State $b_{i}\triangleq$   $v_i$ if  $i \in I$, otherwise $\bot$
+                                            \State  Send  (\informSerializerTag, $({\kappa}, (b_{1}, \cdots, b_{k}))$) to   $s^*$
+
+    %       \State $\tilde{o}_{i}\triangleq$   $o_i$ if  $i \in I$, otherwise $\bot$
+                      %                      \State  Send  (\informSerializerTag, $(t_w, \tilde{o}_{1}, \cdots \tilde{o}_{k})$) to $s^*$
+          %\State  Await {\ackTag} from reader $s^*$
+          \State Receive ({\ackTag}, $t_w$) from  coordinator $s^*$
+        }\EndPart
+      }\end{multicols}
+  % \end{algorithmic} 
+  % \caption{Protocol for   ${\mathbf{write}(v^{(1)}, v^{(2)}, \cdots v^{(k)})_w}, w \in \mathcal{W}$ in  
+  %   algorithm $C$.}
+  % \label{fig:c-writer}
+  %\end{algorithm}
+  
+  %\begin{algorithm}[!ht]
+  % \begin{algorithmic}[1]  
+\vspace{-1.5em}
+ \\\hrulefill
+\vspace{-1.5em}
+      \begin{multicols}{1}{\footnotesize    
+          \Statex  {\bf At reader $r$}
+          \Statex  {\bf \Readtr{$ o_{i_1},  o_{i_2}, \cdots, o_{i_p}$}} 
+          \State $I\triangleq \{i_1, i_2, \cdots, i_p \}$
+          %\State $S_{I}\triangleq \{s_{i_1}, s_{i_2}, \cdots, s_{i_p}\}$
+    % \Part{{\it State Variables}}{   
+    %     \Statex $List$, an ordered from  $\mathcal{T} \times \{ o_1,\bot \} \times \cdots \times \{ o_k,\bot \} $,\\ ~~~~~initially  $List=[(t^0, o_1, \cdots o_k)]$
+    %       }\EndPart
+            \Part{ \underline{\getTagArray}} {
+          \State  Send  (\getTagArrayTag) to server $s^*$
+          \State  Receive response  $(t_r, ({\kappa}_1, {\kappa}_2, \cdots, {\kappa}_k))$ from  $s^*$
+        }\EndPart 
+            \Statex
+          \Part{{\underline{{\readValue}}}}{ 
+            % \State $\forall i, 1 \leq i \leq k$: $t_i^{max}  \leftarrow \max\{ t: (i, t) \in  Tags\}$
+                     \For{$i \in  I$} 
+            \State  Send (\readValueTag, ${\kappa}_i$) to $s_i$
+           \EndFor 
+            \State  Wait responses as $v_{i}$ for each $s_i\in S$
+            \State Return  $(v_{i_1}, v_{i_2}, \cdots, v_{i_p})$
+          }\EndPart
+        }\end{multicols}
+    % \end{algorithmic} 
+    % \caption{The read protocol $\readd_r$,  for reader $r$ in  algorithm $C$.}
+    % \label{fig:c-reader}
+    %\end{algorithm}
+
+%%%% ORIGINAL
+%%%   \begin{algorithm}[!ht]
+%%%     \begin{algorithmic}[1]
+%%%       \begin{multicols}{2}{\footnotesize
+    
+  % \begin{algorithm*}[!ht]
+  %   \begin{algorithmic}[2]
+\vspace{-1.7em}
+\\\hrulefill
+\vspace{-1.5em}
+      \begin{multicols}{3}{\footnotesize
+          \Statex {\bf At server $s_i$ for any $i \in [k]$}
+            \Part{{\it State Variables}}{ 
+              \Statex $Vals\subset \mathcal{K} \times \mathcal{V}_i$, initially   $\{({\kappa}^0, v_i^0)\}$
+              %\Statex $Vals_s \subset \mathcal{T} \times \mathcal{V}_s$, initially   $\{(t_0, v_s^0)\}$
+              %             pair with a tag and a coded element, initially $(t_0, c_0)$.
+              %\Statex $t_c$,  the commited tag, initially $t_0$
+            %\Statex $List$, an ordered from  $\mathcal{T} \times \{ o_1,\bot \} \times \cdots \times \{ o_k,\bot \} $,\\ ~~~~~initially  $List=[(t^0, o_1, \cdots o_k)]$
+\Statex $List$, a list  of  $\mathcal{K} \times \{ 0, 1 \}^k $, initially  $[({\kappa}^0, (1, \cdots 1))]$
+            }\EndPart
+            \Statex
+            \Part {\underline{On recv (\writeValueTag, $({\kappa}, v)$) from  $w$}} {
+                       \State   $Vals \gets   Vals \cup \{({\kappa}, v)\}$ 
+              \State  Send {\ackTag} to writer $w$.
+            }\EndPart
+            \Statex
+            \Part{{\underline{On recv  (\informSerializerTag, $({\kappa}, (b_{1}, \cdots b_{k}))$) from  $w$}}}{ 
+                %   \State append $({\kappa}, (b_{1}, \cdots, b_{k}))$ to $List$
+                                 \State $List  \leftarrow List \bigoplus~ ({\kappa}, (b_{1}, \cdots b_{k}))$ 
+                   //$\bigoplus$ for append
+          % \State Send {\ackTag} to  $w$
+                  \State $tag \leftarrow |List|$ // $| \cdot |$ size of the list
+            \State Send  ({\ackTag}, $tag$) to  $w$
+          }\EndPart
+                   
+                        \Statex
+            \Part{ \underline{On recv (\readValueTag, ${\kappa}$) from  $r$ }} {
+              \State   Send $v_i$ s.t. $({\kappa}, v) \in Vals$  to  $r$
+            }\EndPart 
+          \Statex\Statex   /* used only by $s^*$ */
+          
+          \Part{ \underline{On recv {\getTagArrayTag} from  $r$ }} {
+          \For{$i \in [k]$} 
+                     \State $j^* \leftarrow \max \{ j : List[j].b_i =1 \}$
+                     \State ${\kappa}_i = List[j^*].{\kappa}$
+            %\State  send  ($t_1, t_2, \cdots, t_k$) to $s_i$
+           \EndFor 
+             \State  $t_r \triangleq \max_{1 \leq j \leq |List|} \{ j : List[j].b_i = 1 \wedge i \in I\}$ 
+            \State  Send  ($t_r, ({\kappa}_1,{\kappa}_2, \cdots, {\kappa}_k)$) to $r$
+            }\EndPart       
+          }\end{multicols}
+        \end{algorithmic} 
+        \caption{The protocol for any  writer $w$, reader $r$ or server $s_i$ for  algorithm $B$.}\label{fig:algo_b}
+      \end{algorithm*}
+
+
+\remove{
+
+\begin{theorem} Any well-formed  and fair execution of algorithm $B$ is an implementation of  an object of type $\tilde{\mathcal{O}}_T$ in the MWMR setting, 
+  with no client-to-client communication,  comprising of objects $o_1, o_2, \cdots o_k$ stored in servers $s_1, s_2, \cdots, s_k$, respectively; and it satisfies the SNoW  properties. %Algorithm $B$ also tolerates any client crash failures.
+\end{theorem}
+
+\begin{proof} Below we show that algorithm $B$ satisfies the  SNoW properties. 
+  
+  \noindent{\emph{\underline{S property:}}} 
+  Let $\beta$ be any fair execution  of  $B$ and 
+ suppose all clients in $\beta$ behave in a well-formed
+manner. Suppose $\beta$ contains no incomplete transactions and let  $\Pi$ be the set of transactions in $\beta$.  We define an irreflexive partial ordering ($\prec$) in $\Pi$ as follows:  if $\phi$ and $\pi$ are any two distinct transactions in $\Pi$ then we say 
+  $\phi \prec \pi$ if either $(i)$ $tag(\phi) < tag(\pi)$ or $(ii)$ $tag(\phi) = tag(\pi)$ and $\phi$ is a \wot{} and $\pi$ is a \rot{}. Below we prove the $S$  property of $B$ by showing that  properties $P1$, $P2$, $P3$ and $P4$ of Lemma~\ref{lem:equivalence} hold for $\beta$. 
+  
+  \emph{P1:}   Clearly, from an inspection of the algorithm, 
+   $tag(\pi) \in \mathbb{N}$. From inspection of the algorithm, each \wot{} increases the size of 
+   $List$, and the value of the tags are  defined by the size of $List$. Therefore, there can be at 
+   most a finite number of \wots{} such that can precede $\pi$ (w.r.t. $\prec$) in $\beta$.
+    On the other hand, if $\pi$ is a \rot{} then since all \rot{}s are invoked by readers  in a well-formed manner,  and there are only finite number of readers 
+  therefore, there cannot be an infinite number of \rot{}s such that they all 
+  precede $\pi$ (w.r.t $\prec$).
+  
+   
+    
+  \emph{P2:}  Suppose $\phi$ and $ \pi$ are any two transactions in $\Pi$, such that, $\pi$ begins after $\phi$ completes. Then we show that we have  we cannot have $\pi \prec \phi$. Now, we consider four cases, depending on whether $\phi$ and $\pi$ are \rot{}s or \wots{}. 
+  \begin{enumerate}
+      \item [$(a)$] $\pi$ and $\phi$ are \wots{} invoked by writers $w_{\pi}$ and $w_{\phi}$, respectively. Since the size of $List$, in $s^*$ grows monotonically due to each \wot{}  hence  $w_{\pi}$ receives the  tag  from $s^*$ at least as high as $tag(\phi)$, so $\pi\not \prec \phi$.
+        %
+         \item [$(b)$] $\pi$ is a \rot{}, $\phi$ is a \wot{} invoked by reader  $r_{\pi}$ and writer $w_{\phi}$, respectively.  
+          Since the size of $List$, in $s^*$,  grows monotonically,  because  $r_{\pi}$  invokes $\pi$ after $\phi$ completes hence $tag(\pi)$ is at least as high as $tag(\phi)$, so $\pi\not \prec \phi$.
+        %
+          \item[$(c)$]$\pi$ and $\phi$ are both \rot{}s  invoked by readers $r_{\pi}$ and $r_{\phi}$, respectively. 
+             Since the size of $List$, in $s^*$, grows monotonically,  because   $w_{\pi}$ invokes $\pi$ after $\phi$ completes hence $tag(\pi)$ is at least as high as $tag(\phi)$, so $\pi\not \prec \phi$.
+          %
+           \item [$(d)$] $\pi$ is a \wot{}, $\phi$ is a \rot{}  invoked by writer $w_{\pi}$ and reader $r_{\phi}$, respectively.
+           This case is simple because new values are added to $List$, in $s^*$,  only  by writers, and $tag(\pi)$  has to be larger than the tag of $\phi$ and hence   $\pi\not \prec \phi$. 
+  \end{enumerate}
+  
+  
+  \emph{P3:} This is from  the fact that any \wot{} always creates a unique tag and all tags are totally ordered since they all belong to $\mathbb{N}$
+  
+    \emph{P4:} Consider a \rot{} $\rho$ as $READ(o_{i_1}, o_{i_2}, \cdots, o_{i_q})$, in $\beta$. 
+Let the returned value from $\rho$ be $\mathbf{v} \equiv $$(v_{i_1}, v_{i_2}, \cdots, v_{i_q})$ such that 
+$1 \leq {i_1} <  {i_2} <  \cdots <  {i_q} \leq k$, where value  $v_{i_j}$ corresponds to $o_{i_j}$. 
+  Suppose $tag(\rho) \in \mathbb{N}$ was created during some \wot{}, say $\phi$, i.e., $\phi$ is the \wot{} that 
+  added the elements in index $(tag(\rho)-1)$ of $List$ at the coordinator $s^*$. Note that element in index $0$ contains the initial value.
+  %because \rots{} do not generate new tags as they do not add any new item to the $Vals$ of any server.
+   Now we consider two cases:
+   
+  \emph{Case $tag(\rho) = 1$.} We  know that it corresponds the initial default value $v_i^0$ at each sub-object $o_i$, and this equates to $\rho$ returning the default initial value for each sub-object.
+   %
+  % Therefore, $tag(\rho) = tag(\phi)$. 
+   
+   \emph{Case $tag(\rho) > 1$.} Then we argue that there exists no \wot{}, say $\pi$, that updated object $o_{i_j}$,   in $\beta$, such that,  $\pi \neq \phi$ and $\rho$ returns values written by $\pi$ and $\phi \prec \pi \prec \rho$. Suppose we assume the  contrary, which means $tag(\phi) < tag(\pi) < tag(\rho)$. The latter implies $tag(\phi)  = tag(\pi)$ which is not possible because 
+  this contradicts the fact that for any two distinct \wots{} $tag(\phi) \neq tag(\pi)$  in any execution of   $B$.
+
+  \noindent{\emph{\underline{N, o and W properties:}}}  Evident from an inspection of the algorithm.
+  % for the  response steps  of the servers to the reader.
+  \end{proof}
+
+}

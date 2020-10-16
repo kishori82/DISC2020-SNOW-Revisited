@@ -1,13 +1,13 @@
 %\section{\text{SN$\bar{o}$W} for MWMR setting}\label{mwmr_snow}
-Here, we present  algorithm  $C$ that satisfies  SN$\bar{o}$W  properties in the   \emph{multiple-writers multi-reader} (MWMR) setting, where ``$\bar{o}$'' means a \textit{READ} consists of 
-only one round of communications between the reader and the servers but the servers may respond with multiple versions of the data. We denote the type of object that satisfies the SN$\bar{o}$W properties by $\bar{\mathcal{O}}_T$.   
+Here, we present  algorithm  $C$ which satisfies  SNW and "one-round"  properties in the MWMR setting, where a \textit{READ} consists one round of communications between the reader and the servers but servers may respond with multiple versions of the data. %We denote the type of object that satisfies the SN$\bar{o}$W properties by $\bar{\mathcal{O}}_T$.   
 %Note that $B$ can also tolerate crash failure of writers and readers. 
-The pseudocode is in the appendix. The notation for the  writers, servers and tag are similar to the previous sub-section. 
+The notation for the  writers, servers and tag are similar to the previous sub-section. 
+The steps for the writers are shown in Pseudocode~\ref{fig:algo_bc} and  those for readers and the servers  are presented in Pseudocode~\ref{fig:algo_c}.
 %
 %We assume there is a set of writers $\mathcal{W}$,  a set of readers $\mathcal{R}$ and a set of $k \geq 1$ servers,  $\mathcal{S}$, with ids $s_1, s_2\cdots s_k$ that stores the objects $o_1, o_2, \cdots, o_k$, respectively.  We define  key ${\kappa}$  as a pair $(z, w)$, where $z \in \mathbb{N}$ and $w \in \mathcal{W}$ the  id of a writer. We use $\mathcal{K}$ to denote the set of all possible keys, which  are used to uniquely identify each transaction. Also, with each transaction we associate a tag $t \in \mathbb{N}$. 
 %We assume writers can send message to the reader, i.e., we allow client-to-client messages.
 % We assume that each process has a unique id. We assume that each server $s$ stores object $o_s$, due to sharding.  For the sake of simplicity, we assume that the \emph{WRITE} transactions issued by a writer are of the form: \emph{ write value $v_1$ to object $o_1$, $v_2$ to $o_2$, and so on}. In other words, we assume that such a  transaction consists of the set of operations $\{ \writeop{o_1}{v^{(1)}}, \writeop{o_2}{v^{(2)}}\cdots \writeop{o_k}{v^{(k)}}\} $, which we denote by $write(v_1, v_2, \cdots, v_k)$.  \emph{WRITE} transactions where only a subset of  the objects are updates will be discussed later. We also assume that  the \textit{READ} transactions are of the form  $\{ \readop{o_1}, \readop{o_2}\cdots \readop{o_k}\}$ consisting of $k$ reads to $k$ distinct objects.		
-In algorithm $C$, we designate one of the servers as the coordinator,  denote as $s^*$. 
+We designate one of the servers as the coordinator,  denote as $s^*$. 
 %In addition to managing a shard object 
 %object, the server $s^*$ is used to maintain the order of the \emph{WRITE}s and the objects that are updated during the \emph{WRITE} in the variable $List$. 
  % In any system, where there are many objects 
@@ -47,13 +47,11 @@ During  {\readValuesAndTags},  $r$ sends $s^*$ the message  {\getTagArrayTag}
 %
 
 \textit{\textbf{Server steps:}}  
-When a server $s_i$ receives a message of type $(${\writeValueTag}$, ({\kappa}, v_{i}))$ from a writer $w$; or if 
-the $s^*$, receives  (\updateCoordTag, $({\kappa}, (b_{1}, \cdots, b_{k})$) from writer $w$ or 
- receives  a message as  {\getTagArrayTag} from $r$ the steps are similar to their counterparts in algorithm $B$. 
- Therefore, we omit them.
-On the other hand, if any server $s_i$ receives a message  $(${\readValuesTag}$)$ from a reader $r$ then it responds to $r$ with 
-   the entire set of values, i.e., $Vals$. 
-The following result states that $C$ respects SN$\bar{o}$W  property (proof in Appendix~\ref{app:algrithmC}).
+When a server $s_i$ receives a message $(${\writeValueTag}$, ({\kappa}, v_{i}))$ from a writer $w$ or 
+ $s^*$, receives  (\updateCoordTag, $({\kappa}, (b_{1}, \cdots, b_{k})$) from writer $w$ or 
+ receives  a message as  {\getTagArrayTag} $r$ the steps are similar to those in $B$. 
+On the other hand, if any server $s_i$ receives a message  $(${\readValuesTag}$)$ from a reader $r$ then it responds to $r$ with  $Vals$. 
+The following result states that $C$ respects SNW and ``one-round"  properties.
 % and the proof is omitted for now since it is very straightforward. Note that the liveness property of \textit{READ} and \emph{WRITE}  transactions are a part of the SNOW properties.
 %Consider any failure-free and fair execution of algorithm $C$. 
 %For the purpose of proving the $S$ property, for every transaction transaction  $\phi$ in an execution of $C$ we associate a tag $tag(\phi)$ as described below.
@@ -62,8 +60,8 @@ The following result states that $C$ respects SN$\bar{o}$W  property (proof in A
 % $ \triangleq \max_{1 \leq j \leq |List|} \{ j : List[j].b_i = 1 \wedge i \in I\}$, which is presented as a comment in the pseudo-code for $A$.
 %If $\phi$ is a \emph{WRITE} (\textit{READ}) then  $tag(\phi)$ is the value of the variable $t_w$ ($t_r$) immediately before the operation completes.
 
-\begin{theorem} Any well-formed  and fair execution of  $C$, in the MWMR setting, 
-	with no C2C communication,  satisfies the SN$\bar{o}$W  properties. %Algorithm $B$ also tolerates any client crash failures.
+\begin{theorem} Any well-formed  and fair execution of  $C$, in the MWMR setting
+  satisfies the SNW and "one-round" properties. %Algorithm $B$ also tolerates any client crash failures.
 \end{theorem}
 %\begin{theorem} Any well-formed  and fair execution of algorithm $C$ is an implementation of  an object of type $\bar{\mathcal{O}}_T$ in the MWMR setting, 	with no client-to-client communication,  comprising of objects $o_1, o_2, \cdots o_k$ stored in servers $s_1, s_2, \cdots, s_k$, respectively; and it satisfies the SN$\bar{o}$W  properties. %Algorithm $B$ also tolerates any client crash failures. \end{theorem}
 %In algorihtm C, when a server $s_i$ responds to a reader with the entire history of  update values $Vals_i$ for object $o_i$. This impractical behavior 

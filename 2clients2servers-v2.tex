@@ -1,10 +1,12 @@
 %\section{Impossibility of SNOW properties with two clients with restricted communication }\label{two-client}
 \section{Two Client Open Question}
 \label{sec:2c2s}
-This section closes the open question of whether SNOW properties can be implemented with two clients. We first prove that SNOW remains impossible in a 2-client 2-server system if the clients cannot directly send messages to each other.
-% We prove our result by showing 
- %a contradiction. 
- However, in the presence of client to client communication, it is possible to have all SNOW properties with two clients and at least two servers.
+{ \color{blue}
+This section closes the open question of whether SNOW properties can be implemented in the MWSR setting (subsumes with a two-clients) scenario state in ~\cite{SNOW2016}. We first prove that SNOW remains impossible in a 
+MWSR and 2-server the system if C2C communication is diallowed. 
+Next, we present an algorithm that implements SNOW properties in an MWSR setting with at least two servers. Hence we resolve a more general version of the open question raised in ~\cite{SNOW2016}: the feasibility of SNOW in this setting depends on whether C2C communication is allowed.
+}
+%  the presence of client to client communication, it is possible to have all SNOW properties with two clients and at least two servers.
  %Fig~\ref{fig:architecture2a}.
  
  \subsection{No  SNOW Without C2C  Messages}
@@ -80,7 +82,8 @@ This section closes the open question of whether SNOW properties can be implemen
 %However,  the  W property guarantees termination of any \wot{}. Therefore, all we can claim is  $\RESP{W}$ eventually appears after  $\INV{W}$.
 
 
-Our strategy is still proof by contradiction: We assume there exists some algorithm $\mathcal{A}$ that satisfies all SNOW properties, and then we show the existence of a sequence of executions of $\mathcal{A}$, eventually leading to an execution that contradicts  the S property.
+Our strategy is still proof by contradiction: We assume there exists some algorithm $\mathcal{A}$ that satisfies all SNOW properties, and then we show the existence of a sequence of executions of $\mathcal{A}$, finally leading to an execution contradicting the S property. 
+\remove{
  %If $\epsilon$ is an execution of $\mathcal{A}$, with \rot{} $R$.
 %  We denote by  $\frag{1,x}{\epsilon}$ and $\frag{1,y}{\epsilon}$  the execution fragments of $\epsilon$  between  the actions $recv(x)_{ s_x, r}$ and  $send(m_x^r)_{r, s_x}$ at $s_x$; and   $recv(x)_{ s_x, r}$ and  $send(m_y^r)_{r, s_y}$ at $s_y$, respectively, and in  $\frag{1,x}{\epsilon}$ and $\frag{1,y}{\epsilon}$  no other internal actions occur at $s_x$ and $s_y$, respectively.
  First,  we show the existence of an execution $\alpha$ of $\mathcal{A}$ where 
@@ -114,16 +117,16 @@ of the form  $\prefix{\eta} \circ \frag{1,x}{\eta} \circ \frag{1,y}{\eta}\circ \
     % i.e., $\prefix{\delta^{(i)}}$ is a prefix of $\prefix{\delta^{(i-1)}}$. 
     Based on $\delta^{(f)}$, we prove the existence of an execution $\phi$ (Fig.~\ref{fig:execution2} $(h)$), where $R_1$ returns 
     $(x_1, y_1)$ even before $W$ begins, which violates the $S$ property.
-
+}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%555
 
 
 
-  The following theorem proves that it is impossible to have all SNOW properties with two clients without client-to-client communication. We start with an execution $\eta$ and create a sequence of executions of 
-  $\mathcal{A}$, where each one is of the form $\prefix{\cdot} \circ \frag{1,x}{\cdot}\circ \frag{1,y}{\cdot}\circ \suffix{\cdot}$, with progressively shorter $\prefix{\cdot}$ until we have a final execution that contradicts the $S$ property.
+  The following theorem states when client-to-client communication is not allowed it is impossible to have the SNOW properties even with  two clients. 
+%  We start with an execution $\eta$ and create a sequence of executions of $\mathcal{A}$, where each one is of the form $\prefix{\cdot} \circ \frag{1,x}{\cdot}\circ \frag{1,y}{\cdot}\circ \suffix{\cdot}$, with progressively shorter $\prefix{\cdot}$ until we have a final execution that contradicts the $S$ property.
 
  \begin{theorem}\label{thm:two-snow}
- The SNOW properties cannot be implemented in a system with two clients and two servers, where the clients do not communicate with each other.
+ The SNOW properties cannot be implemented in a system with two clients and two servers, where the clients are not allowed to communicate with each other.
 \end{theorem}
 
 

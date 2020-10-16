@@ -1,16 +1,19 @@
+{\color{blue}
 \rots{} that read data distributed across servers dominate the workloads of real-world distributed storage systems.
-The SNOW Theorem~\cite{SNOW2016} proved that ideal \rots{} that have optimal latency and the strongest guarantees---i.e., ``SNOW'' \rots{}---are impossible in one specific setting. That setting requires three or more clients, at least two readers among the clients (SWMR), and does not allow client-to-client communication.
-It left many open questions around when SNOW is possible that depend on whether client-to-client communication is allowed, whether clients are readers or writers, and when there are two clients.
+The SNOW Theorem~\cite{SNOW2016} stated that ideal \rots{} that have optimal latency and the strongest guarantees---i.e., ``SNOW'' \rots{}---are impossible in one specific setting that requires three or more clients: at least two readers and one writer. However, it left many open questions.
+
 %It implicitly left open the possibility of SNOW with client-to-client communication, 
 %implicitly left open the possibility of SNOW with one reader and multiple writers (MWSR), and
 %explicitly left open the possibility of SNOW with two clients.
-We close all of these open questions with new impossibility results or new algorithms.
-We prove SNOW is impossible when client-to-client communication is allowed with three or more clients.
-That proof uses two writers and one reader, and thus also shows SNOW is impossible for multiple writers and a single reader (MWSR) with client-to-client communication.
-We show SNOW's possibility with two clients (SWSR) is dependent on client-to-client communication:
-We give an algorithm that provides SNOW when client-to-client communication is allowed;
-we prove it is impossible when client-to-client communication is disallowed.
-
+We close all of these open questions with new impossibility results and new algorithms.
+First, we prove rigorously the result from ~\cite{SNOW2016} saying that it is impossible to have a \rot{}s system that satisfies SNOW properties with three or more clients.
+The insight we gained from this proof led to teasing out the implicit assumptions that are required to state the results and also, resolving the open question regarding the possibility of SNOW with two clients.
+%proof uses two writers and one reader, and thus also shows SNOW is impossible for multiple writers and a single reader (MWSR) with client-to-client communication.
+We show that SNOW  is possible in a multi-writer, single-reader (MWSR) setting when a client can send messages to other clients by an algorithm;
+on the other hand, we prove it is impossible to implement SNOW in a multi-writer, single-reader (MWSR) setting--which is more general than the two-client setting--when client-to-client communication is disallowed.
+We also correct the previous claim in ~\cite{SNOW2016} that incorrectly identified one existing system, Eiger~\cite{Lloyd:nsdi2013}, as supporting the strongest guarantees (SW) and whose read-only transactions had bounded latency. Thus, there were no previous algorithms that provided the strongest guarantees and had bounded latency. Next, we provide two algorithms: one satisfies SNW and one-round properties, and another satisfies the SNW and one-version properties.
+}
+%{\color{blue} We correct this claim and show that Eiger's transactions do not provide strict serializability. Thus, there were no previous algorithms that provided the strongest guarantees and had bounded latency.}
 
 
 

@@ -1,7 +1,7 @@
 %\section{Impossibility of SNOW properties with  three clients}\label{three-client}
 \section{No SNOW with Three Clients and C2C}
 \label{sec:formal_proof}
-\sloppy This section provides a formal proof of the SNOW Theorem with 3 clients, i.e., SNOW is impossible in a system with 3 or more clients even when client-to-client communication is allowed. The main result of this section is captured by the following theorem. 
+\sloppy This section provides the sketch of a formal proof of the SNOW Theorem with 3 clients, i.e., SNOW is impossible in a system with 3 or more clients even when client-to-client communication is allowed. The main result of this section is captured by the following theorem. 
 \begin{theorem}\label{thm:snow3}
 	The SNOW properties cannot be implemented in a system with two readers and one writer, for two servers even in the presence of client-to-client communication.
 \end{theorem}
@@ -24,20 +24,19 @@ that point then $R_1$ returns $(x_1, y_1$).
 There exist  executions $\alpha_0$ and $\alpha_1$ of $\mathcal{A}$ that contain transactions $W$ and  $R_1$ 
 %   with  the following properties:
 that satisfy the following properties where $k$ is some positive integer and $\finiteprefixt{k-1}{k}$ is a prefix of $\finiteprefixt{k}{k+1}$:
-\begin{enumerate}
-\item[$(i)$] $\alpha_0$ can be written as 
+$(i)$ $\alpha_0$ can be written as 
 $\finiteprefixt{k-1}{k} \circ 
 \frage{R_1}{\alpha_0}{x_0, y_0}
 %\fragt{I_1}{\alpha_0}{} \circ \fragt{F_{1,x}}{\alpha_0}{x_0} \circ \fragt{F_{1,y}}{\alpha_0}{y_0} \circ \fragt{E_1}{\alpha_0}{x_0, y_0}
  \circ \frage{S}{\alpha_0}{}$ ;
  %and  $\beta_0$  as $\finiteprefixt{k-1}{k} \circ \fragt{R_1}{}{x_0, y_0} \circ \fragt{S}{\beta_0}{}$;
-\item[$(ii)$]   $\alpha_1$ can be written as 
+$(ii)$   $\alpha_1$ can be written as 
 $\finiteprefixt{k}{k+1} \circ 
 \frage{R_1}{\alpha_1}{x_1, y_1}  \circ \frage{S}{\alpha_1}{}$; and  
 %$\beta_1$  as $\finiteprefixt{k}{k+1} \circ  \fragt{R_1}{}{x_1, y_1}
 %\fragt{I_1}{\alpha_1}{} \circ \fragt{F_{1,x}}{\alpha_1}{x_1} \circ \fragt{F_{1,y}}{\alpha_1}{y_1}  \circ \fragt{E_1}{\alpha_1}{x_1, y_1} \circ \fragt{S}{\alpha_1}{}$; and 
-\item[$(iii)$] $a_{k+1}$ in $\alpha_1$  occurs at  $r_1$, 
-\end{enumerate} 
+$(iii)$ $a_{k+1}$ in $\alpha_1$  occurs at  $r_1$, 
+
 %where $k$ is some positive integer and $\finiteprefixt{k-1}{k}$ is a prefix of $\finiteprefixt{k}{k+1}$.
 %, i.e., the actions  $recv(m_x^r)_{r, s_x}$ and  $send(x)_{r, s_x}$ appear in $trace(\alpha)|s_x$, where  there is no input action of  $s_x$  between these actions.
 % \item[$(ii)$]  $R(\alpha)$ returns  $(x_1, y_1)$. 
@@ -125,7 +124,7 @@ So we conclude that $a_{k+1}$ must occur at $r_1$ in $\alpha_1$.
 \end{proof}
 
 In the remainder of the section, we suppress the explicit reference to the execution. For instance, we use $\fragt{I_i}{\alpha}{}$, $\fragt{F_{i,x}}{\alpha}{x}$, 
-$\fragt{F_{i,y}}{\alpha}{y}$, $\fragt{E_i}{\alpha}{x, y} $ and $ \fragt{S}{\alpha}{}$
+$\fragt{F_{i,y}}{\alpha}{y}$, $\fragt{E_i}{\alpha}{x, y}$ and $ \fragt{S}{\alpha}{}$, where we drop $\alpha$, 
 instead of $\frage{I_i}{\alpha}{}$, $\frage{F_{i,x}}{\alpha}{x}$, 
 $\frage{F_{i,y}}{\alpha}{y}$, $\frage{E_i}{\alpha}{x, y} $ and $ \frage{S}{\alpha}{}$.
 %Moreover, for any execution $\alpha_i$ of 
@@ -140,8 +139,8 @@ In the rest of the section, $\alpha_0$, $\alpha_1$, and the value of $k$ are the
 $\finiteprefixA{k}{k}$ and $\finiteprefixA{k}{k+1}$ respectively.
 %, which are the same irrespective of the execution they appear in.
 
-Our proof proceeds with a set of lemmas. Due to space limit, we omit the proof of some lemmas from the main paper, and present them in Appendix~\ref{app:sec5_lemmas} as they are relatively straightforward.
-The first lemma proves there exists an execution in which two consecutive \rots{} follow a \wot{}, and both \rots{}
+Our proof proceeds with a set of lemmas. 
+The first lemma states there exists an execution in which two consecutive \rots{} follow a \wot{}, and both \rots{}
 return the new values by the \wot{}.
 
 \begin{lemma}[Existence of $\alpha_2$] \label{lem:exec3_alpha2} 
@@ -228,6 +227,7 @@ we have shown the existence  of  an execution
 \end{proof}
 %}
 
+\remove{
 In the following lemma, we show that we can create an execution $\alpha_4$ of $\mathcal{A}$, where 
 $\fragt{F_{2,y}}{\alpha_4}{}$ occurs immediately before  $ \fragt{E_1}{\alpha_4}{x_1, y_1}$, while $\fragt{R_1}{\alpha_4}{}$ and 
 $\fragt{R_2}{\alpha_4}{}$ both return 
@@ -240,6 +240,7 @@ $ \finiteprefixA{k-1}{k} \circ \fragt{I_2}{\alpha_4}{}  \circ a_{k+1} $$ \circ \
 \circ \fragn{E_1}{\alpha_4}{x_1, y_1}
 $$\circ \fragn{F_{2,x}}{\alpha_4}{x_1} \circ  \fragn{E_2}{\alpha_4}{x_1, y_1}\circ \fragt{S}{\alpha_4}{}$, where both $R_1$ and $R_2$ return $(x_1, y_1)$.
 \end{lemma}
+}
 
 %\begin{proof}
 %Presented in Appendix~\ref{app:sec5_lemmas}.
@@ -273,11 +274,14 @@ those of $\fragt{F_{2,y}}{\alpha_3}{}$ at $s_y$. Furthermore, $\alpha_4$
 \end{proof}
 }
 
+
+\remove{
  Next, we create an execution  $\alpha_5$ where 
     $\fragt{F_{2,y}}{\alpha_5}{}$ occurs before  $ \fragt{F_{1,y}}{\alpha_5}{}$. 
     %However, because the actions in both execution fragments occur at the same automaton care has to be taken to swap these fragments 
     %compared to $\alpha_4$.
 %\blue{
+
 \begin{lemma}[Existence of $\alpha_5$] \label{lem:exec3_alpha4b} 
 \sloppy There exists  execution $\alpha_5$  of $\mathcal{A}$ that contains transactions $W$, $R_1$ and $R_2$ and  can be written in the form
 $ \finiteprefixA{k-1}{k} \circ \fragt{I_2}{\alpha_5}{}  \circ a_{k+1} $$ \circ \fragt{I_1}{\alpha_5}{}
@@ -285,8 +289,10 @@ $ \finiteprefixA{k-1}{k} \circ \fragt{I_2}{\alpha_5}{}  \circ a_{k+1} $$ \circ \
 $$\circ \fragn{F_{2,x}}{\alpha_5}{x_1} \circ  \fragn{E_2}{\alpha_5}{x_1, y_1}\circ \fragt{S}{\alpha_5}{}$, 
 where both $R_1$ and $R_2$ return $(x_1, y_1)$.
 \end{lemma}
-%}
 
+%}
+}
+\remove{
 \begin{proof}
 %\blue{
 Given all actions  in $ \fragt{F_{1,y}}{\alpha_4}{} $ and 
@@ -322,8 +328,8 @@ From the above argument we know that  $\alpha_5$ is of the form $ \finiteprefixA
 $$\circ \fragt{F_{2,x}}{\alpha_5}{x_1} \circ  \fragt{E_2}{\alpha_5}{x_1, y_1}\circ \fragt{S}{\alpha_5}{}$.
 %}
 \end{proof}
-
-
+}
+\remove{
 In the next lemma, we show the existence of an execution of $\mathcal{A}$ where $R_1$ returns $(x_0, y_0)$  and $I_2$ occurs immediately after $a_{k}$ and 
  $R_2$ responds with $(x_1, y_1)$. 
 %In fact, this is the most important of the sequence of executions of  
@@ -371,8 +377,8 @@ $\frage{F_{2,y}}{\alpha_5}{} \stackrel{s_y}{\sim} \frage{F_{2,y}}{\epsilon}{} \s
 \circ\fragt{F_{2,y}}{\alpha_6}{y_1}\circ \fragt{F_{1,y}}{\alpha_6}{y_0} \circ\fragt{E_1}{\alpha_6}{x_0, y_0}
 \circ\fragt{F_{2,x}}{\alpha_6}{x_1} \circ \fragt{E_2}{\alpha_6}{x_1, y_1}\circ \fragt{S}{\alpha_6}{}$ as in the statement of the lemma.
 \end{proof}
-
-
+}
+\remove{
 The  following lemma shows that there exists  an execution $\alpha_7$ for $\mathcal{A}$ where $\fragt{F_{2,x}}{\alpha_7}{}$ 
 appears  before $\fragn{F_{1,y}}{\alpha_7}{y_0} \circ\fragn{E_1}{\alpha_7}{x_0, y_0}$, where $R_1$ returns $(x_0, y_0)$ and $R_2$ returns $(x_1, y_1)$.  The lemma can be proven by  starting from $\alpha_6$ in Lemma~\ref{lem:exec3_alpha5} and  moving the execution fragments  of $R_2$ earlier, a little at a time, until finally we have $R_2$ finishing before $R_1$ starts.  This simply uses commutativity since the actions in the swapped execution fragments occur at different automata.
 
@@ -385,6 +391,7 @@ $\finiteprefixA{k-1}{k} \circ \fragt{I_2}{\alpha_7}{}  \circ \fragt{I_1}{\alpha_
  \circ \fragn{F_{1,y}}{\alpha_7}{y_0} \circ\fragn{E_1}{\alpha_7}{x_0, y_0}\circ
  \fragn{E_2}{\alpha_7}{x_1, y_1}\circ \fragt{S}{\alpha_7}{}$ where $R_1$ returns $(x_0, y_0)$ and $R_2$ returns $(x_1, y_1)$.
 \end{lemma}
+}
 
 \remove{
 \begin{proof}
@@ -406,6 +413,7 @@ $\finiteprefixA{k-1}{k}  \circ \fragt{I_2}{\alpha_7}{}  \circ \fragt{I_1}{\alpha
 \end{proof}
 }
 
+\remove{
 The following lemma leverages Lemma~\ref{lem:exec3_commute} to show the existence of an execution $\alpha_8$ of $\mathcal{A}$ where $\fragt{F_{2,y}}{\alpha_8}{}$ appears before $\fragt{I_1}{\alpha_8}{} \circ \fragt{F_{1,x}}{\alpha_8}{}$, and $R_1$ returns $(x_0, y_0)$ while $R_2$ returns $(x_1, y_1)$.
 
 \begin{lemma} [Existence of $\alpha_8$]  \label{lem:exec3_alpha7} 
@@ -417,6 +425,8 @@ $$\fragt{I_1}{\alpha_8}{} \circ \fragn{F_{1,x}}{\alpha_8}{x_0}
 $$ \circ \fragn{F_{1,y}}{\alpha_8}{y_0} \circ \fragn{E_1}{\alpha_8}{x_0, y_0}
 \circ \fragn{E_2}{\alpha_8}{x_1, y_1}\circ \fragt{S}{\alpha_8}{}$, where $R_1$ returns $(x_0, y_0)$ and $R_2$ returns $(x_1, y_1)$.
 \end{lemma}
+}
+
 
 \remove{
 \begin{proof}
@@ -449,7 +459,7 @@ $\fragt{F_{1,x}}{\alpha_8}{}$ and $\fragt{F_{1,y}}{\alpha_8}{}$ sends $x_0$ and 
 }
 
 %\wl{Please replace all language ``forward past'' with ``earlier than'', which is much clearer about where things are moving. I think i have fixed all of these.}
-
+\remove{
 The following lemma shows the existence of an execution  $\alpha_9$, of $\mathcal{A}$, where 
 $\fragt{F_{2,x}}{}{}$ appears before $\fragt{F_{1,x}}{}{}$.
 %\blue{
@@ -464,7 +474,7 @@ $$ \circ \fragt{F_{1,y}}{\alpha_8}{y_0} \circ \fragt{E_1}{\alpha_8}{x_0, y_0}
 where $R_1$ returns $(x_0, y_0)$ and $R_2$ returns $(x_1, y_1)$.
 \end{lemma}
 %}
-
+}
 \remove{
 \begin{proof}
 %\blue{
@@ -507,8 +517,9 @@ must return $(x_0, y_0 )$ in $\alpha_9$.
 
 %\wl{below should be ``where $R_1$ returns $(x_0, y_0)$ and $R_2$ completes by returning $(x_1, y_1)$'' I think! (the first $R_2$ should be a $R_1$.)}
 
-Now we show the existence of an execution of $\mathcal{A}$ where the execution fragments corresponding to $R_2$ appears 
-before $R_1$, where  $R_1$ returns $(x_0, y_0)$ and $R_2$ completes by returning $(x_1, y_1)$.
+Now we realize the existence of an execution $\alpha_{10}$  of $\mathcal{A}$ where the execution fragments corresponding to $R_2$ appears 
+before $R_1$, where  $R_1$ returns $(x_0, y_0)$ and $R_2$ completes by returning $(x_1, y_1)$
+but $R_1$ is in real time after $R_2$, therefore, violates the S property.
 %\blue{
 \begin{lemma} [Existence of $\alpha_{10}$]  \label{lem:exec3_alpha11} 
 \sloppy There exists an execution $\alpha_{10}$  of $\mathcal{A}$ that contains transactions $W$, $R_1$ and $R_2$
@@ -553,14 +564,13 @@ $\finiteprefixA{k-1}{k}   \circ
  \circ \fragt{S}{\alpha_{10}}{}$.
 %}
 \end{proof}
-
+\remove{
 Using the above results,  we prove Theorem ~\ref{thm:snow3} for 3-clients by showing the existence of $\alpha_{10}$,  where $R_2$ completes before $R_1$ is invoked and  $R_2$ returns $(x_1, y_1)$ whereas $R_1$ returns $(x_0, y_0)$, which  violates the S property. 
-
-
-\begin{proof}
+}
+%\begin{proof}
 \sloppy 
-$\alpha_{10}$ as shown in Fig.~\ref{fig:executions3} provides a contradicting execution, where $R_1$ returns $(x_0, y_0)$ and $R_2$ returns $(x_1, y_1)$, but $R_1$ is in real time after $R_2$, which violates the S property.
-\end{proof}
+%Therefore, $\alpha_{10}$ (shown in Fig.~\ref{fig:executions3}) provides an execution, where $R_1$ returns $(x_0, y_0)$ and $R_2$ returns $(x_1, y_1)$, but $R_1$ is in real time after $R_2$, therefore, violates the S property.
+%\end{proof}
 
 \setcounter{algorithm}{3}
 

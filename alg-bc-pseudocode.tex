@@ -1,0 +1,214 @@
+\begin{algorithm}[!ht]
+	\label{app:algrithmBC}
+	\begin{algorithmic}[3]
+		
+		\begin{multicols}{1}{\footnotesize
+				\Statex  {\bf At writer $w$}
+				\Part{{\it State Variables}}{   
+					\Statex $z \in \mathbb N$, initially   $0$
+				}\EndPart
+				
+				\Statex  {\bf  \Writetr{$(i_1, v_{i_1}), \cdots, (i_p,  v_{i_p})$}   }
+				\State $I\triangleq \{i_1, i_2, \cdots, i_p \}$
+				%\State $S_{I}\triangleq \{s_{i_1}, s_{i_2}, \cdots, s_{i_p}\}$
+				\Part{ \underline{\writeValue}} {
+					%    \State $t_w \leftarrow (z +1,  \text{``id''})$; $z \leftarrow z +1 $
+					\State ${\kappa} \leftarrow (z +1,  w)$
+					\State $z \leftarrow z +1 $
+					\For{$i \in I$} 
+					\State Send (\writeValueTag, $({\kappa}, v_{s_i})$) \\ to $s_i$
+					\EndFor 
+					\State  Await {\ackTag} from servers in  $S_I$.
+				}\EndPart
+				\Statex
+				\Part{ \underline{\informSerializer}} {
+					
+					\For{$i \in [k]$} 
+					\If{$i \in I$}
+					\State $b_i \leftarrow 1$
+					\Else
+					\State $b_i \leftarrow 0$
+					\EndIf
+					\EndFor 
+					%      \State $b_{i}\triangleq$   $v_i$ if  $i \in I$, otherwise $\bot$
+					\State  Send  (\informSerializerTag, $({\kappa},$
+					\\ $(b_{1}, \cdots, b_{k}))$) to   $s^*$
+					
+					%       \State $\tilde{o}_{i}\triangleq$   $o_i$ if  $i \in I$, otherwise $\bot$
+					%                      \State  Send  (\informSerializerTag, $(t_w, \tilde{o}_{1}, \cdots \tilde{o}_{k})$) to $s^*$
+					%\State  Await {\ackTag} from reader $s^*$
+					\State Receive ({\ackTag}, 
+					\\$t_w$) from $s^*$
+				}\EndPart
+		}\end{multicols}
+	\end{algorithmic} 
+	\caption{Protocol for writer $w$ in algorithms $B$ and $C$.}\label{fig:algo_bc}
+	          \vspace{-1.2em}
+\end{algorithm}
+
+
+
+\begin{algorithm}[!ht]
+\label{app:algrithmB}
+  \begin{algorithmic}[3]
+      \begin{multicols}{0}{\footnotesize    
+          \Statex  {\bf At reader $r$}
+          \Statex  {\bf \Readtr{$ o_{i_1},  o_{i_2}, \cdots, o_{i_p}$}} 
+          \State $I\triangleq \{i_1, i_2, \cdots, i_p \}$
+          %\State $S_{I}\triangleq \{s_{i_1}, s_{i_2}, \cdots, s_{i_p}\}$
+    % \Part{{\it State Variables}}{   
+    %     \Statex $List$, an ordered from  $\mathcal{T} \times \{ o_1,\bot \} \times \cdots \times \{ o_k,\bot \} $,\\ ~~~~~initially  $List=[(t^0, o_1, \cdots o_k)]$
+    %       }\EndPart
+            \Part{ \underline{\getTagArray}} {
+          \State  Send (\getTagArrayTag) to $s^*$
+          \State  Receive  $(t_r, ({\kappa}_1, {\kappa}_2, \cdots, {\kappa}_k))$ from  $s^*$
+        }\EndPart 
+            \Statex
+          \Part{{\underline{{\readValue}}}}{ 
+            % \State $\forall i, 1 \leq i \leq k$: $t_i^{max}  \leftarrow \max\{ t: (i, t) \in  Tags\}$
+                     \For{$i \in  I$} 
+            \State  Send (\readValueTag, ${\kappa}_i$) to $s_i$
+           \EndFor 
+            \State  Await responses as $v_{i}$ $\forall$ $s_i\in S$
+            \State Return  $(v_{i_1}, v_{i_2}, \cdots, v_{i_p})$
+          }\EndPart
+        }\end{multicols}
+  \vspace{-1.5em}
+\\\hrulefill
+\vspace{-1.5em}
+      \begin{multicols}{1}{\footnotesize
+          \Statex {\bf At server $s_i$ for any $i \in [k]$}
+            \Part{{\it State Variables}}{ 
+              \Statex $Vals\subset \mathcal{K} \times \mathcal{V}_i$, initially   $\{({\kappa}^0, v_i^0)\}$
+              %\Statex $Vals_s \subset \mathcal{T} \times \mathcal{V}_s$, initially   $\{(t_0, v_s^0)\}$
+              %             pair with a tag and a coded element, initially $(t_0, c_0)$.
+              %\Statex $t_c$,  the commited tag, initially $t_0$
+            %\Statex $List$, an ordered from  $\mathcal{T} \times \{ o_1,\bot \} \times \cdots \times \{ o_k,\bot \} $,\\ ~~~~~initially  $List=[(t^0, o_1, \cdots o_k)]$
+\Statex $List$, list  of  $\mathcal{K} \times \{ 0, 1 \}^k $, initially  $[({\kappa}^0, (1, \cdots 1))]$
+            }\EndPart
+            \Statex
+            \Part {\underline{On recv (\writeValueTag,}
+            	\\\underline{$({\kappa}, v)$) from  $w$}} {
+                       \State   $Vals \gets   Vals \cup \{({\kappa}, v)\}$ 
+              \State  Send {\ackTag} to $w$.
+            }\EndPart
+            \Statex
+            \Part{{\underline{On recv  (\informSerializerTag, }} \\\underline{
+            		$({\kappa}, (b_{1}, \cdots b_{k}))$)
+            		 from  $w$} }{ 
+                %   \State append $({\kappa}, (b_{1}, \cdots, b_{k}))$ to $List$
+               \State $List  \leftarrow $ 
+                 \\~~~~~~ $List \bigoplus~ ({\kappa}, (b_{1}, \cdots b_{k}))$ 
+                 \\~~~//$\bigoplus$ for append
+          % \State Send {\ackTag} to  $w$
+                  \State $tag \leftarrow |List|$ // $| \cdot |$ list size
+            \State Send  ({\ackTag}, $tag$) to  $w$
+          }\EndPart
+                   
+                        \Statex
+            \Part{ \underline{On recv (\readValueTag, ${\kappa}$) from  $r$ }} {
+              \State   Send $v_i$ s.t. $({\kappa}, v) \in Vals$  to  $r$
+            }\EndPart 
+          \Statex\Statex   /* used only by $s^*$ */
+          
+          \Part{ \underline{On recv {\getTagArrayTag} from  $r$ }} {
+          \For{$i \in [k]$} 
+                     \State $j^* \leftarrow \max \{ j :$ 
+                      \\~~~~~~~~~~~~$ List[j].b_i =1 \}$
+                     \State ${\kappa}_i \leftarrow List[j^*].{\kappa}$
+            %\State  send  ($t_1, t_2, \cdots, t_k$) to $s_i$
+           \EndFor 
+            \Statex
+             \State  $t_r \triangleq \max_{1 \leq j \leq |List|} \{j:$
+             \\~~~~~~~~$List[j].b_i = 1 \wedge i \in I\}$ 
+            \State  Send  ($t_r, ({\kappa}_1,{\kappa}_2, \cdots, {\kappa}_k)$) to $r$
+            }\EndPart       
+          }\end{multicols}
+        \end{algorithmic} 
+        \caption{Protocols reader $r$ and server $s_i$ in alg. $B$.}\label{fig:algo_b}
+                  \vspace{-1.2em}
+\end{algorithm}
+
+
+
+
+\label{app:algrithmC}
+\begin{algorithm}[!ht]
+  \begin{algorithmic}[3]
+      \begin{multicols}{0}{\footnotesize    
+          \Statex  {\bf At reader $r$}
+          \Statex  {\bf \Readtr{$ o_{i_1},  o_{i_2}, \cdots, o_{i_p}$}} 
+          \State $I\triangleq \{i_1, i_2, \cdots, i_p \}$
+          %\State $S_{I}\triangleq \{s_{i_1}, s_{i_2}, \cdots, s_{i_p}\}$
+    % \Part{{\it State Variables}}{   
+    %     \Statex $List$, an ordered from  $\mathcal{T} \times \{ o_1,\bot \} \times \cdots \times \{ o_k,\bot \} $,\\ ~~~~~initially  $List=[(t^0, o_1, \cdots o_k)]$
+    %       }\EndPart
+            \Part{ \underline{\readValuesAndTags}} {
+          \State  Send  (\getTagArrayTag) to $s^*$
+           \For{$i \in  I$} 
+            \State  Send (\readValuesTag) to $s_i$
+             \EndFor 
+             
+          \State  Recv $(t_r, ({\kappa}_1, {\kappa}_2, \cdots, {\kappa}_k))$ from  $s^*$
+            % \State $\forall i, 1 \leq i \leq k$: $t_i^{max}  \leftarrow \max\{ t: (i, t) \in  Tags\}$
+            \State Recv. $Vals_{i}$ from $\forall$ $s_i\in S_I$
+            \State Return  $(v_{i_1}, v_{i_2}, \cdots, v_{i_p})$ 
+            \\~~~~~~s.t.  $({\kappa}_{j}, v_{j}) \in Vals_{j}$, $j\in I$
+          }\EndPart
+        }\end{multicols}
+
+  \vspace{-1.5em}
+\\\hrulefill
+\vspace{-1.5em}
+      \begin{multicols}{2}{\footnotesize
+          \Statex {\bf At server $s_i$ for any $i \in [k]$}
+            \Part{{\it State Variables}}{ 
+              \Statex $Vals\subset \mathcal{K} \times \mathcal{V}_i$, initially   $\{({\kappa}^0, v_i^0)\}$
+              %\Statex $Vals_s \subset \mathcal{T} \times \mathcal{V}_s$, initially   $\{(t_0, v_s^0)\}$
+              %             pair with a tag and a coded element, initially $(t_0, c_0)$.
+              %\Statex $t_c$,  the commited tag, initially $t_0$
+            %\Statex $List$, an ordered from  $\mathcal{T} \times \{ o_1,\bot \} \times \cdots \times \{ o_k,\bot \} $,\\ ~~~~~initially  $List=[(t^0, o_1, \cdots o_k)]$
+\Statex $List$, a list  of  $\mathcal{K} \times \{ 0, 1 \}^k $, initially  $[({\kappa}^0, (1, \cdots 1))]$
+            }\EndPart
+            \Statex
+            \Part {\underline{On recv (\writeValueTag, }
+            	\\ \underline{$({\kappa}, v))$ from  $w$}} {
+                       \State   $Vals \gets   Vals \cup \{({\kappa}, v)\}$ 
+              \State  Send {\ackTag} to writer $w$.
+            }\EndPart
+            \Statex
+            \Part{{\underline{On recv (\informSerializerTag,}
+            	\\ \underline{$({\kappa}, (b_{1}, \cdots b_{k}))$) from  $w$}}}{ 
+                %   \State append $({\kappa}, (b_{1}, \cdots, b_{k}))$ to $List$
+                 \State $List  \leftarrow$ 
+                 \\~~~~~~$List \bigoplus~ ({\kappa}, (b_{1}, \cdots b_{k}))$ 
+                  \\~~~~~~//$\bigoplus$ for append
+          % \State Send {\ackTag} to  $w$
+                  \State $tag \leftarrow |List|$ /* $| \cdot |$ list size */
+            \State Send  ({\ackTag}, $tag$) to  $w$
+          }\EndPart
+                   
+                        \Statex
+            \Part{ \underline{On recv ({\readValuesTag}) from  $r$ }} {
+              \State   Send $Vals$  to  $r$
+            }\EndPart 
+          \Statex\Statex   /* used only by $s^*$ */
+          
+          \Part{ \underline{On recv {\getTagArrayTag} from  $r$ }} {
+          \For{$i \in [k]$} 
+          \State $j^* \leftarrow \max \{j:$ 
+          \\~~~~~~~~$ List[j].b_i = 1\}$
+          \State ${\kappa}_i \leftarrow List[j^*].{\kappa}$
+            %\State  send  ($t_1, t_2, \cdots, t_k$) to $s_i$
+           \EndFor 
+           \Statex
+             \State  $t_r \triangleq \max_{1 \leq j \leq |List|} \{j:$ 
+              \\~~~~~~$List[j].b_i = 1 \wedge i \in I\}$ 
+            \State  Send  ($t_r, ({\kappa}_1,{\kappa}_2, \cdots, {\kappa}_k)$) to $r$
+            }\EndPart       
+          }\end{multicols}
+        \end{algorithmic} 
+        \caption{Protocols for reader $r$ \& server $s_i$ in alg. $C$.}\label{fig:algo_c}
+          \vspace{-1.2em}
+      \end{algorithm}
+

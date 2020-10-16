@@ -1,15 +1,15 @@
 %\section{SNoW for MWMR setting}\label{mwmr}
-In this section,  we present  algorithm  $B$, which satisfies  SNoW  properties, where ``o'' means a \rot{} may consist of more than one round trip of communication between the reader and the servers. We denote the type of object  that satisfies the SNoW properties by $\tilde{\mathcal{O}}_T$.   
+Here present  algorithm  $B$, which satisfies  SNW and "one-version" properties, in MWMR setting where a \rot{} must consist of one version of the data but, possibly, mulitple communication trips between the reader and the servers.% We denote the type of object  that satisfies the SNoW properties by $\tilde{\mathcal{O}}_T$.   
 %Note that $B$ can also tolerate crash failure of writers and readers. 
-The steps of the algorithm for the writers, readers and the servers  are presented in appendix (Pseudocode~\ref{fig:algo_b}).
+In B, the steps for the writers are shown in Pseudocode~\ref{fig:algo_bc} and for readers and the servers  are presented in Pseudocode~\ref{fig:algo_b}.
 We assume  a set of writers $\mathcal{W}$,  a set of readers $\mathcal{R}$ and a set of $k \geq 1$ servers,  $\mathcal{S}$, with ids $s_1, s_2\cdots s_k$ that stores the objects $o_1, o_2, \cdots, o_k$, respectively.  We define  key ${\kappa}$ is defined as a pair $(z, w)$, 
 where $z \in \mathbb{N}$ and $w \in \mathcal{W}$ the  id of a writer. We use $\mathcal{K}$ to denote the set of all possible keys. 
 In $B$, the keys are used to uniquely identify each transaction. Also, with each transaction we associate a tag $t \in \mathbb{N}$. 
 %We assume writers can send message to the reader, i.e., we allow client-to-client messages.
 % We assume that each process has a unique id. We assume that each server $s$ stores object $o_s$, due to sharding.  For the sake of simplicity, we assume that the \wots{} issued by a writer are of the form: \emph{ write value $v_1$ to object $o_1$, $v_2$ to $o_2$, and so on}. In other words, we assume that such a  transaction consists of the set of operations $\{ \writeop{o_1}{v^{(1)}}, \writeop{o_2}{v^{(2)}}\cdots \writeop{o_k}{v^{(k)}}\} $, which we denote by $write(v_1, v_2, \cdots, v_k)$.  \wots{} where only a subset of  the objects are updates will be discussed later. We also assume that  the \rots{} are of the form  $\{ \readop{o_1}, \readop{o_2}\cdots \readop{o_k}\}$ consisting of $k$ reads to $k$ distinct objects.	
 	
-In  $B$, we designate one of the servers as coordinator, we denote as $s^*$,
- for the transactions. The coordinator $s^*$ is used to maintain the order of the \wots{} and the objects that are updated during the \wot{} in the variable $List$.  %Note that in a system, where there are many objects 
+In  $B$, we designate one of the servers as coordinator, denote as $s^*$,
+ for the transactions. The $s^*$  maintains the order of the \wots{} and the objects that are updated during the \wot{} in the variable $List$.  %Note that in a system, where there are many objects 
 %different objects may be use different servers  as coordinators based on some load-balancing rule. 
 
 \textit{\textbf{State variables:}} Each of the writers and servers maintain a set of state variables as follows: $(i)$ At  any  \emph{writer $w$}, there is  a counter $z$ to keep track of the
@@ -27,13 +27,13 @@ A server also contains an
   place holder identifier string for writer id. The elements in $List$ can be identified with an index, e.g., 
   $List[0] =({\kappa}^0, (1, \cdots, 1))$.  Essentially, a $(k+1)$-tuple  $(\kappa, (b_1, \cdots, b_k))$ in $List$ corresponds to a \wot{} and 
    identifies the set of objects that are updated during the \wot{}, i.e., if $b_i=1$ then object 
-   $o_i$ was updated  during the execution of the  \wot{}, otherwise $b_i=0$.
+   $o_i$ was updated  during  the  \wot{}, otherwise $b_i=0$.
 			%labeled with phase names, viz., {\readGetTag}, {\readValueTag}, {\readCompleteTag} and {\writeGetTag}. The server to server messages are labeled as {\readDisperseTag}. Also, in some phases of {\SODA},  the message-disperse primitives {\mdmetaprim} and {\mdvalueprim} are used  as services. 
 					
 \textit{\textbf{Writer steps:}} A \wot{} updates
 			a  list of $p$ objects $o_{i_1}, o_{i_2}, \cdots o_{i_p}$  with values
 			 $v_{i_1}, v_{i_2}, \cdots v_{i_p}$, respectively, is invoked at $w$ via the procedure
-			$\Writetr{ (o_{i_1}, v_{i_1}), (o_{i_2}, v_{i_2}), \cdots, (o_{i_p}, v_{i_p}) }$.
+			$\Writetr{ (o_{i_1}, v_{i_1}), \cdots, (o_{i_p}, v_{i_p}) }$.
 We use the notations:  $I \triangleq \{i_1, i_2, \cdots, i_p\}$  and $S_I\triangleq \{s_{i_1}, s_{i_2}, \cdots, s_{i_p}\}$.
 This procedure  consists of two phases: {\writeValue} and {\updateCoord}. 
 %We denote the set of servers involved   in the \wot{}  by  $S_I=\{s_{i_1}, s_{i_2}, \cdots, s_{i_p}\}$.   
@@ -43,8 +43,8 @@ from all servers in $S_I$.
 After receiving {\ackTag} from all servers in $S_I$,  $w$
 initiates the {\updateCoord} phase where it sends 
 (\updateCoordTag, $({\kappa}, (b_{1}, \cdots b_{k})$) to $s^*$, where for any $i \in [k]$,  $b_i=1$ if $s_i \in S_I$, 
-otherwise $b_i=0$,   and finishes after it receive a   {\ackTag} message from $s^*$.  
-	  After receiving message  ({\ackTag}, $t_w$),  $w$ completes the \wot{}.
+otherwise $b_i=0$,   and completes then \wot{} after it receive a   ({\ackTag}, $t_w$) from $s^*$.  
+%	  After receiving message  ({\ackTag}, $t_w$),  $w$ completes the \wot{}.
 
 %At $s^*$, upon receiving  (\updateCoordTag, $({\kappa}, (b_{1}, \cdots, b_{k})$) from $w$ appends  
 %			 $({\kappa}, (b_{1}, \cdots, b_{k}))$ to its  $List$,  and responds with  
@@ -54,8 +54,7 @@ otherwise $b_i=0$,   and finishes after it receive a   {\ackTag} message from $s
 %			  After receiving an ({\ackTag}, $t_w$),  $w$ completes the \wot{}.
 
 \textit{\textbf{Reader steps:}}
-Note that we use the same notations for $I$ and $S_I$ as above by the set of indices are not necessarily similar across different 
-transactions.
+We use the same notations for $I$ and $S_I$ as above but the indices can vary across  transactions.
 The procedure  \Readtr{$ o_{i_1},  o_{i_2}, \cdots, o_{i_p}$} can be 
 initiated by  some reader  $r$,   as a \rot{}, intending to read the values of 
 subset $o_{i_1},  o_{i_2}, \cdots, o_{i_p}$ of the objects. The procedure 
@@ -95,15 +94,15 @@ If the coordinator $s^*$ receives  (\updateCoordTag, $({\kappa}, (b_{1}, \cdots,
 			 The order of the  elements in  $List$ corresponds to  the order  
 the \wots{}, the order of the incoming  {\updateCoordTag} updates,  as seen by $s^*$.
 	
-Again, when $s^*$  receives  the message  {\getTagArrayTag} from $r$  it responds with a message 
+When $s^*$  receives  the message  {\getTagArrayTag} from $r$  it responds with 
 $(\kappa_1, \cdots, \kappa_k)$ such that for each $i \in [k]$, $\kappa_i$ is the key  part of the $(k+1)$-tuple that was modified
 last, i.e., 	${\kappa}_i = List[j^*].{\kappa}$ such that 	 $j^* \triangleq\max \{ j : List[j].b_i =1 \}$, and 
 $t_r$, $t_r \triangleq \max_{1 \leq j \leq |List|} \{ j : List[j].b_i = 1 \wedge i \in I\}$.
-
+%
   	If any server $s_i$ receives a message  $(${\readValueTag}$, {\kappa})$ from a reader $r$ then it responds to $r$ with 
    the value $v_i$ corresponding to key with value  $\kappa$ in  $Vals$. 
 
-The following result states that algorithm $B$ respects SNoW  property, whose proof appears in Appendix~\ref{app:algrithmB}.
+The following result states that algorithm $B$ respects SNW and "one-round" properties.
 % and the proof is omitted for now since it is very straightforward. Note that the liveness property of \rot{} and \wot{}  transactions are a part of the SNOW properties.
 %Consider any failure-free and fair execution of algorithm $B$. 
 %For the purpose of proving the $S$ property, for every transaction transaction  $\phi$ in an execution of $B$ we associate a tag $tag(\phi)$ as described below.
@@ -113,8 +112,8 @@ The following result states that algorithm $B$ respects SNoW  property, whose pr
 %If $\phi$ is a \wot{} (\rot{}) then  $tag(\phi)$ is the value of the variable $t_w$ ($t_r$) immediately before the 
 %operation completes.
 
-	\begin{theorem} Any well-formed  and fair execution of algorithm $B$  satisfies the SNoW  properties. %Algorithm $B$ also tolerates any client crash failures.
-	\end{theorem}
+\begin{theorem} Any well-formed  and fair execution of algorithm $B$  satisfies the SNW and "one-round"  properties. %Algorithm $B$ also tolerates any client crash failures.
+\end{theorem}
 
 %	\begin{theorem} Any well-formed  and fair execution of algorithm $B$ is an implementation of  an object of type $\tilde{\mathcal{O}}_T$ in the MWMR setting, 	with no client-to-client communication,  comprising of objects $o_1, o_2, \cdots o_k$ stored in servers $s_1, s_2, \cdots, s_k$, respectively; and it satisfies the SNoW  properties. %Algorithm $B$ also tolerates any client crash failures.\end{theorem}
 

@@ -2,11 +2,12 @@
 \IEEEoverridecommandlockouts
 
 \usepackage{amssymb}
-\usepackage{color}
+\usepackage{xcolor}
 \usepackage{ifthen}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{amsmath,multicol}
+\usepackage{amsthm}
 \usepackage{ioa_code}
 \usepackage{graphicx}
 \usepackage{subcaption}
@@ -16,8 +17,12 @@
 \usepackage{subcaption}
 \usepackage{cleveref}
 
+
 \input{nn_macros}
+\newtheorem{lemma*}{Lemma}
 \newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem*{claim}{Claim}
 \newtheorem{theorem}{Theorem}
 \newcommand{\states}[1]{{\textit{states}(#1)}}
 \newcommand{\startstates}[1]{{\textit{start}(#1)}}
@@ -97,22 +102,22 @@
 \newcommand{\writeValue}{{\it write-value}}
 \newcommand{\readValue}{{\it read-value}}
 \newcommand{\readValuesAndTags}{{\it read-values-and-tags}}
-\newcommand{\informReaders}{{\it inform-readers}}
-\newcommand{\informReader}{{\it inform-reader}}
-\newcommand{\informSerializer}{{\it update-coord}}
-\newcommand{\updateCoord}{{\it update-coord}}
+\newcommand{\informReaders}{{\it info-readers}}
+\newcommand{\informReader}{{\it info-reader}}
+\newcommand{\informSerializer}{{\it update-coor}}
+\newcommand{\updateCoord}{{\it update-coor}}
 \newcommand{\commit}{{\it commit}}
 
 \newcommand{\getTagTag}{{\sc get-tag}}
-\newcommand{\getTagArrayTag}{{\sc get-tag-array}}
-\newcommand{\writeValueTag}{{\sc write-value}}
-\newcommand{\readValueTag}{{\sc read-value}}
-\newcommand{\readValuesTag}{{\sc read-values}}
+\newcommand{\getTagArrayTag}{{\sc get-tag-arr}}
+\newcommand{\writeValueTag}{{\sc write-val}}
+\newcommand{\readValueTag}{{\sc read-val}}
+\newcommand{\readValuesTag}{{\sc read-vals}}
 \newcommand{\informReadersTag}{{\sc inform-readers}}
-\newcommand{\informSerializerTag}{{\sc update-coord}}
-\newcommand{\informReaderTag}{{\sc inform-reader}}
-\newcommand{\updateCoordTag}{{\sc  update-coord}}
-\newcommand{\ackTag}{{\sc acknowledge}}
+\newcommand{\informSerializerTag}{{\sc update-coor}}
+\newcommand{\informReaderTag}{{\sc info-reader}}
+\newcommand{\updateCoordTag}{{\sc  update-coor}}
+\newcommand{\ackTag}{{\sc ack}}
 \newcommand{\commitTag}{{\sc commit}}
 \newcommand{\commitedTag}{{\sc commited}}
 \newcommand{\tentativeTag}{{\sc tentative}}
@@ -182,22 +187,20 @@ lynch@csail.mit.edu}
 \input{summary}
 \input{formal_proof}
 \input{2clients2servers-v2}
-\input{c2c_mwsr}
+%\input{c2c_mwsr}
+\input{appendix_algra}
 
-
-\section{Bounded Latency}
-\subsection{No Prior Bounded Latency for SW}\label{sec:eiger}
+%\section{Bounded Latency}
+\section{No Prior Bounded Latency for SW}\label{sec:eiger}
 \input{no_bounded_latency.tex}
 \input{eiger_not_s.tex}
 
-\vspace{-1em}
-\subsection{SNW +  One Version,  MWMR setting}\label{mwmr_snow_one_version}
+\section{SNW +  One Version,  MWMR setting}\label{mwmr_snow_one_version}
 \input{SNW-one-version-short-v1.tex}
+\input{alg-bc-pseudocode.tex}
 %
-\subsection{SNW + One Round,  MWMR setting}\label{mwmr_snow_one_round}
+\section{SNW + One Round,  MWMR setting}\label{mwmr_snow_one_round}
 \input{SNW-one-round-short-v1.tex}
-%
-\vspace{-0.8em}
 
 
 %\section{Related Work}\label{related}
@@ -207,10 +210,12 @@ lynch@csail.mit.edu}
 \section{Conclusion}
 \input{conclusion-v1.tex}
 
-\bibliographystyle{IEEEtran}
-\bibliography{IEEEabrv, biblio}
+%\bibliographystyle{IEEEtran}
+%\bibstyle(IEEEtran)
+\bibliographystyle{plain}
+\bibliography{biblio}
 
-\appendix
+%\appendix
 %\input{system-model-arch-v1.tex}
 
 %\section{Impossibility of SNOW  with two clients with restricted communication }\label{two-client-app}
@@ -221,7 +226,7 @@ lynch@csail.mit.edu}
 
 %\input{appendix_snow.tex}
 
-\input{appendix_v1.tex}
+%\input{appendix_v1.tex}
 
 %\input{eiger_not_s.tex}
 
