@@ -56,14 +56,14 @@ It shows there is a fundamental tradeoff between the latency and guarantees of \
 SNOW is trivially possible in systems with a single client or a single server because the single entity naturally serializes all transactions.
 The SNOW Theorem shows SNOW is impossible in systems with at least three clients and at least two servers.
 It explicitly leaves open the question of the possibility of SNOW in a system with two clients.
-{\color{blue}
+%{\color{blue}
 In addition, the model used in the prior work implicitly leaves open several questions.
 It assumed the three clients were a single writer and multiple readers (SWMR).
 This leaves open the possibility of SNOW with multiple writers and a single reader (MWSR).
 The SNOW Theorem also implicitly assumed that clients do not directly exchange messages and that write operations in such a system must eventually complete.
 %disallowed client-to-client communication (C2C).
 This also leaves open the question of whether allowing or disallowing client-to-client (C2C) communication has any impact on the feasibility of \rot{}s with SNOW properties.
-}
+%}
 
 In this work, the new impossibility results % built upon the SNOW Theorem 
 are philosophically similar to other impossibility results---such as FLP~\cite{Fischer:pds1983} and CAP~\cite{Brewer:pdc2000, Gilbert:sigact2002}---in that they help system designers avoid wasting effort in trying to achieve the impossible. That is, the SNOW Theorem identifies a boundary in the design space of \rots{}, beyond which no algorithms can possibly exist. By revisiting SNOW, our work makes this boundary more precise.
@@ -73,7 +73,7 @@ are philosophically similar to other impossibility results---such as FLP~\cite{F
 % First, we state the SNOW properties in the context of execution, as in I/O automata~\cite{Lynch1996},
 
 \subsection{Our Contributions}
-{\color{blue}
+%{\color{blue}
 Our work builds on the SNOW Theorem to clarify this fundamental tradeoff by providing a thorough proof for the SNOW Theorem~\cite{SNOW2016} and also, answer the open questions mentioned above. 
 First, we formally state the SNOW properties in the context of executions of I/O automata~\cite{Lynch1996}  with the additional requirement, for the W property, that any WRITE must eventually complete (\S\ref{sec:prelim}). Next, we identify and prove some basic results, required in the proofs, for transforming one valid execution to another possible and safe execution in a \rot{} system (\S\ref{sec:summary}). 
 Then we present a new, rigorous proof of the impossibility of SNOW with three or more clients even when client-to-client (C2C) communication is allowed (\S\ref{sec:formal_proof}).
@@ -87,7 +87,7 @@ Next, after realizing the limits posed by the SNOW Theorem, we ask ourselves whe
 (\S\ref{mwmr_snow_one_round}). Thereby, making these \rot{}s algorithms with a bounded number of non-blocking rounds and guarantees strict serializability. 
 %
 Due to space limitations, we omit most of the proofs and present them in an extended version in arXiv~\cite{konwar2018snow}.
-}
+%}
 
 \remove{ KMK
 The general impossibility of SNOW, even with client-to-client communication, raises the question of what the best achievable latency is for \rot{}s with the strongest guarantees (S and W).
