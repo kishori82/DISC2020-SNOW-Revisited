@@ -85,7 +85,7 @@ Next, we show this claim is not true by showing that not all execution of Eiger 
 
 Next, after realizing the limits posed by the SNOW Theorem, we ask ourselves whether it is possible to construct \rot{} algorithms with no C2C communication, as in most practical systems, where one of the SNOW properties is relaxed. One obvious candidate property is the ``O" property, where one of the two restrictions (i.e., ``one-round" of communication and ``one-version" of data) can be relaxed. We provide two algorithms for the \emph{multiple-writers multi-reader} (MWMR) setting: the first algorithm $B$ guarantees SNW and the ``one-version" property and completes \rot{}s in two rounds (\S\ref{mwmr_snow_one_version}); the second algorithm, $C$, guarantees SNW and the ``one-round" property but returns up to as many versions of the data as there are concurrent \wot{}s
 (\S\ref{mwmr_snow_one_round}). Thereby, making these \rot{}s algorithms with a bounded number of non-blocking rounds and guarantees strict serializability. 
-
+%
 Due to space limitations, we omit most of the proofs and present them in an extended version in arXiv~\cite{konwar2018snow}.
 }
 
@@ -108,4 +108,4 @@ Our second algorithm finishes in one round and returns $W$ versions, where $W$ i
 We prove that our algorithms are non-blocking, strictly serializable, and respect write isolation.
 }
 
-%\input{contr-table}
+\input{contr-table}

@@ -1,21 +1,21 @@
 %\section{\text{SN$\bar{o}$W} for MWMR setting}\label{mwmr_snow}
 Here, we present  algorithm  $C$ which satisfies  SNW and "one-round"  properties in the MWMR setting, where a \textit{READ} consists one round of communications between the reader and the servers but servers may respond with multiple versions of the data. %We denote the type of object that satisfies the SN$\bar{o}$W properties by $\bar{\mathcal{O}}_T$.   
 %Note that $B$ can also tolerate crash failure of writers and readers. 
-The notation for the  writers, servers and tag are similar to the previous sub-section. 
-The steps for the writers are shown in Pseudocode~\ref{fig:algo_bc} and  those for readers and the servers  are presented in Pseudocode~\ref{fig:algo_c}.
+The notation for the  writers, servers and tag are similar to algorithm $B$. 
+Pseudocodes~\ref{fig:algo_bc} and ~\ref{fig:algo_c} show the steps for the  writers, and the readers and the servers, respectively.
 %
 %We assume there is a set of writers $\mathcal{W}$,  a set of readers $\mathcal{R}$ and a set of $k \geq 1$ servers,  $\mathcal{S}$, with ids $s_1, s_2\cdots s_k$ that stores the objects $o_1, o_2, \cdots, o_k$, respectively.  We define  key ${\kappa}$  as a pair $(z, w)$, where $z \in \mathbb{N}$ and $w \in \mathcal{W}$ the  id of a writer. We use $\mathcal{K}$ to denote the set of all possible keys, which  are used to uniquely identify each transaction. Also, with each transaction we associate a tag $t \in \mathbb{N}$. 
 %We assume writers can send message to the reader, i.e., we allow client-to-client messages.
 % We assume that each process has a unique id. We assume that each server $s$ stores object $o_s$, due to sharding.  For the sake of simplicity, we assume that the \emph{WRITE} transactions issued by a writer are of the form: \emph{ write value $v_1$ to object $o_1$, $v_2$ to $o_2$, and so on}. In other words, we assume that such a  transaction consists of the set of operations $\{ \writeop{o_1}{v^{(1)}}, \writeop{o_2}{v^{(2)}}\cdots \writeop{o_k}{v^{(k)}}\} $, which we denote by $write(v_1, v_2, \cdots, v_k)$.  \emph{WRITE} transactions where only a subset of  the objects are updates will be discussed later. We also assume that  the \textit{READ} transactions are of the form  $\{ \readop{o_1}, \readop{o_2}\cdots \readop{o_k}\}$ consisting of $k$ reads to $k$ distinct objects.		
-We designate one of the servers as the coordinator,  denote as $s^*$. 
+We designate a server as the coordinator,  denote as $s^*$. 
 %In addition to managing a shard object 
 %object, the server $s^*$ is used to maintain the order of the \emph{WRITE}s and the objects that are updated during the \emph{WRITE} in the variable $List$. 
  % In any system, where there are many objects 
 %different objects may be use different servers  as coordinators based on some load-balancing rule. 
 
-\textit{\textbf{State variables:}} The state variables in algorithm $C$ is similar to those of algorithm $B$, therefore, we omit here.
+\textit{\textbf{State variables:}} The state variables are similar to  $B$.
 			
-\textit{\textbf{Writer steps:}} The steps of a \emph{WRITE} transaction is similarly to algorithm $B$, therefore, we omit here.
+\textit{\textbf{Writer steps:}} \emph{WRITE} transaction is similar to algorithm $B$..
 
 
 %At $s^*$, upon receiving  (\updateCoordTag, $({\kappa}, (b_{1}, \cdots, b_{k})$) from $w$ appends  
