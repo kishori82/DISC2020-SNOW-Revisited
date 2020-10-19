@@ -14,7 +14,7 @@ We consider a transaction processing system that comprises a set of read/write o
  where each object 
 $o \in \mathcal{O}$ is maintained by a separate server process,
 %, and all processes are connected via a  communication network.
-and also another set of processes, we refer to as \emph{clients}, that can initiate transactions.
+and also another set of processes, we refer to as \emph{clients}, that can initiate transactions, after the previous ones, if any, have completed.
  The system allows two types of transaction: {\sc READ} transaction, a group of read requests for the values stored in some subset of objects in $\mathcal{O}$; and {\sc WRITE} transaction, a group of write requests intending to update the values stored in some subset of objects  $\mathcal{O}$.
  A read-client executes only READ transactions, while write-client executes only WRITE transactions; no client executes both types of transaction.
 
@@ -120,7 +120,7 @@ individual object. For the purpose of elucidation, we consider an execution $\al
   % and there is  a read operation in it  to  read the value of some object $o_i$ managed by some server $s_i$.
 % If The read operation involves $r$ communicating a \emph{send value} message   to $s_i$ requesting the stored value of $o_i$. 
 
-{\bf Non-blocking reads (N).} The \emph{non-blocking} property means that if $r$ sends any message to any $s_i$ ($s_i$ manages object $o_i$) during the transaction then  $s_i$ can  respond to  $r$ without waiting for any external input event, such as the arrival of messages, any mutex operations, time, etc. This property ensures that {\sc READ} transactions are delayed only due to delay in message delivery between $r$ and $s_i$. We define this property formally as follows.
+{\bf Non-blocking reads (N).} The \emph{non-blocking} property means that if $r$, a reader-client,  sends any message to any $s_i$ ($s_i$ manages object $o_i$) during the transaction then  $s_i$ can  respond to  $r$ without waiting for any external input event, such as the arrival of messages, any mutex operations, time, etc. This property ensures that {\sc READ} transactions are delayed only due to delay in message delivery between $r$ and $s_i$. We define this property formally as follows.
 
 \begin{definition}[Non-blocking read (N)]
 %The one-round, one-version and non-blocking properties states the following properties for $\alpha$.

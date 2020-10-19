@@ -1,9 +1,8 @@
 \section{Technical Preliminaries}
 \label{sec:summary}
-%This section explains at a high level our proof techniques and the roadmap of the proofs.
-In this section, we describe the proof techniques and some useful preliminary results for proving the main impossibility results.
-Those main results will be proven by showing contradictions.
-In each proof, we use a simple system consisting of two servers, $s_x$ and $s_y$, and either two or three clients.
+%This section explains at a high level our proof techniques and the road-map of the proofs.
+In this section, we present some useful preliminary results and ideas for  proving the impossibility results, by showing existence of certain contradictory executions.
+In each proof, we use a simple system consisting of two servers, $s_x$ and $s_y$, denote the stored values as $x$ and $y$, respectively, and either two or three clients.
 One of the clients is a writer $w$, which initiates only \wots{}.
 One or two of the clients are readers, $r_1$ and $r_2$, which initiate only \rots{}.
 
@@ -83,13 +82,13 @@ Our proofs often use a special type of execution fragment, named non-blocking fr
 %\end{notation}
 %
 %\begin{definition}
-\item \emph{Non-blocking fragments $\frage{F_{i,j}}{\alpha}{v_j}$, $j \in \{x, y\}$.}
+\item \emph{Non-blocking fragments.}
  For a \rot{} $R_i$ by reader $r_i$, $i\in \{1, 2\}$, suppose there is a execution fragment that starts with $recv(m_j^r)_{r_i, s_j}$ and ends with
  $send(v_j)_{s_j, r_i}$, both of which  occur  at $s_j$. Moreover, suppose there is  
  no other input action at $s_j$ in this fragment. Then we call this execution fragment 
-   a \emph{non-blocking fragment} for $R_i$ at  $s_j$ (Fig.~\ref{fig:exe3_fragments}).
-
-   When the context is clear, we omit the first subscript of $F$ that denotes the reader. For instance, for a \rot{} $R$, $\frage{F_{x}}{\alpha}{x_0}$ denotes the non-blocking fragment of $R$ on $s_x$.  
+   a \emph{non-blocking fragment} for $R_i$ at  $s_j$ and denote by $\frage{F_{i,j}}{\alpha}{v_j}$, $j \in \{x, y\}$(Fig.~\ref{fig:exe3_fragments}).
+%
+   When the context is clear, we omit the first subscript of $F$. For instance, for a \rot{} $R$, $\frage{F_{x}}{\alpha}{x_0}$ denotes the non-blocking fragment of $R$ on $s_x$.  
 %We use the notation  $\frage{F_i}{\alpha}{v_j}$ to denote this fragment of   execution of $\alpha$ (Fig.~\ref{fig:exe3_fragments}). In the context of a \rot{} $R_i$, for $i\in \{1, 2\}$, we use the notation $\frage{F_{i,j}}{\alpha}{v_j}$ to denote $\frage{F_j}{\alpha}{v_j}$.
 
 %
@@ -141,7 +140,7 @@ of a fair execution $\alpha$ of $\mathcal{A}$.}}
  \end{figure}
 }
 
-To play non-blocking fragments against the requirements of strict serializability and write isolation, we derive the following lemmas, which are frequently used by our proofs. In these lemmas, all \rots{} are assumed to have all SNOW properties, and we will derive contradictions in our main proofs. Due to space constraints, we explain these lemmas at a high level. %The proofs of these lemmas can be found in Appendix~\ref{app:lem_exec3_consistent}.
+In our proofs, we frequently use arguments that rely on the existence of   non-blocking fragments and the constraints of strict serializability and write isolation. We derive the following use lemmas. In these lemmas, all \rots{} are assumed to have all SNOW properties, and we will derive contradictions in our main proofs. Due to space constraints, we explain these lemmas at a high level. %The proofs of these lemmas can be found in Appendix~\ref{app:lem_exec3_consistent}.
 
 %We construct executions using \rots{} and \wots{} that always contact both servers $s_x$ and $s_y$.
 %Because there is only one writer this makes objects $o_1$ and $o_2$ progress through versions together.
@@ -252,7 +251,7 @@ is identical to the suffix in $\alpha'$ after the execution fragment
 
 
 %The following lemma states that if there are two fair executions of $\mathcal{A}$ with a \rot{}  $R$ in each of them, and suppose at any server the non-blocking execution fragments  of $R$  are identical (in terms of the sequence of states and actions)  then in both executions, $R$   returns the same object value.
-The following lemma states that if there are two fair executions of $\mathcal{A}$ with \rot{} $R$ in each of them, and suppose at any server the non-blocking fragments of $R$ are identical (in terms of the sequence of states and actions), then $R$ returns the same value in both executions.
+The following lemma states that if there are two fair executions of $\mathcal{A}$ with \rot{} $R$ in each of them, and suppose at any server the non-blocking fragments of $R$ are identical (in terms of the sequence of states and actions), then $R$ returns the similar values in both executions.
 \begin{lemma}[Indistinguishability]  \label{lem:exec3_equiv}
 Let $\alpha$ and $\beta$ be executions of $\mathcal{A}$ and let $R$ be any \rot{}. Then 
 $(i)$  if $\frage{F_{x}}{\alpha}{} \stackrel{s_x}{\sim}\frage{F_{x}}{\beta}{}$ then both 

@@ -28,12 +28,12 @@ Understanding the performance-guarantee tradeoff due to sharding is important be
 This is particularly true for the reads needed to handle a user request, which are what dominate real-world workloads:
 Facebook reported 500 reads for every write in their TAO system~\cite{TAO2013} and
 Google reported three orders of magnitude more reads than general transactions for their F1 database that runs on their Spanner system~\cite{Corbett:osdi2012}.
-In this work we focus on clarifying the performance-guarantee tradeoff for reads that results from sharding.
+In this work, we focus on clarifying the performance-guarantee tradeoff for reads that results from sharding.
 %, an impossibility result proving that there exists a fundamental tradeoff between the latency of {\
 %  \sc READ} transactions and the consistency systems provide.
 % SNOW
 %\subsection{\roT{} Guarantees and Latency}
-Distributed storage systems group read requests (that each individually access a separate shard) into \textit{\rots{}} that together return a consistent, cross-shard view of the system.
+Distributed storage systems group read requests (that each individually accesses a separate shard) into \textit{\rots{}} that together return a consistent, cross-shard view of the system.
 Whether a view is consistent is determined by the consistency model a system provides.
 The ideal \rots{} would have the strongest guarantees:
 They would provide strict serializability~\cite{Papadimitriou79}, the strongest consistency model,
@@ -49,7 +49,7 @@ complete in a single round trip of non-blocking parallel requests to the shards 
 %To the best of our knowledge, the only result in the sharding dimension that is relevant to \rots{} is the SNOW Theorem~\cite{SNOW2016}.
 \subsection{Previous Results and Open Questions}
 The SNOW Theorem was the first result in the sharding dimension that is relevant to \rots{}~\cite{SNOW2016}.
-The SNOW Theorem is an impossibility result that proves no \rot{} can provide \textbf{S}trict serializability with \textbf{N}on-blocking client-server communication that completes with \textbf{O}ne response per read in a system with \wotsSNOW{} (\S\ref{sec:snow}).
+The SNOW Theorem is an impossibility result that proves no \rot{} can provide \textbf{S}trict serializability with \textbf{N}on-blocking client-server communication that completes with \textbf{O}ne response, with only one version of the data, per read in a system with concurrent \wotsSNOW{} (\S\ref{sec:snow}).
 It shows there is a fundamental tradeoff between the latency and guarantees of \rots{} that system designers must grapple with, they must pick either the strongest guarantees (S and W) or optimal latency (N and O).
 %Section~\ref{sec:snow} defines the four SNOW properties more precisely.
 
@@ -75,7 +75,7 @@ are philosophically similar to other impossibility results---such as FLP~\cite{F
 \subsection{Our Contributions}
 %{\color{blue}
 Our work builds on the SNOW Theorem to clarify this fundamental tradeoff by providing a thorough proof for the SNOW Theorem~\cite{SNOW2016} and also, answer the open questions mentioned above. 
-First, we formally state the SNOW properties in the context of executions of I/O automata~\cite{Lynch1996}  with the additional requirement, for the W property, that any WRITE must eventually complete (\S\ref{sec:prelim}). Next, we identify and prove some basic results, required in the proofs, for transforming one valid execution to another possible and safe execution in a \rot{} system (\S\ref{sec:summary}). 
+First, we formally state the SNOW properties of executions using the I/O automata framework~\cite{Lynch1996}  with the additional requirement, for the W property, that any WRITE must eventually complete (\S\ref{sec:prelim}). Next, we identify and prove some basic results, required in the proofs, for transforming one valid execution to another possible and safe execution in a \rot{} system (\S\ref{sec:summary}). 
 Then we present a new, rigorous proof of the impossibility of SNOW with three or more clients even when client-to-client (C2C) communication is allowed (\S\ref{sec:formal_proof}).
 Next, we show that the feasibility of implementing an algorithm with SNOW in MWSR (which also includes the two-client system model) depends on whether C2C communication is allowed:
 when it is not allowed, SNOW is impossible (\S\ref{subsec:no_snow_no_c2c}); and when it is allowed, SNOW is possible (\S\ref{app:algorithm-a}) for any MWSR setting.
